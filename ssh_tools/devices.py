@@ -6,25 +6,14 @@ import subprocess
 from configparser import ConfigParser, NoSectionError
 from os.path import join, dirname, expanduser
 
-# import netifaces
 import psutil
+
 from timtools.log import get_logger
+from errors import NetworkError, DeviceNotFoundError, DeviceNotPresentError, ErrorHandler
 
 project_dir = dirname(__file__)
 logger = get_logger("ssh-tools.devices")
 
-
-# def get_ips():
-# 	adresses = []
-# 	interfaces = [ifname for ifname in netifaces.interfaces() if ifname[:3] in ["eth", "wla", "enp", "wlo", "wlp"]]
-#
-# 	for i in interfaces:
-# 		ifaces = netifaces.ifaddresses(i).get(netifaces.AF_INET)
-# 		if ifaces != None:
-# 			for iface in ifaces:
-# 				adresses.append(iface["addr"])
-#
-# 	return adresses
 
 def get_ips():
 	interfaces = psutil.net_if_addrs()
@@ -41,44 +30,6 @@ def get_ips():
 		raise NetworkError()
 	else:
 		return addresses
-
-
-class ErrorHandler(Exception):
-	logger = None
-
-	def __init__(self, message):
-		if self.logger:
-			self.logger.critical(message)
-		else:
-			temp_log = get_logger(__name__)
-			temp_log.critical(message)
-
-		super().__init__(message)
-
-
-class ConnectionError(ErrorHandler):
-	def __init__(self, name):
-		super().__init__(f'Device {name} could not be reached.')
-
-
-class NetworkError(ErrorHandler):
-	def __init__(self):
-		super().__init__(f'You are not connected to the internet.')
-
-
-class DeviceNotFoundError(ErrorHandler):
-	def __init__(self, name):
-		super().__init__(f'Device {name} not found.')
-
-
-class DeviceNotPresentError(ErrorHandler):
-	def __init__(self, name):
-		super().__init__(f'Device {name} is not present on this network.')
-
-
-class ConfigError(ErrorHandler):
-	def __init__(self, name):
-		super().__init__(f'Device {name} was not correctly configured for this action.')
 
 
 class Device(object):
