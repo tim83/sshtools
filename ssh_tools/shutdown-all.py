@@ -8,10 +8,12 @@ from os.path import join, expanduser
 from time import sleep
 
 from timtools import log
+
 # from sshin import Device, Ssh
 
 PROJECT_DIR = expanduser('~')  # dirname(__file__)
 logger = log.get_logger("ssh_tools.shutdown-all")
+
 
 # Errors
 

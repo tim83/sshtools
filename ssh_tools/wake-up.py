@@ -4,8 +4,9 @@ import argparse
 import os
 import subprocess
 
-from ssh_tools.devices import Device
 from timtools import log
+
+from ssh_tools.devices import Device
 
 logger = log.get_logger("ssh_tools.wake-up")
 

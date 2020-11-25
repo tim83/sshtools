@@ -4,10 +4,10 @@ import argparse
 import os
 import subprocess
 
+from timtools import log
+
 from ssh_tools.devices import Device, ConnectionError, ConfigError, DeviceNotPresentError, ErrorHandler
 from ssh_tools.sshin import Ssh
-
-from timtools import log
 
 logger = log.get_logger("ssh_tools.smount")
 

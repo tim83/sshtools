@@ -2,8 +2,9 @@
 
 import argparse
 
-from ssh_tools.devices import Device
 import timtools
+
+from ssh_tools.devices import Device
 
 logger = timtools.log.get_logger('ssh-tools.getip')
 
