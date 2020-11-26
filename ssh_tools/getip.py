@@ -3,7 +3,7 @@
 
 import argparse
 
-import timtools
+import timtools.log
 
 from devices import Device
 

@@ -6,7 +6,7 @@ import os
 import subprocess
 import sys
 
-import timtools
+import timtools.log
 
 from devices import Device
 from errors import ConfigError, DeviceNotPresentError

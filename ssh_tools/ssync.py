@@ -7,7 +7,8 @@ import os
 import subprocess
 from os.path import abspath, dirname, expanduser, join
 
-import timtools
+import timtools.bash
+import timtools.log
 
 from devices import Device
 from errors import NotReachableError
