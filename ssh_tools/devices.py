@@ -10,10 +10,10 @@ from os.path import dirname, expanduser, join
 import psutil
 from timtools.log import get_logger
 
-from errors import NotReachableError, DeviceNotFoundError, DeviceNotPresentError, ErrorHandler, NetworkError
+from errors import DeviceNotFoundError, DeviceNotPresentError, ErrorHandler, NetworkError, NotReachableError
 
 project_dir = dirname(__file__)
-logger = get_logger("ssh-tools.devices")
+logger = get_logger(__name__)
 
 
 def get_ips():
@@ -26,8 +26,8 @@ def get_ips():
 			if interface_name[:3] in ["eth", "wla", "enp", "wlo", "wlp"]:
 				ip_addr = next(
 					address.address
-						for address in interfaces[interface_name]
-						if address.family == socket.AF_INET
+					for address in interfaces[interface_name]
+					if address.family == socket.AF_INET
 				)
 				addresses.append(ip_addr)
 		except StopIteration:
