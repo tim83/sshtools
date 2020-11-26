@@ -1,48 +1,73 @@
 #! /usr/bin/python3
+"""Classes for managing devices used by other files"""
 
 import os
 import socket
 import subprocess
 from configparser import ConfigParser, NoSectionError
-from os.path import join, dirname, expanduser
+from os.path import dirname, expanduser, join
 
 import psutil
-
 from timtools.log import get_logger
-from errors import NetworkError, DeviceNotFoundError, DeviceNotPresentError, ErrorHandler
+
+from errors import NotReachableError, DeviceNotFoundError, DeviceNotPresentError, ErrorHandler, NetworkError
 
 project_dir = dirname(__file__)
 logger = get_logger("ssh-tools.devices")
 
 
 def get_ips():
+	"""Get the IPs that the current device has assigned"""
 	interfaces = psutil.net_if_addrs()
 	interface_names = sorted(interfaces.keys())
 	addresses = []
 	for interface_name in interface_names:
 		try:
 			if interface_name[:3] in ["eth", "wla", "enp", "wlo", "wlp"]:
-				ip = next(address.address for address in interfaces[interface_name] if address.family == socket.AF_INET)
-				addresses.append(ip)
+				ip_addr = next(
+					address.address
+						for address in interfaces[interface_name]
+						if address.family == socket.AF_INET
+				)
+				addresses.append(ip_addr)
 		except StopIteration:
 			pass
 	if len(addresses) == 0:
 		raise NetworkError()
-	else:
-		return addresses
+
+	return addresses
 
 
-class Device(object):
+class Device:  # pylint: disable=too-many-instance-attributes
+	"""A physical device"""
 	config: ConfigParser = None
 	devices: list = None
 	current_ips: list = get_ips()
+	# Config
+	hostname: str
+	wlan = str
+	eth: str
+	present: bool
+	sync: str
+	ssh: bool
+	ssh_port: int
+	mosh: bool
+	emac: str
+	wmac: str
+	user: str
+	relay: str
+	relay_to: str
+	ip_addr: str
 
 	@staticmethod
 	def get_devices(extra_config=None):
+		"""Returns and stores the configured devices"""
 		if not extra_config:
 			extra_config = []
 
-		config_files = [join(project_dir, 'devices.ini'), expanduser('~/ssh_tools/devices.ini')] + extra_config
+		general_devices_config: str = join(project_dir, 'devices.ini')
+		local_devices_config: str = expanduser('~/ssh_tools/devices.ini')
+		config_files = [general_devices_config, local_devices_config] + extra_config
 
 		try:
 			ssid = subprocess.check_output('iwgetid -r', shell=True).decode().strip("\n")
@@ -53,7 +78,8 @@ class Device(object):
 		except subprocess.CalledProcessError:
 			logger.debug("WiFi not connected (or iwgetid can not be called)")
 
-		ips = Device.current_ips  # gives priority to my own routers (192.168.{23,24}.*) over the home routers (192.168.20.*)
+		ips = Device.current_ips
+		# Give priority to my own routers (192.168.{23,24}.*) over the home routers (192.168.20.*)
 		ip_id = ips[0][:10]
 		if ip_id in ["192.168.20"]:
 			# Home network
@@ -80,6 +106,7 @@ class Device(object):
 		self.get_config(name)
 
 	def get_config(self, name, relay=None):
+		"""Loads and stores the device's config"""
 		if relay:
 			self.get_devices(extra_config=[expanduser(relay.relay_to)])
 		elif not self.config:
@@ -94,59 +121,61 @@ class Device(object):
 			self.ssh = self.config.getboolean(name, 'ssh', fallback=True)
 			self.ssh_port = self.config.get(name, 'ssh_port', fallback=22)
 			self.mosh = self.config.getboolean(name, 'mosh', fallback=False)
-			self.ssh_port = self.config.get(name, 'ssh_port', fallback='22')
 			self.emac = self.config.get(name, 'emac', fallback=None)
 			self.wmac = self.config.get(name, 'wmac', fallback=None)
 			self.user = self.config.get(name, 'user', fallback='tim')
 			self.relay = self.config.get(name, 'relay', fallback=None)
 			self.relay_to = self.config.get(name, 'relay_to', fallback=None)
-			self.ip = None
-			if type(self.sync) == str:
+			self.ip_addr = None
+			if isinstance(self.sync, str):
 				if self.sync == 'True':
 					self.sync = True
 				elif self.sync == 'False':
 					self.sync = False
-		except NoSectionError:
-			raise DeviceNotFoundError(name)
+		except NoSectionError as error:
+			raise DeviceNotFoundError(name) from error
 
 	def get_ip(self):
-		for ip in self.eth, self.wlan:
-			if ip:
-				response = os.system(f'ping -c 1 {ip} > /dev/null')
+		"""Returns the IP to used for the device"""
+		for ip_addr in self.eth, self.wlan:
+			if ip_addr:
+				response = os.system(f'ping -c 1 {ip_addr} > /dev/null')
 				if response == 0:  # or self.name == "serverpi":
-					self.ip = ip
-					return ip
-		else:
-			if not self.eth and not self.wlan:
-				raise DeviceNotPresentError(self.name)
-			else:
-				# Check if one of the interfaces is connected to a different network that the one just used
-				selected_network_id = Device.current_ips[0][10:]  # Extract the "192.168.XX" part of the IP
-				alternative_ips = [ip for ip in Device.current_ips if selected_network_id not in ip]  # Filter out all ips in the same subnet
-				if len(alternative_ips) >= 1:
-					logger.info(f"Could not find {self.name} in the selected network")
-					Device.current_ips = alternative_ips
-					self.get_config(self.name)
-					return self.get_ip()
-				else:
-					raise ConnectionError(self.name)
+					self.ip_addr = ip_addr
+					return ip_addr
+
+		if not self.eth and not self.wlan:
+			raise DeviceNotPresentError(self.name)
+
+		# Check if one of the interfaces is connected to a different network that the one just used
+		selected_network_id = Device.current_ips[0][10:]  # Extract the "192.168.XX" part of the IP
+		alternative_ips = [ip for ip in Device.current_ips if selected_network_id not in ip]  # Filter out all ips in the same subnet
+		if len(alternative_ips) >= 1:
+			logger.info("Could not find %s in the selected network", self.name)
+			Device.current_ips = alternative_ips
+			self.get_config(self.name)
+			return self.get_ip()
+
+		raise NotReachableError(self.name)
 
 	def get_relay(self):
+		"""Return the relay device to be used when connecting to this device"""
 		if self.relay:
 			return Device(self.relay)
-		else:
-			return None
+		return None
 
-	def is_self(self):
+	def is_self(self) -> bool:
+		"""Checks if the device is the currenct machine"""
 		hostname_machine = os.uname().nodename
 		return self.hostname == hostname_machine
 
-	def is_local(self):
+	def is_local(self) -> bool:
+		"""Checks if the device is present on the local LAN"""
 		try:
-			if not self.ip:
+			if not self.ip_addr:
 				self.get_ip()
 
-			return self.ip.startswith("192.168")
+			return self.ip_addr.startswith("192.168")
 		except ErrorHandler:
 			return False
 

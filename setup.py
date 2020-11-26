@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
 	name='ssh_tools',
-	version='1.91',
+	version='1.99',
 	packages=['ssh_tools'],
 	url='',
 	license='',
@@ -28,10 +28,9 @@ setup(
 		"bin/smount",
 	],
 	include_package_data=True,
-	data_files=[
-		('',
+	data_files=[(
+		'',
 		[f'ssh_tools/{filename}.ini' for filename in ["devices", "kot", "kot-tim", "home", "home-tim"]] +
 		[f'ssh_tools/{filename}.txt' for filename in ["exclude", "include", "limited"]]
-		),
-	]
+	), ]
 )

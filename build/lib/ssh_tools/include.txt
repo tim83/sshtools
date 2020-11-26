@@ -1,8 +1,0 @@
-Documenten/pc/.wachtwoorden.txt
-*blendcache*
-*.git*
-.idea
-.config/geary
-.local/share/geary
-.Private
-.ecryptfs

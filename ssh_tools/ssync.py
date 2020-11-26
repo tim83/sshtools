@@ -1,122 +1,149 @@
 #! /usr/bin/python3
+"""Syncs devices over LAN"""
 
 import argparse
 import datetime as dt
 import os
 import subprocess
-from os.path import join, expanduser, abspath, dirname
+from os.path import abspath, dirname, expanduser, join
 
 import timtools
 
-from ssh_tools.devices import Device, ConnectionError
+from devices import Device
 
 PROJECT_DIR = dirname(__file__)
-logger = timtools.log.get_logger("ssh_tools.ssync")
+logger = timtools.log.get_logger(__name__)
 
 
 class Sync:
-	def __init__(self, master, slave):
+	"""Sync devices"""
+
+	def __init__(self, master, slaves):
 		self.hostname = os.uname().nodename
 		self.username = os.environ['USER']
 		self.dir = expanduser('~')
 
-		for s in slave:
-			if not s.sync or not s.present:
+		for slave in slaves:
+			if not slave.sync or not slave.present:
 				continue
 			print()
-			print(master.name + ' -> ' + s.name)
+			print(master.name + ' -> ' + slave.name)
 			try:
-				cmd = ['rsync'] + ['--archive', '-v', '-h', '-P', '--force', '--delete'] + self.backup_parm() + self.inex_parm(master, s) + self.get_source(master) + self.get_target(s)
+				cmd = ['rsync']
+				cmd += ['--archive', '-v', '-h', '-P', '--force', '--delete']
+				cmd += self.backup_parm()
+				cmd += self.inex_parm(master, slave)
+				cmd += self.get_source(master)
+				cmd += self.get_target(slave)
 
 				logger.debug(' '.join(cmd))
 				try:
 					print(cmd)
 					timtools.bash.run(cmd)
-				except subprocess.CalledProcessError as e:
-					if e.returncode == 255:
-						raise ConnectionError(s.name)
-					else:
-						raise e
+				except subprocess.CalledProcessError as error:
+					if error.returncode == 255:
+						raise ConnectionError(slave.name) from error
+					raise error
 			except ConnectionError:
 				pass
 
-	def backup_parm(self):
+	@classmethod
+	def backup_parm(cls) -> list:
+		"""Returns the rsync paramters pertaining to the backup of files"""
 		now = dt.datetime.now()
 		backup_dir = join('/var/tmp/sync', str(now.year), str(now.month), str(now.day))
 		return ['--backup', '--backup-dir={dir}'.format(dir=backup_dir)]
 
-	def inex_parm(self, master: Device, slave: Device) -> list:
+	@classmethod
+	def inex_parm(cls, master: Device, slave: Device) -> list:
+		"""Retruns the rsync parameters for excluding and including files"""
 		infile: str = abspath(join(PROJECT_DIR, 'include.txt'))
 		exfile: str = abspath(join(PROJECT_DIR, 'exclude.txt'))
 		limfile: str = abspath(join(PROJECT_DIR, 'limited.txt'))
 
-		parm: list = ["--exclude=*.sock", f"--include-from={infile}", f'--exclude-from={exfile}', "--exclude=.*"]
+		parm: list = [
+			"--exclude=*.sock",
+			f"--include-from={infile}",
+			f'--exclude-from={exfile}',
+			"--exclude=.*"
+		]
 
 		if slave.sync == 'Limited' or master.sync == 'Limited':
 			parm: list = ['--exclude=__pycache__', f'--include-from={limfile}', '--exclude=*']
 
 		return parm
 
-	def get_source(self, master):
+	def get_source(self, master) -> list:
+		"""Get source parameters of rsync"""
+		source: list
 		if self.hostname == master.hostname:
-			return [self.dir + '/']
+			source = [self.dir + '/']
 		else:
-			return ['{user}@{ip}:{dir}/'.format(user=master.user, ip=master.get_ip(), dir=join('/home', master.user))]
+			source = ['{user}@{ip}:{dir}/'.format(
+				user=master.user,
+				ip=master.get_ip(),
+				dir=join('/home', master.user)
+			)]
+		return source
 
-	def get_target(self, slave):
+	def get_target(self, slave) -> list:
+		"""Get source parameters of rsync"""
+		target: list
 		if self.hostname == slave.hostname:
-			return [self.dir]
+			target = [self.dir]
 		else:
-			return ['{user}@{ip}:{dir}'.format(user=slave.user, ip=slave.get_ip(), dir=join('/home', slave.user))]
+			target = ['{user}@{ip}:{dir}'.format(
+				user=slave.user,
+				ip=slave.get_ip(),
+				dir=join('/home', slave.user)
+			)]
+		return target
 
 
-class Main:
-	def __init__(self):
-		args = self.init_args()
-		timtools.log.set_verbose(args.verbose)
+def main():
+	"""Main executable for ssync"""
+	# Arguments
+	parser = argparse.ArgumentParser()
+	parser.add_argument('master', help='Welke computer is de referentie', nargs='?')
+	parser.add_argument('-v', '--verbose', help='Geef feedback', action='store_true')
+	parser.add_argument('-f', '--from', help='Manuele referentie (heeft --to nodig)')
+	parser.add_argument('-t', '--to', help='Maneel doel (heeft --from nodig)')
+	args = parser.parse_args()
 
-		devices = Device.get_devices()
-		logger.debug(devices)
+	timtools.log.set_verbose(args.verbose)
 
-		if getattr(args, 'from') and args.to:
-			# Define both SLAVE and MASTER
-			master = Device(getattr(args, 'from').replace(' ', ''))
-			slave = [Device(args.to.replace(' ', ''))]
-		elif getattr(args, 'from') and not args.to:
-			# Define only MASTER
-			master = Device(getattr(args, 'from').replace(' ', ''))
-			slavename = os.uname().nodename.replace('-tim', '')
-			slave = [Device(slavename)]
-		elif not getattr(args, 'from') and args.to:
-			# Define only SLAVE
-			mastername = os.uname().nodename.replace('-tim', '')
-			master = Device(mastername)
-			slave = [Device(args.to.replace(' ', ''))]
-		elif args.master:
-			master = Device(args.master)
-			slave = [Device(name) for name in devices if name != args.master]
-		else:
-			mastername = os.uname().nodename.replace('-tim', '')
-			master = Device(mastername)
-			slave = [Device(name) for name in devices if name != mastername]
+	devices: list = Device.get_devices()
+	logger.debug(devices)
 
-		if master in slave:
-			raise argparse.ArgumentError(args.master, 'Master kan geen slave zijn')
+	if getattr(args, 'from') and args.to:
+		# Define both SLAVE and MASTER
+		master = Device(getattr(args, 'from').replace(' ', ''))
+		slave = [Device(args.to.replace(' ', ''))]
+	elif getattr(args, 'from') and not args.to:
+		# Define only MASTER
+		master = Device(getattr(args, 'from').replace(' ', ''))
+		slavename = os.uname().nodename.replace('-tim', '')
+		slave = [Device(slavename)]
+	elif not getattr(args, 'from') and args.to:
+		# Define only SLAVE
+		mastername = os.uname().nodename.replace('-tim', '')
+		master = Device(mastername)
+		slave = [Device(args.to.replace(' ', ''))]
+	elif args.master:
+		master = Device(args.master)
+		slave = [Device(name) for name in devices if name != args.master]  # pylint: disable=not-an-iterable
+	else:
+		mastername = os.uname().nodename.replace('-tim', '')
+		master = Device(mastername)
+		slave = [Device(name) for name in devices if name != mastername]  # pylint: disable=not-an-iterable
 
-		logger.info(master.hostname + ' -> ' + ', '.join([s.hostname for s in slave]))
+	if master in slave:
+		raise argparse.ArgumentError(args.master, 'Master kan geen slave zijn')
 
-		Sync(master, slave)
+	logger.info("%s -> %s", master.hostname, ', '.join([s.hostname for s in slave]))
 
-	def init_args(self):
-		parser = argparse.ArgumentParser()
-		parser.add_argument('master', help='Welke computer is de referentie', nargs='?')
-		parser.add_argument('-v', '--verbose', help='Geef feedback', action='store_true')
-		parser.add_argument('-f', '--from', help='Manuele referentie (heeft --to nodig)')
-		parser.add_argument('-t', '--to', help='Maneel doel (heeft --from nodig)')
-		args = parser.parse_args()
-
-		return args
+	Sync(master, slave)
 
 
 if __name__ == '__main__':
-	Main()
+	main()

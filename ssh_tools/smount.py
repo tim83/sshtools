@@ -1,4 +1,5 @@
 #! /usr/bin/python3
+"""Mounts a device using sftp"""
 
 import argparse
 import os
@@ -6,97 +7,98 @@ import subprocess
 
 from timtools import log
 
-from ssh_tools.devices import Device, ConnectionError, ConfigError, DeviceNotPresentError, ErrorHandler
-from ssh_tools.sshin import Ssh
+from devices import Device
+from errors import ConfigError, NotReachableError, DeviceNotPresentError, NotEmptyError
+from sshin import Ssh
 
-logger = log.get_logger("ssh_tools.smount")
-
-
-# ~ PROJECT_DIR = dirname(__file__)
-
-class NotEmptyError(ErrorHandler):
-	def __init__(self, mountpoint):
-		super().__init__(f'Mountpoint {mountpoint} is not empty.')
+logger = log.get_logger(__name__)
 
 
-class Mount():
-	def __init__(self, dev, src, mountpoint, open=False):
-		logger.debug(f'Device: {dev.name} ; Source {src} ; Mountpoint {mountpoint}')
+class Mount:
+	"""Mounts a source directory of a device on mountpoint"""
+
+	def __init__(self, device: Device, src: str, mountpoint: str, open_mountpoint: bool = False):
+		logger.debug('Device: %s ; Source %s ; Mountpoint %s', device, src, mountpoint)
 
 		self.hostname = os.uname().nodename
-		self.username = os.environ['USER']  # os.getlogin()
-		if not dev.ssh:
-			raise ConfigError(dev.name)
+		self.username = os.environ['USER']
+		if not device.ssh:
+			raise ConfigError(device.name)
 		try:
-			ip = dev.get_ip()
-			relay = None
+			ip_addr = device.get_ip()
 
 			try:
 				os.makedirs(mountpoint, exist_ok=True)
 				if len(os.listdir(mountpoint)) > 0:
 					raise NotEmptyError(mountpoint)
+
+				cmd = [
+					'mount',
+					'-t', 'fuse.sshfs',
+					'-o', 'user,_netdev,reconnect,uid=1000,gid=1000,allow_other',
+					f'{device.user}@{ip_addr}:{src}', f"{mountpoint}"
+				]
+				logger.debug(' '.join(cmd))
+				response = subprocess.call(cmd)
+				if response != 0:
+					print(f'Responsecode from SSH: {response}')
 				else:
-					cmd = ['mount', '-t', 'fuse.sshfs', '-o', 'user,_netdev,reconnect,uid=1000,gid=1000,allow_other', f'{dev.user}@{ip}:{src}', f"{mountpoint}"]
-					logger.debug(' '.join(cmd))
-					response = subprocess.call(cmd)
-					if response != 0:
-						print(f'Responsecode from SSH: {response}')
-					else:
-						if open:
-							subprocess.call(["xdg-open", mountpoint])
-			except ConnectionError:
-				logger.critical(dev.name)
+					if open_mountpoint:
+						subprocess.call(["xdg-open", mountpoint])
+			except NotReachableError:
+				logger.critical(device.name)
 
 		except DeviceNotPresentError:
-			relay = dev.get_relay()
+			relay = device.get_relay()
+			dest: str
 			if mountpoint[0] == '/':
-				d = mountpoint[1:]
+				dest = mountpoint[1:]
 			else:
-				d = mountpoint
-			relay_mount = os.path.join("/tmp/smount", dev.name, d)
-			Ssh(relay, exe=["python3", "-m", "ssh_tools.smount", dev.name, f"\"{src}\"", f"\"{relay_mount}\""])
+				dest = mountpoint
+			relay_mount = os.path.join("/tmp/smount", device.name, dest)
+			Ssh(relay, exe=["python3", "-m", "ssh_tools.smount", device.name, f"\"{src}\"", f"\"{relay_mount}\""])
 			Mount(relay, relay_mount, mountpoint)
 
-	def print_header(self, ip):
+	@classmethod
+	def print_header(cls, ip_addr: str):
+		"""Prints a header to the terminal"""
 		os.system('clear')
 		try:
 			twidth = os.get_terminal_size().columns
 
-			print(f'Connecting to {ip} ...\n')
+			print(f'Connecting to {ip_addr} ...\n')
 			print('-' * twidth + '\n')
 		except OSError:
 			pass
 
-	def print_footer(self):
+	@classmethod
+	def print_footer(cls):
+		"""Prints a footer to the terminal"""
 		twidth = os.get_terminal_size().columns
 		print('\n' + '-' * twidth + '\n')
 
 
-class Main():
-	def __init__(self):
-		args = self.init_args()
-		log.set_verbose(args.verbose)
+def main():
+	"""Main executable class for smount"""
+	parser = argparse.ArgumentParser()
+	parser.add_argument('target', help='Welke computer is de referentie')
+	parser.add_argument('source', help='Locatie op taget die gemount moet worden', nargs='?', default="/home/tim")
+	parser.add_argument('mountpoint', help='Mountpoint')
+	parser.add_argument('-v', '--verbose', help='Geef feedback', action='store_true')
+	parser.add_argument('-o', '--open', help='Open het mountpoint', action='store_true')
+	args = parser.parse_args()
 
-		devices = Device.get_devices()
-		logger.debug(devices)
+	log.set_verbose(args.verbose)
 
-		target = Device(args.target)
-		source = args.source
-		mountpoint = args.mountpoint
+	devices = Device.get_devices()
+	logger.debug(devices)
 
-		Mount(target, source, mountpoint, open=args.open)
+	target = Device(args.target)
+	source = args.source
+	mountpoint = args.mountpoint
 
-	def init_args(self):
-		parser = argparse.ArgumentParser()
-		parser.add_argument('target', help='Welke computer is de referentie')
-		parser.add_argument('source', help='Locatie op taget die gemount moet worden', nargs='?', default="/home/tim")
-		parser.add_argument('mountpoint', help='Mountpoint')
-		parser.add_argument('-v', '--verbose', help='Geef feedback', action='store_true')
-		parser.add_argument('-o', '--open', help='Open het mountpoint', action='store_true')
-		args = parser.parse_args()
-
-		return args
+	Mount(target, source, mountpoint, open_mountpoint=args.open)
 
 
-if __name__ == '__main__':
-	Main()
+if __name__ == "__main__":
+	main()

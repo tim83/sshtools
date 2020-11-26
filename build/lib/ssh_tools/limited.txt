@@ -1,8 +1,0 @@
-Programs/***
-bin/***
-Documenten
-Documenten/pc/***
-Documenten/IMBIT
-Documenten/IMBIT/Finance
-Documenten/IMBIT/Finance/inschrijvingen/***
-texmf/***

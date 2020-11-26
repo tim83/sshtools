@@ -1,4 +1,5 @@
 #! /usr/bin/python3
+"""Module to ssh into a device"""
 
 import argparse
 import os
@@ -7,41 +8,41 @@ import sys
 
 import timtools
 
-from ssh_tools.devices import Device, ConnectionError, ConfigError, DeviceNotPresentError
+from devices import Device
+from errors import ConfigError, DeviceNotPresentError
 
-logger = timtools.log.get_logger("ssh_tools.sshin")
+logger = timtools.log.get_logger(__name__)
 
 
 class Ssh:
-	def __init__(self, dev, exe: (str, list) = None, mosh: bool = False, copy_id: bool = False, user_override: str = None):
-		logger.debug(f'Device: {dev.name} ; Executable: {exe} ; Mosh: {mosh} ; Copy ID: {copy_id}')
+	"""Class to ssh into a device"""
 
-		if type(exe) == list:
+	def __init__(self, dev, exe: (str, list) = None, mosh: bool = False, copy_id: bool = False):
+		logger.debug('Device: %s ; Executable: %s ; Mosh: %s ; Copy ID: %s', dev, exe, mosh, copy_id)
+
+		if isinstance(exe, list):
 			exe = ' '.join(exe)
 
 		self.hostname = os.uname().nodename
 		self.username = os.environ['USER']  # os.getlogin()
-		if user_override:
-			user = user_override
-		else:
-			user = dev.user
+		user = dev.user
 		if not dev.ssh:
 			raise ConfigError(dev.name)
 		try:
-			ip = dev.get_ip()
-			self.print_header(ip)
+			ip_addr = dev.get_ip()
+			self.print_header(ip_addr)
 
 			try:
 				if copy_id:
-					cmd_ci = ['ssh-copy-id', '-p', dev.ssh_port, f'{user}@{ip}']
+					cmd_ci = ['ssh-copy-id', '-p', dev.ssh_port, f'{user}@{ip_addr}']
 					logger.debug(' '.join(cmd_ci))
 
 					response_ci = subprocess.call(cmd_ci)
-					logger.info(f'SSH-COPY-ID exited with code {response_ci}')
+					logger.info('SSH-COPY-ID exited with code %s', response_ci)
 				if mosh:
-					cmd = ['mosh', f'{user}@{ip}']
+					cmd = ['mosh', f'{user}@{ip_addr}']
 				else:
-					cmd = ['ssh', '-t', '-p', dev.ssh_port, f'{user}@{ip}']
+					cmd = ['ssh', '-t', '-p', dev.ssh_port, f'{user}@{ip_addr}']
 
 				if exe:
 					cmd += [exe]
@@ -50,9 +51,9 @@ class Ssh:
 				timtools.bash.run(cmd)
 			except ConnectionError:
 				pass
-			except subprocess.CalledProcessError as e:
-				if e.returncode != 255:
-					raise e
+			except subprocess.CalledProcessError as error:
+				if error.returncode != 255:
+					raise error
 
 			self.print_footer()
 
@@ -61,60 +62,56 @@ class Ssh:
 			if relay:
 				Ssh(relay, exe=["python3 -m ssh_tools.sshin"] + [f"\"{arg}\"" for arg in sys.argv[1:]], mosh=mosh, copy_id=copy_id)
 
-	def print_header(self, ip):
-		# os.system('clear')
+	def print_header(self, ip_addr: str):
+		"""Prints a header to the terminal"""
 		twidth = self.get_terminal_columns()
 
-		print(f'Connecting to {ip} ...\n')
+		print(f'Connecting to {ip_addr} ...\n')
 		print('-' * twidth + '\n')
 
 	@staticmethod
-	def get_terminal_columns():
+	def get_terminal_columns() -> int:
+		"""Returns the width of the terminal"""
 		try:
 			return os.get_terminal_size().columns
 		except OSError:
 			return 80
 
 	def print_footer(self):
+		"""Prints a footer to the terminal"""
 		twidth = self.get_terminal_columns()
 		print('\n' + '-' * twidth + '\n')
 
 
-class Main:
-	def __init__(self):
-		args = self.init_args()
-		timtools.log.set_verbose(args.verbose)
+def main():
+	"""Main executable for sshin"""
+	logger.debug(sys.argv)
+	parser = argparse.ArgumentParser()
+	parser.add_argument('target', help='Welke computer is de referentie')
+	parser.add_argument('-c', '--command', help='Uit te voeren commando')
+	parser.add_argument('-u', '--user', help='Login als deze gebruiker, in plaats van de standaard gebruiker')
+	parser.add_argument('-i', '--copy-id', help='Voert ssh-copy-id uit voor de verbinden', action='store_true')
+	parser.add_argument('-m', '--mosh', help='Gebruik MOSH in plaats van SSH', action='store_true')
+	parser.add_argument('-s', '--ssh', help='Gebruik MOSH in plaats van SSH', action='store_true')
+	parser.add_argument('-v', '--verbose', help='Geef feedback', action='store_true')
+	args = parser.parse_args()
+	logger.debug(args)
 
-		devices = Device.get_devices()
-		logger.debug(devices)
+	timtools.log.set_verbose(args.verbose)
 
-		target = Device(args.target)
+	devices = Device.get_devices()
+	logger.debug(devices)
 
-		if args.mosh:
-			use_mosh = True
-		elif args.ssh:
-			use_mosh = False
-		# elif args.command:
-		# 	use_mosh = False
-		else:
-			use_mosh = target.mosh
-		Ssh(target, exe=args.command, mosh=use_mosh, copy_id=args.copy_id, user_override=args.user)
+	target = Device(args.target)
 
-	def init_args(self):
-		logger.debug(sys.argv)
-		parser = argparse.ArgumentParser()
-		parser.add_argument('target', help='Welke computer is de referentie')
-		parser.add_argument('-c', '--command', help='Uit te voeren commando')
-		parser.add_argument('-u', '--user', help='Login als deze gebruiker, in plaats van de standaard gebruiker')
-		parser.add_argument('-i', '--copy-id', help='Voert ssh-copy-id uit voor de verbinden', action='store_true')
-		parser.add_argument('-m', '--mosh', help='Gebruik MOSH in plaats van SSH', action='store_true')
-		parser.add_argument('-s', '--ssh', help='Gebruik MOSH in plaats van SSH', action='store_true')
-		parser.add_argument('-v', '--verbose', help='Geef feedback', action='store_true')
-		args = parser.parse_args()
-		logger.debug(args)
-
-		return args
+	if args.mosh:
+		use_mosh = True
+	elif args.ssh:
+		use_mosh = False
+	else:
+		use_mosh = target.mosh
+	Ssh(target, exe=args.command, mosh=use_mosh, copy_id=args.copy_id)
 
 
 if __name__ == '__main__':
-	Main()
+	main()

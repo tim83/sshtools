@@ -1,4 +1,5 @@
 #! /usr/bin/python3
+"""Errors to used by the modules"""
 
 from os.path import dirname
 
@@ -9,6 +10,7 @@ logger = get_logger(__name__)
 
 
 class ErrorHandler(Exception):
+	"""General handler for errors"""
 	logger = None
 
 	def __init__(self, message):
@@ -21,26 +23,43 @@ class ErrorHandler(Exception):
 		super().__init__(message)
 
 
-class ConnectionError(ErrorHandler):
+class NotEmptyError(ErrorHandler):
+	"""Error to be raised when a mountpoint is not an empty directory"""
+
+	def __init__(self, mountpoint):
+		super().__init__(f'Mountpoint {mountpoint} is not empty.')
+
+
+class NotReachableError(ErrorHandler):
+	"""Error to be raised when the device could not be reached"""
+
 	def __init__(self, name):
 		super().__init__(f'Device {name} could not be reached.')
 
 
 class NetworkError(ErrorHandler):
+	"""Error to be raised when the device is not connected to the internet"""
+
 	def __init__(self):
-		super().__init__(f'You are not connected to the internet.')
+		super().__init__('You are not connected to the internet.')
 
 
 class DeviceNotFoundError(ErrorHandler):
+	"""Error to be raised when the device is not configured"""
+
 	def __init__(self, name):
 		super().__init__(f'Device {name} not found.')
 
 
 class DeviceNotPresentError(ErrorHandler):
+	"""Error to be raised when the device is not present"""
+
 	def __init__(self, name):
 		super().__init__(f'Device {name} is not present on this network.')
 
 
 class ConfigError(ErrorHandler):
+	"""Error raised when there is problem with the config"""
+
 	def __init__(self, name):
 		super().__init__(f'Device {name} was not correctly configured for this action.')
