@@ -38,7 +38,6 @@ class Sync:
 
 				logger.debug(' '.join(cmd))
 				try:
-					print(cmd)
 					timtools.bash.run(cmd)
 				except subprocess.CalledProcessError as error:
 					if error.returncode == 255:
