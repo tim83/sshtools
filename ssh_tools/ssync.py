@@ -10,6 +10,7 @@ from os.path import abspath, dirname, expanduser, join
 import timtools
 
 from devices import Device
+from errors import NotReachableError
 
 PROJECT_DIR = dirname(__file__)
 logger = timtools.log.get_logger(__name__)
@@ -41,9 +42,9 @@ class Sync:
 					timtools.bash.run(cmd)
 				except subprocess.CalledProcessError as error:
 					if error.returncode == 255:
-						raise ConnectionError(slave.name) from error
+						raise NotReachableError(slave.name) from error
 					raise error
-			except ConnectionError:
+			except NotReachableError:
 				pass
 
 	@classmethod
