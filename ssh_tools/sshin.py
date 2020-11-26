@@ -37,12 +37,12 @@ class Ssh:
 					cmd_ci = ['ssh-copy-id', '-p', dev.ssh_port, f'{user}@{ip_addr}']
 					logger.debug(' '.join(cmd_ci))
 
-					response_ci = subprocess.call(cmd_ci)
+					response_ci = timtools.bash.run(cmd_ci)
 					logger.info('SSH-COPY-ID exited with code %s', response_ci)
 				if mosh:
 					cmd = ['mosh', f'{user}@{ip_addr}']
 				else:
-					cmd = ['ssh', '-t', '-p', dev.ssh_port, f'{user}@{ip_addr}']
+					cmd = ['ssh', '-t', '-p', str(dev.ssh_port), f'{user}@{ip_addr}']
 
 				if exe:
 					cmd += [exe]
