@@ -7,9 +7,9 @@ import subprocess
 
 from timtools import log
 
-from devices import Device
-from errors import ConfigError, NotReachableError, DeviceNotPresentError, NotEmptyError
-from sshin import Ssh
+from ssh_tools.devices import Device
+from ssh_tools.errors import ConfigError, NotReachableError, DeviceNotPresentError, NotEmptyError
+from ssh_tools.sshin import Ssh
 
 logger = log.get_logger(__name__)
 

@@ -10,8 +10,8 @@ from os.path import abspath, dirname, expanduser, join
 import timtools.bash
 import timtools.log
 
-from devices import Device
-from errors import NotReachableError
+from ssh_tools.devices import Device
+from ssh_tools.errors import NotReachableError
 
 PROJECT_DIR = dirname(__file__)
 logger = timtools.log.get_logger(__name__)

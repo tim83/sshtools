@@ -10,7 +10,7 @@ from os.path import dirname, expanduser, join
 import psutil
 from timtools.log import get_logger
 
-from errors import DeviceNotFoundError, DeviceNotPresentError, ErrorHandler, NetworkError, NotReachableError
+from ssh_tools.errors import DeviceNotFoundError, DeviceNotPresentError, ErrorHandler, NetworkError, NotReachableError
 
 project_dir = dirname(__file__)
 logger = get_logger(__name__)

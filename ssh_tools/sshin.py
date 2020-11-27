@@ -8,8 +8,8 @@ import sys
 
 import timtools.log
 
-from devices import Device
-from errors import ConfigError, DeviceNotPresentError
+from ssh_tools.devices import Device
+from ssh_tools.errors import ConfigError, DeviceNotPresentError
 
 logger = timtools.log.get_logger(__name__)
 
