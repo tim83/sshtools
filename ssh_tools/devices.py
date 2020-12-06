@@ -150,7 +150,8 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		]
 		ping_out: str = bash.run(ping_cmd + ip_addrs, passable_exit_codes=[1], capture_stdout=True)
 		alive_ips: list = ping_out.split('\n')
-		alive_ips.remove('')
+		if '' in alive_ips:
+			alive_ips.remove('')
 		if len(alive_ips) > 0:
 			return alive_ips[0]
 
