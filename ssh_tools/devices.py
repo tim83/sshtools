@@ -8,6 +8,7 @@ from configparser import ConfigParser, NoSectionError
 from os.path import dirname, expanduser, join
 
 import psutil
+from timtools import bash
 from timtools.log import get_logger
 
 from ssh_tools.errors import DeviceNotFoundError, DeviceNotPresentError, ErrorHandler, NetworkError, NotReachableError
@@ -26,8 +27,8 @@ def get_ips():
 			if interface_name[:3] in ["eth", "wla", "enp", "wlo", "wlp"]:
 				ip_addr = next(
 					address.address
-					for address in interfaces[interface_name]
-					if address.family == socket.AF_INET
+						for address in interfaces[interface_name]
+						if address.family == socket.AF_INET
 				)
 				addresses.append(ip_addr)
 		except StopIteration:
@@ -135,17 +136,22 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		except NoSectionError as error:
 			raise DeviceNotFoundError(name) from error
 
-	def get_ip(self):
+	def get_ip(self) -> str:
 		"""Returns the IP to used for the device"""
-		for ip_addr in self.eth, self.wlan:
-			if ip_addr:
-				response = os.system(f'ping -c 1 {ip_addr} > /dev/null')
-				if response == 0:  # or self.name == "serverpi":
-					self.ip_addr = ip_addr
-					return ip_addr
-
 		if not self.eth and not self.wlan:
 			raise DeviceNotPresentError(self.name)
+
+		ip_addrs = [self.eth, self.wlan]
+		ping_cmd = [
+			"fping",
+			"-q",  # don't report failed pings
+			"-r 1",  # only try once
+			"-a"  # only print alive ips
+		]
+		ping_out = bash.run(ping_cmd + ip_addrs, passable_exit_codes=[1], capture_stdout=True)
+		alive_ips = ping_out.split('\n')
+		if len(alive_ips) > 0:
+			return alive_ips[0]
 
 		# Check if one of the interfaces is connected to a different network that the one just used
 		selected_network_id = Device.current_ips[0][10:]  # Extract the "192.168.XX" part of the IP

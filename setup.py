@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
 	name='ssh_tools',
-	version='1.99',
+	version='2.0',
 	packages=['ssh_tools'],
 	url='',
 	license='',
@@ -19,6 +19,7 @@ setup(
 		'configparser',
 		'psutil',
 		'timtools',
+		'fping',
 	],
 	scripts=[
 		"bin/getip",
