@@ -32,5 +32,5 @@ setup(
 		'',
 		[f'ssh_tools/{filename}.ini' for filename in ["devices", "kot", "kot-tim", "home", "home-tim"]] +
 		[f'ssh_tools/{filename}.txt' for filename in ["exclude", "include", "limited"]]
-	), ]
+	)]
 )

@@ -33,6 +33,12 @@ class Sync:
 			try:
 				cmd = ['rsync']
 				cmd += ['--archive', '-v', '-h', '-P', '--force', '--delete']
+				if not slave.is_self():
+					port = slave.ssh_port
+					cmd += ["-e", f"ssh -p {port}"]
+				elif not master.is_self():
+					port = master.ssh_port
+					cmd += [f"-e \'ssh -p {port}\'"]
 				cmd += self.backup_parm()
 				cmd += self.inex_parm(master, slave)
 				cmd += self.get_source(master)
@@ -77,7 +83,7 @@ class Sync:
 	def get_source(self, master) -> list:
 		"""Get source parameters of rsync"""
 		source: list
-		if self.hostname == master.hostname:
+		if master.is_self():
 			source = [self.dir + '/']
 		else:
 			source = ['{user}@{ip}:{dir}/'.format(
@@ -90,7 +96,7 @@ class Sync:
 	def get_target(self, slave) -> list:
 		"""Get source parameters of rsync"""
 		target: list
-		if self.hostname == slave.hostname:
+		if slave.is_self():
 			target = [self.dir]
 		else:
 			target = ['{user}@{ip}:{dir}'.format(
