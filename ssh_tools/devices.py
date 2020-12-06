@@ -141,7 +141,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		if not self.eth and not self.wlan:
 			raise DeviceNotPresentError(self.name)
 
-		ip_addrs = [self.eth, self.wlan]
+		ip_addrs = [ip for ip in [self.eth, self.wlan] if ip is not None]
 		ping_cmd = [
 			"fping",
 			"-q",  # don't report failed pings
