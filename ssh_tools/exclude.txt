@@ -4,17 +4,14 @@ Downloads/*.img
 Documenten/ISO
 *.part
 VirtualBox VMs
-Android
 Video's/Downloads
 Video's/Media
 Video's/Torrent
 snap
 PlayOnLinux's virtual drives
-mycroft-core
 nosync
 Bureaublad
 tmp/torrent-download
-Media/
 Openbaar/Dropbox
 Openbaar/Nextcloud
 Private
