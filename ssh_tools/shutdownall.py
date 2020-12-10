@@ -42,11 +42,11 @@ class Main:  # pylint: disable=too-few-public-methods
 
 		log.set_verbose(args.verbose)
 
-		devices = Device.get_devices()
+		devices: list = Device.get_devices()
 		logger.debug(devices)
 
 		master_name = os.uname().nodename.replace('-tim', '')
-		names = [name for name in devices if name not in (master_name, 'media', 'imbit')]
+		names = [name for name in devices if name not in (master_name, 'media', 'imbit')]  # pylint: disable=not-an-iterable
 		self.slave = []
 		for name in names:
 			dev = Device(name)
