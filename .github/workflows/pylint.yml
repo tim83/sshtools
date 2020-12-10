@@ -20,4 +20,4 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         cd ssh_tools
-        pylint `ls -R|grep .py$|xargs`
+        pylint --rcfile=.pylintrc `ls -R|grep .py$|xargs`
