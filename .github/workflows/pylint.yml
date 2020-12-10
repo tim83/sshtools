@@ -19,4 +19,5 @@ jobs:
         pip install pylint
     - name: Analysing the code with pylint
       run: |
-        pylint --rcfile=ssh_tools/.pylintrc  `ls -R|grep .py$|xargs`
+        cd ssh_tools
+        pylint --rcfile=../.pylintrc  `ls ssh_tools -R|grep .py$|xargs`
