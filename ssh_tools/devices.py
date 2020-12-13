@@ -183,7 +183,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
 			if not self.ip_addr:
 				self.get_ip()
 
-			return self.ip_addr.startswith("192.168")
+			return self.ip_addr is not None and self.ip_addr.startswith("192.168")
 		except ErrorHandler:
 			return False
 
