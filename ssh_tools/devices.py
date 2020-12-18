@@ -180,10 +180,8 @@ class Device:  # pylint: disable=too-many-instance-attributes
 	def is_local(self) -> bool:
 		"""Checks if the device is present on the local LAN"""
 		try:
-			if not self.ip_addr:
-				self.get_ip()
-
-			return self.ip_addr is not None and self.ip_addr.startswith("192.168")
+			ip_addr: str = self.get_ip()
+			return ip_addr is not None and ip_addr.startswith("192.168")
 		except ErrorHandler:
 			return False
 
