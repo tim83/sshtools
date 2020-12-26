@@ -34,7 +34,7 @@ class Ssh:
 
 			try:
 				if copy_id:
-					cmd_ci = ['ssh-copy-id', '-p', dev.ssh_port, f'{user}@{ip_addr}']
+					cmd_ci = ['ssh-copy-id', '-p', str(dev.ssh_port), f'{user}@{ip_addr}']
 					logger.debug(' '.join(cmd_ci))
 
 					response_ci = timtools.bash.run(cmd_ci)
