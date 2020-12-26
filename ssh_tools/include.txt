@@ -1,9 +1,5 @@
 Documenten/pc/.wachtwoorden.txt
 Documenten/pc/config/**
 *blendcache*
-*.git*
+*.git/**
 .idea
-.config/geary
-.local/share/geary
-.Private
-.ecryptfs
