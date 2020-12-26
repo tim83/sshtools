@@ -1,4 +1,5 @@
 #! /usr/bin/python3
+"""Information for packaging the module"""
 
 from setuptools import setup
 
@@ -6,7 +7,7 @@ from setuptools import setup
 
 setup(
 	name='ssh_tools',
-	version='2.0',
+	version='2.01',
 	packages=['ssh_tools'],
 	url='',
 	license='',
