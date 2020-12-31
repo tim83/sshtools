@@ -124,6 +124,7 @@ def main():
 	parser.add_argument('-v', '--verbose', help='Geef feedback', action='store_true')
 	parser.add_argument('-f', '--from', help='Manuele referentie (heeft --to nodig)')
 	parser.add_argument('-t', '--to', help='Maneel doel (heeft --from nodig)')
+	parser.add_argument('-l', '--limited', help='Synchroniseer het minimum aan bestanden', action='store_true')
 	args = parser.parse_args()
 
 	timtools.log.set_verbose(args.verbose)
@@ -155,6 +156,9 @@ def main():
 
 	if master in slave:
 		raise argparse.ArgumentError(args.master, 'Master kan geen slave zijn')
+
+	if args.limited and master.sync:
+		master.sync = 'Limited'
 
 	logger.info("%s -> %s", master.hostname, ', '.join([s.hostname for s in slave]))
 
