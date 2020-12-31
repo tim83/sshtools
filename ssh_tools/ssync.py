@@ -32,7 +32,16 @@ class Sync:
 			print(master.name + ' -> ' + slave.name)
 			try:
 				cmd = ['rsync']
-				cmd += ['--archive', '-v', '-h', '-P', '--force', '--delete']
+				cmd += [
+					'--archive',
+					'--verbose',
+					'--human-readable',
+					'-P',
+					'--force',
+					'--delete',
+					'--compress',
+					f'--partial-dir={os.path.join(self.dir, ".cache/ssync")}'
+				]
 				if not slave.is_self():
 					port = slave.ssh_port
 					cmd += ["-e", f"ssh -p {port}"]
