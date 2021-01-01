@@ -6,7 +6,7 @@ from setuptools import setup
 # from distutils.core import setup
 
 setup(
-	name='ssh_tools',
+	name='sshtools',
 	version='2.03',
 	packages=['sshtools'],
 	url='',
@@ -32,7 +32,7 @@ setup(
 	include_package_data=True,
 	data_files=[(
 		'',
-		[f'ssh_tools/{filename}.ini' for filename in ["devices", "kot", "kot-tim", "home", "home-tim"]] +
-		[f'ssh_tools/{filename}.txt' for filename in ["exclude", "include", "limited"]]
+		[f'sshtools/{filename}.ini' for filename in ["devices", "kot", "kot-tim", "home", "home-tim"]] +
+		[f'sshtools/{filename}.txt' for filename in ["exclude", "include", "limited"]]
 	)]
 )
