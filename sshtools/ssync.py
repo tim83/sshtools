@@ -85,7 +85,11 @@ class Sync:
 		]
 
 		if slave.sync == 'Limited' or master.sync == 'Limited':
-			parm: list = ['--exclude=__pycache__', f'--include-from={limfile}', '--exclude=*']
+			parm: list = [
+				'--exclude=__pycache__',
+				'--exclude=Documenten/pc/config/VMs',
+				f'--include-from={limfile}', '--exclude=*'
+			]
 
 		return parm
 
