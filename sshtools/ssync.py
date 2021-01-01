@@ -88,7 +88,8 @@ class Sync:
 			parm: list = [
 				'--exclude=__pycache__',
 				'--exclude=Documenten/pc/config/VMs',
-				f'--include-from={limfile}', '--exclude=*'
+				f'--include-from={limfile}', 
+				'--exclude=*'
 			]
 
 		return parm
