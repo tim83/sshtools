@@ -48,7 +48,7 @@ class Ssh:
 				cmd += [exe]
 
 			logger.debug(' '.join(cmd))
-			timtools.bash.run(cmd, passable_exit_codes=[255,100])
+			timtools.bash.run(cmd, passable_exit_codes=[255,100,127])
 		except ConnectionError:
 			pass
 
