@@ -11,7 +11,8 @@ import psutil
 from timtools import bash
 from timtools.log import get_logger
 
-from sshtools.errors import DeviceNotFoundError, DeviceNotPresentError, ErrorHandler, NetworkError, NotReachableError
+from sshtools.errors import DeviceNotFoundError, DeviceNotPresentError, ErrorHandler, NetworkError, \
+	NotReachableError
 
 project_dir = dirname(__file__)
 logger = get_logger(__name__)
@@ -141,7 +142,10 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		if not self.eth and not self.wlan:
 			raise DeviceNotPresentError(self.name)
 
-		ip_addrs = [ip for ip in [self.eth, self.wlan] if ip is not None]
+		if self.hostname == os.uname().nodename:
+			return "127.0.0.1"
+
+		ip_addrs = [ip for ip in [self.hostname + ".local", self.eth, self.wlan] if ip is not None]
 		ping_cmd = [
 			"fping",
 			"-q",  # don't report failed pings
@@ -157,7 +161,10 @@ class Device:  # pylint: disable=too-many-instance-attributes
 
 		# Check if one of the interfaces is connected to a different network that the one just used
 		selected_network_id = Device.current_ips[0][10:]  # Extract the "192.168.XX" part of the IP
-		alternative_ips = [ip for ip in Device.current_ips if selected_network_id not in ip]  # Filter out all ips in the same subnet
+		alternative_ips = [
+			ip for ip in Device.current_ips if
+			selected_network_id not in ip
+		]  # Filter out all ips in the same subnet
 		if len(alternative_ips) >= 1:
 			logger.info("Could not find %s in the selected network", self.name)
 			Device.current_ips = alternative_ips

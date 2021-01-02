@@ -18,7 +18,8 @@ class Ssh:
 	"""Class to ssh into a device"""
 
 	def __init__(self, dev, exe: (str, list) = None, mosh: bool = False, copy_id: bool = False):
-		logger.debug('Device: %s ; Executable: %s ; Mosh: %s ; Copy ID: %s', dev, exe, mosh, copy_id)
+		logger.debug('Device: %s ; Executable: %s ; Mosh: %s ; Copy ID: %s', dev, exe, mosh,
+			copy_id)
 
 		if isinstance(exe, list):
 			exe = ' '.join(exe)
@@ -48,7 +49,7 @@ class Ssh:
 				cmd += [exe]
 
 			logger.debug(' '.join(cmd))
-			timtools.bash.run(cmd, passable_exit_codes=[255,100,127])
+			timtools.bash.run(cmd, passable_exit_codes=[255, 100, 127])
 		except ConnectionError:
 			pass
 
@@ -57,7 +58,11 @@ class Ssh:
 		except DeviceNotPresentError:
 			relay = dev.get_relay()
 			if relay:
-				Ssh(relay, exe=["python3 -m sshtools.sshin"] + [f"\"{arg}\"" for arg in sys.argv[1:]], mosh=mosh, copy_id=copy_id)
+				Ssh(
+					relay,
+					exe=["python3 -m sshtools.sshin"] + [f"\"{arg}\"" for arg in sys.argv[1:]],
+					mosh=mosh, copy_id=copy_id
+				)
 
 	def print_header(self, ip_addr: str):
 		"""Prints a header to the terminal"""
@@ -86,8 +91,10 @@ def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('target', help='Welke computer is de referentie')
 	parser.add_argument('-c', '--command', help='Uit te voeren commando')
-	parser.add_argument('-u', '--user', help='Login als deze gebruiker, in plaats van de standaard gebruiker')
-	parser.add_argument('-i', '--copy-id', help='Voert ssh-copy-id uit voor de verbinden', action='store_true')
+	parser.add_argument('-u', '--user',
+		help='Login als deze gebruiker, in plaats van de standaard gebruiker')
+	parser.add_argument('-i', '--copy-id', help='Voert ssh-copy-id uit voor de verbinden',
+		action='store_true')
 	parser.add_argument('-m', '--mosh', help='Gebruik MOSH in plaats van SSH', action='store_true')
 	parser.add_argument('-s', '--ssh', help='Gebruik MOSH in plaats van SSH', action='store_true')
 	parser.add_argument('-v', '--verbose', help='Geef feedback', action='store_true')
