@@ -143,7 +143,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
 			raise DeviceNotPresentError(self.name)
 
 		if self.hostname == os.uname().nodename:
-			return "127.0.0.1"
+			return self.hostname
 
 		ip_addrs = [ip for ip in [self.hostname + ".local", self.eth, self.wlan] if ip is not None]
 		ping_cmd = [
