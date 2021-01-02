@@ -6,7 +6,7 @@ import subprocess
 
 from timtools import log
 
-from ssh_tools.devices import Device
+from sshtools.devices import Device
 
 logger = log.get_logger(__name__)
 

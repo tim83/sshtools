@@ -7,9 +7,9 @@ import subprocess
 
 from timtools import log
 
-from ssh_tools.devices import Device
-from ssh_tools.errors import ConfigError, NotReachableError, DeviceNotPresentError, NotEmptyError
-from ssh_tools.sshin import Ssh
+from sshtools.devices import Device
+from sshtools.errors import ConfigError, NotReachableError, DeviceNotPresentError, NotEmptyError
+from sshtools.sshin import Ssh
 
 logger = log.get_logger(__name__)
 
@@ -56,7 +56,7 @@ class Mount:
 			else:
 				dest = mountpoint
 			relay_mount = os.path.join("/tmp/smount", device.name, dest)
-			Ssh(relay, exe=["python3", "-m", "ssh_tools.smount", device.name, f"\"{src}\"", f"\"{relay_mount}\""])
+			Ssh(relay, exe=["python3", "-m", "sshtools.smount", device.name, f"\"{src}\"", f"\"{relay_mount}\""])
 			Mount(relay, relay_mount, mountpoint)
 
 	@classmethod

@@ -9,9 +9,9 @@ from time import sleep
 
 from timtools import log
 
-from ssh_tools.devices import Device
-from ssh_tools.errors import ErrorHandler
-from ssh_tools.sshin import Ssh
+from sshtools.devices import Device
+from sshtools.errors import ErrorHandler
+from sshtools.sshin import Ssh
 
 PROJECT_DIR = expanduser('~')
 logger = log.get_logger(__name__)

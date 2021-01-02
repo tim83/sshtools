@@ -8,8 +8,8 @@ import sys
 
 import timtools.log
 
-from ssh_tools.devices import Device
-from ssh_tools.errors import ConfigError, DeviceNotPresentError
+from sshtools.devices import Device
+from sshtools.errors import ConfigError, DeviceNotPresentError
 
 logger = timtools.log.get_logger(__name__)
 
@@ -57,7 +57,7 @@ class Ssh:
 		except DeviceNotPresentError:
 			relay = dev.get_relay()
 			if relay:
-				Ssh(relay, exe=["python3 -m ssh_tools.sshin"] + [f"\"{arg}\"" for arg in sys.argv[1:]], mosh=mosh, copy_id=copy_id)
+				Ssh(relay, exe=["python3 -m sshtools.sshin"] + [f"\"{arg}\"" for arg in sys.argv[1:]], mosh=mosh, copy_id=copy_id)
 
 	def print_header(self, ip_addr: str):
 		"""Prints a header to the terminal"""

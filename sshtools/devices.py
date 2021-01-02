@@ -11,7 +11,7 @@ import psutil
 from timtools import bash
 from timtools.log import get_logger
 
-from ssh_tools.errors import DeviceNotFoundError, DeviceNotPresentError, ErrorHandler, NetworkError, NotReachableError
+from sshtools.errors import DeviceNotFoundError, DeviceNotPresentError, ErrorHandler, NetworkError, NotReachableError
 
 project_dir = dirname(__file__)
 logger = get_logger(__name__)
@@ -67,7 +67,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
 			extra_config = []
 
 		general_devices_config: str = join(project_dir, 'devices.ini')
-		local_devices_config: str = expanduser('~/ssh_tools/devices.ini')
+		local_devices_config: str = expanduser('~/sshtools/devices.ini')
 		config_files = [general_devices_config, local_devices_config] + extra_config
 
 		try:
