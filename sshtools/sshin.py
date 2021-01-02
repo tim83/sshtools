@@ -28,32 +28,29 @@ class Ssh:
 		user = dev.user
 		if not dev.ssh:
 			raise ConfigError(dev.name)
+
+		ip_addr = dev.get_ip()
+		self.print_header(ip_addr)
+
 		try:
-			ip_addr = dev.get_ip()
-			self.print_header(ip_addr)
+			if copy_id:
+				cmd_ci = ['ssh-copy-id', '-p', str(dev.ssh_port), f'{user}@{ip_addr}']
+				logger.debug(' '.join(cmd_ci))
 
-			try:
-				if copy_id:
-					cmd_ci = ['ssh-copy-id', '-p', str(dev.ssh_port), f'{user}@{ip_addr}']
-					logger.debug(' '.join(cmd_ci))
+				response_ci = timtools.bash.run(cmd_ci)
+				logger.info('SSH-COPY-ID exited with code %s', response_ci)
+			if mosh:
+				cmd = ['mosh', f'{user}@{ip_addr}']
+			else:
+				cmd = ['ssh', '-t', '-p', str(dev.ssh_port), f'{user}@{ip_addr}']
 
-					response_ci = timtools.bash.run(cmd_ci)
-					logger.info('SSH-COPY-ID exited with code %s', response_ci)
-				if mosh:
-					cmd = ['mosh', f'{user}@{ip_addr}']
-				else:
-					cmd = ['ssh', '-t', '-p', str(dev.ssh_port), f'{user}@{ip_addr}']
+			if exe:
+				cmd += [exe]
 
-				if exe:
-					cmd += [exe]
-
-				logger.debug(' '.join(cmd))
-				timtools.bash.run(cmd)
-			except ConnectionError:
-				pass
-			except subprocess.CalledProcessError as error:
-				if error.returncode != 255:
-					raise error
+			logger.debug(' '.join(cmd))
+			timtools.bash.run(cmd, passable_exit_codes=[255,100])
+		except ConnectionError:
+			pass
 
 			self.print_footer()
 
