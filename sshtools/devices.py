@@ -6,6 +6,7 @@ import socket
 import subprocess
 from configparser import ConfigParser, NoSectionError
 from os.path import dirname, expanduser, join
+from typing import List
 
 import psutil
 from timtools import bash
@@ -145,23 +146,12 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		if self.hostname == os.uname().nodename:
 			return self.hostname
 
-		ip_addrs = [ip for ip in [self.hostname + ".local", self.eth, self.wlan] if ip is not None]
-		ping_cmd = [
-			"fping",
-			"-q",  # don't report failed pings
-			"-r 1",  # only try once
-			"-a"  # only print alive ips
-		]
-		ping_out: str = bash.run(
-			ping_cmd + ip_addrs,
-			passable_exit_codes=[1, 2],
-			capture_stdout=True
-		)
-		alive_ips: list = ping_out.split('\n')
-		if '' in alive_ips:
-			alive_ips.remove('')
-		if len(alive_ips) > 0:
-			return alive_ips[0]
+		ip_addrs = [ip for ip in [self.eth, self.wlan] if ip is not None]
+
+		for ips in [ip_addrs, [self.hostname + ".local"]]:
+			alive_ips = check_ips(ips)
+			if len(alive_ips) > 0:
+				return alive_ips[0]
 
 		# Check if one of the interfaces is connected to a different network that the one just used
 		selected_network_id = Device.current_ips[0][10:]  # Extract the "192.168.XX" part of the IP
@@ -198,3 +188,27 @@ class Device:  # pylint: disable=too-many-instance-attributes
 
 	def __repr__(self):
 		return '<Device({name})>'.format(name=self.hostname)
+
+
+def check_ips(ip_addrs: List[str]) -> List[str]:
+	"""Returns the IPs from a list that are reachable
+	:param ip_addrs: A list of the IPs that need to be tested
+	:returns: A list of reachable IPs"""
+
+	ping_cmd = [
+		"fping",
+		"-q",  # don't report failed pings
+		"-r 1",  # only try once
+		"-a"  # only print alive ips
+	]
+
+	ping_out: str = bash.run(
+		ping_cmd + ip_addrs,
+		passable_exit_codes=[1, 2],
+		capture_stdout=True
+	)
+	alive_ips: list = ping_out.split('\n')
+	if '' in alive_ips:
+		alive_ips.remove('')
+
+	return alive_ips
