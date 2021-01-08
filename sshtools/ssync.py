@@ -40,8 +40,7 @@ class Sync:
 					'--force',
 					'--delete',
 					'--compress',
-					f'--partial-dir={os.path.join(self.dir, ".cache/ssync")}',
-					'--dry-run'
+					f'--partial-dir={os.path.join(self.dir, ".cache/ssync")}'
 				]
 				if not slave.is_self():
 					port = slave.ssh_port
