@@ -16,3 +16,4 @@ Openbaar/Dropbox
 Openbaar/Nextcloud
 Private
 Documenten/pc/config/oh-my-zsh/log
+Documenten/pc/config/VMs
