@@ -40,14 +40,15 @@ class Sync:
 					'--force',
 					'--delete',
 					'--compress',
-					f'--partial-dir={os.path.join(self.dir, ".cache/ssync")}'
+					f'--partial-dir={os.path.join(self.dir, ".cache/ssync")}',
+					'--dry-run'
 				]
 				if not slave.is_self():
 					port = slave.ssh_port
 					cmd += ["-e", f"ssh -p {port}"]
 				elif not master.is_self():
 					port = master.ssh_port
-					cmd += [f"-e \'ssh -p {port}\'"]
+					cmd += ["-e", f"ssh -p {port}"]
 				cmd += self.backup_parm()
 				cmd += self.inex_parm(master, slave)
 				cmd += self.get_source(master)
