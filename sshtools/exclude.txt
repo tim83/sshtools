@@ -6,6 +6,7 @@ Documenten/ISO
 VirtualBox VMs
 Video's/Downloads
 Video's/Media
+Video's/Media_bu
 Video's/Torrent
 snap
 PlayOnLinux's virtual drives

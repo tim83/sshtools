@@ -81,8 +81,9 @@ class Sync:
 			"--exclude=*.sock",
 			f"--include-from={infile}",
 			f'--exclude-from={exfile}',
-			"--include=Documenten/pc/config/**"
-			"--exclude=.*"
+			"--include=Documenten/pc/config/**",
+			"--exclude=.*",
+			'--dry-run'
 		]
 
 		if slave.sync == 'Limited' or master.sync == 'Limited':
