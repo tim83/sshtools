@@ -1,5 +1,4 @@
 Documenten/pc/.wachtwoorden.txt
-Documenten/pc/config/**
 *blendcache*
 *.git**
 .pylintrc

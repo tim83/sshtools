@@ -81,6 +81,7 @@ class Sync:
 			"--exclude=*.sock",
 			f"--include-from={infile}",
 			f'--exclude-from={exfile}',
+			"--include=Documenten/pc/config/**"
 			"--exclude=.*"
 		]
 
