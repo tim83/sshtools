@@ -82,8 +82,7 @@ class Sync:
 			f"--include-from={infile}",
 			f'--exclude-from={exfile}',
 			"--include=Documenten/pc/config/**",
-			"--exclude=.*",
-			'--dry-run'
+			"--exclude=.*"
 		]
 
 		if slave.sync == 'Limited' or master.sync == 'Limited':
