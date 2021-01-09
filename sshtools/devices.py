@@ -4,7 +4,8 @@
 import os
 import socket
 import subprocess
-from configparser import ConfigParser, NoSectionError
+from configparser import ConfigParser, NoSectionError, RawConfigParser
+from collections import OrderedDict
 from os.path import dirname, expanduser, join
 from typing import List
 
@@ -41,9 +42,18 @@ def get_ips():
 	return addresses
 
 
+class MultiOrderedDict(OrderedDict):
+	def __setitem__(self, key, value):
+		if isinstance(value, list) and key in self and key in ["eth", "wlan", "emac", "wmac"]:
+			self[key].extend(value)
+		else:
+			super(OrderedDict, self).__setitem__(key, value)
+
+
 class Device:  # pylint: disable=too-many-instance-attributes
 	"""A physical device"""
 	config: ConfigParser = None
+	config_all: ConfigParser = None
 	devices: list = None
 	current_ips: list = get_ips()
 	# Config
@@ -82,23 +92,26 @@ class Device:  # pylint: disable=too-many-instance-attributes
 			logger.debug("WiFi not connected (or iwgetid can not be called)")
 
 		ips = Device.current_ips
+		ifaces = sorted(psutil.net_if_addrs().keys())
 		# Give priority to my own routers (192.168.{23,24}.*) over the home routers (192.168.20.*)
 		ip_id = ips[0][:10]
+		if ip_id in ["192.168.23"] or 'tun0' in ifaces:
+			# own kot network
+			logger.info("Detected Tims Kot network.")
+			config_files.append(join(project_dir, 'kot-tim.ini'))
 		if ip_id in ["192.168.20"]:
 			# Home network
 			logger.info("Detected Home network.")
 			config_files.append(join(project_dir, 'home.ini'))
-		elif ip_id in ["192.168.24"]:
+		if ip_id in ["192.168.24"]:
 			# Own home network
 			logger.info("Detected Tims Home network.")
 			config_files.append(join(project_dir, 'home-tim.ini'))
-		elif ip_id in ["192.168.23"]:
-			# own kot network
-			logger.info("Detected Tims Kot network.")
-			config_files.append(join(project_dir, 'kot-tim.ini'))
 
+		Device.config_all = RawConfigParser(dict_type=MultiOrderedDict, strict=False)
 		Device.config = ConfigParser()
-		Device.config.read(config_files)
+		for config in [Device.config_all, Device.config]:
+			config.read(config_files)
 		Device.devices = Device.config.sections()
 
 		return Device.devices
@@ -117,9 +130,9 @@ class Device:  # pylint: disable=too-many-instance-attributes
 
 		try:
 			self.hostname = self.config.get(name, 'hostname', fallback=self.name)
-			self.wlan = self.config.get(name, 'wlan', fallback=None)
-			self.eth = self.config.get(name, 'eth', fallback=None)
-			self.present = self.wlan or self.eth
+			self.wlan = self.config_all.get(name, 'wlan', fallback=None)
+			self.eth = self.config_all.get(name, 'eth', fallback=None)
+			self.present = self.wlan is not None or self.eth is not None
 			self.sync = self.config.get(name, 'sync', fallback=True)
 			self.ssh = self.config.getboolean(name, 'ssh', fallback=True)
 			self.ssh_port = self.config.get(name, 'ssh_port', fallback=22)
@@ -146,24 +159,14 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		if self.hostname == os.uname().nodename:
 			return self.hostname
 
-		ip_addrs = [ip for ip in [self.eth, self.wlan] if ip is not None]
-
-		for ips in [ip_addrs, [self.hostname + ".local"]]:
+		for ips in [
+			list(reversed(ips))
+			for ips in [self.eth, self.wlan, [self.hostname + ".local"]]
+			if ips is not None
+		]:
 			alive_ips = check_ips(ips)
 			if len(alive_ips) > 0:
 				return alive_ips[0]
-
-		# Check if one of the interfaces is connected to a different network that the one just used
-		selected_network_id = Device.current_ips[0][10:]  # Extract the "192.168.XX" part of the IP
-		alternative_ips = [
-			ip for ip in Device.current_ips if
-			selected_network_id not in ip
-		]  # Filter out all ips in the same subnet
-		if len(alternative_ips) >= 1:
-			logger.info("Could not find %s in the selected network", self.name)
-			Device.current_ips = alternative_ips
-			self.get_config(self.name)
-			return self.get_ip()
 
 		raise NotReachableError(self.name)
 
