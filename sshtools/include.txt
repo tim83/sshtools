@@ -6,5 +6,4 @@ Documenten/pc/.wachtwoorden.txt
 .directory
 Documenten/**
 Afbeeldingen/**
-Video's/**
 Programs/**
