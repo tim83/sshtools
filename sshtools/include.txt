@@ -7,3 +7,4 @@ Documenten/pc/.wachtwoorden.txt
 Documenten/**
 Afbeeldingen/**
 Video's/**
+Programs/**
