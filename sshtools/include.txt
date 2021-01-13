@@ -4,3 +4,5 @@ Documenten/pc/.wachtwoorden.txt
 .pylintrc
 .idea
 .directory
+.vscode
+Documenten/**
