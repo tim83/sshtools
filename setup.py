@@ -7,7 +7,7 @@ from setuptools import setup
 
 setup(
 	name='sshtools',
-	version='2.10',
+	version='2.10.1',
 	packages=['sshtools'],
 	url='',
 	license='',
