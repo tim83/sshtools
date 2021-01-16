@@ -1,6 +1,5 @@
-Documenten/pc/.wachtwoorden.txt
 *blendcache*
-*.git**
+.git/**
 .pylintrc
 .idea
 .directory

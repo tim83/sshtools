@@ -81,14 +81,15 @@ class Sync:
 			"--exclude=*.sock",
 			f"--include-from={infile}",
 			f'--exclude-from={exfile}',
-			"--include=Documenten/pc/config/**",
+			"--include=Config/**",
 			"--exclude=.*"
 		]
 
 		if slave.sync == 'Limited' or master.sync == 'Limited':
 			parm: list = [
 				'--exclude=__pycache__',
-				'--exclude=Documenten/pc/config/VMs',
+				'--exclude=Config/VMs',
+				'--exclude=Config/oh-my-zsh/log',
 				f'--include-from={limfile}', 
 				'--exclude=*'
 			]

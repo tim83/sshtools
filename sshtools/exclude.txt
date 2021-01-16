@@ -1,4 +1,4 @@
-*__pycache__*
+__pycache__
 Downloads/*.iso
 Downloads/*.img
 Documenten/ISO
@@ -16,5 +16,5 @@ tmp/torrent-download
 Openbaar/Dropbox
 Openbaar/Nextcloud
 Private
-Documenten/pc/config/oh-my-zsh/log
-Documenten/pc/config/VMs
+Config/oh-my-zsh/log
+Config/VMs
