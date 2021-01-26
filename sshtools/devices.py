@@ -13,7 +13,11 @@ import psutil
 from timtools import bash
 from timtools.log import get_logger
 
-from sshtools.errors import DeviceNotFoundError, DeviceNotPresentError, ErrorHandler, NetworkError, \
+from sshtools.errors import \
+	DeviceNotFoundError, \
+	DeviceNotPresentError, \
+	ErrorHandler, \
+	NetworkError, \
 	NotReachableError
 
 project_dir = dirname(__file__)

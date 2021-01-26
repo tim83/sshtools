@@ -4,7 +4,7 @@
 import argparse
 import subprocess
 
-from timtools import log
+from timtools import log, bash
 
 from sshtools.devices import Device
 
@@ -13,7 +13,7 @@ logger = log.get_logger(__name__)
 
 def wake(device: Device):
 	"""Wake up a device"""
-	ip_addr: str = device.eth
+	ip_addr: str = device.eth[0]
 	mac_addr: str = device.emac
 
 	try:
@@ -25,16 +25,13 @@ def wake(device: Device):
 		else:
 			raise ConnectionError()
 
-		logger.debug(' '.join(cmd))
+		logger.debug(cmd)
 
-		response: int
 		try:
-			response = subprocess.call(cmd)
-		except FileNotFoundError:
-			response = subprocess.call(['sudo', 'wakeonlan'] + cmd[1:])
+			bash.run(cmd)
+		except subprocess:
+			bash.run(['sudo', 'wakeonlan'] + cmd[1:])
 
-		if response != 0:
-			print(f'Responsecode from WOL: {response}')
 	except ConnectionError:
 		logger.critical('%s kan niet bereikt worden', device.hostname)
 
