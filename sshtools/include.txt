@@ -3,9 +3,3 @@
 .pylintrc
 .idea
 .directory
-Afbeeldingen/**
-bin/**
-Documenten/**
-Muziek/**
-Programs/**
-Video's/**

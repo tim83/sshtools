@@ -6,6 +6,7 @@ import datetime as dt
 import os
 import subprocess
 from os.path import abspath, dirname, expanduser, join
+from typing import List
 
 import timtools.bash
 import timtools.log
@@ -13,12 +14,16 @@ import timtools.log
 from sshtools.devices import Device
 from sshtools.errors import NotReachableError
 
-PROJECT_DIR = dirname(__file__)
+PROJECT_DIR: str = dirname(__file__)
+TMP_DIR: str = "/tmp"
 logger = timtools.log.get_logger(__name__)
 
 
 class Sync:
 	"""Sync devices"""
+	dir:str
+	username:str
+	hostname:str
 
 	def __init__(self, master, slaves):
 		self.hostname = os.uname().nodename
@@ -70,18 +75,26 @@ class Sync:
 		backup_dir = join('/var/tmp/sync', str(now.year), str(now.month), str(now.day))
 		return ['--backup', '--backup-dir={dir}'.format(dir=backup_dir)]
 
-	@classmethod
-	def inex_parm(cls, master: Device, slave: Device) -> list:
+	def inex_parm(self, master: Device, slave: Device) -> list:
 		"""Retruns the rsync parameters for excluding and including files"""
 		infile: str = abspath(join(PROJECT_DIR, 'include.txt'))
 		exfile: str = abspath(join(PROJECT_DIR, 'exclude.txt'))
 		limfile: str = abspath(join(PROJECT_DIR, 'limited.txt'))
+		in2file: str = abspath(join(TMP_DIR, 'include_rest.txt'))
+
+		with open(in2file, "w") as fobj:
+			rules: List[str] = [
+				f"{d}/**\n"
+				for d in os.listdir(self.dir)
+				if not d.startswith(".")
+			]
+			fobj.writelines(rules)
 
 		parm: list = [
 			"--exclude=*.sock",
 			f"--include-from={infile}",
 			f'--exclude-from={exfile}',
-			"--include=Config/**",
+			f"--include-from={in2file}",
 			"--exclude=.*"
 		]
 
@@ -90,7 +103,7 @@ class Sync:
 				'--exclude=__pycache__',
 				'--exclude=Config/VMs',
 				'--exclude=Config/oh-my-zsh/log',
-				f'--include-from={limfile}', 
+				f'--include-from={limfile}',
 				'--exclude=*'
 			]
 
@@ -131,7 +144,8 @@ def main():
 	parser.add_argument('-v', '--verbose', help='Geef feedback', action='store_true')
 	parser.add_argument('-f', '--from', help='Manuele referentie (heeft --to nodig)')
 	parser.add_argument('-t', '--to', help='Maneel doel (heeft --from nodig)')
-	parser.add_argument('-l', '--limited', help='Synchroniseer het minimum aan bestanden', action='store_true')
+	parser.add_argument('-l', '--limited', help='Synchroniseer het minimum aan bestanden',
+		action='store_true')
 	args = parser.parse_args()
 
 	timtools.log.set_verbose(args.verbose)
@@ -155,11 +169,13 @@ def main():
 		slave = [Device(args.to.replace(' ', ''))]
 	elif args.master:
 		master = Device(args.master)
-		slave = [Device(name) for name in devices if name != args.master]  # pylint: disable=not-an-iterable
+		slave = [Device(name) for name in devices if
+			name != args.master]  # pylint: disable=not-an-iterable
 	else:
 		mastername = os.uname().nodename.replace('-tim', '')
 		master = Device(mastername)
-		slave = [Device(name) for name in devices if name != mastername]  # pylint: disable=not-an-iterable
+		slave = [Device(name) for name in devices if
+			name != mastername]  # pylint: disable=not-an-iterable
 
 	if master in slave:
 		raise argparse.ArgumentError(args.master, 'Master kan geen slave zijn')
