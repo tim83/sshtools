@@ -17,25 +17,57 @@ logger = timtools.log.get_logger(__name__)
 class Ssh:
 	"""Class to ssh into a device"""
 
-	def __init__(self, dev, exe: (str, list) = None, mosh: bool = False, copy_id: bool = False):
-		logger.debug('Device: %s ; Executable: %s ; Mosh: %s ; Copy ID: %s', dev, exe, mosh,
-			copy_id)
+	def __init__(
+			self,
+			dev: Device,
+			exe: (str, list) = None,
+			mosh: bool = False,
+			copy_id: bool = False,
+			connect: bool = True
+	):
+		if connect:
+			logger.debug('Device: %s ; Executable: %s ; Mosh: %s ; Copy ID: %s', dev.hostname, exe, mosh, copy_id)
+		else:
+			logger.debug('Device: %s', dev.hostname)
+
+		self.device: Device = dev
+		self.hostname: str = os.uname().nodename
+		self.username: str = os.environ['USER']  # os.getlogin()
+
+		if connect:
+			self.connect(exe=exe, copy_id=copy_id, mosh=mosh)
+
+	def connect(
+			self,
+			ip_addr: str = None,
+			exe: (str, list) = None,
+			ssh_port: str = None,
+			copy_id: bool = False,
+			mosh: bool = False,
+	):
+
+		user = self.device.user
+		if not self.device.ssh:
+			raise ConfigError(self.device.name)
 
 		if isinstance(exe, list):
 			exe = ' '.join(exe)
 
-		self.hostname = os.uname().nodename
-		self.username = os.environ['USER']  # os.getlogin()
-		user = dev.user
-		if not dev.ssh:
-			raise ConfigError(dev.name)
+		if ip_addr is None:
+			ip_addr = self.device.get_ip()
+		else:
+			ip_addr = ip_addr
 
-		ip_addr = dev.get_ip()
+		if ssh_port is None:
+			ssh_port = str(self.device.ssh_port)
+		else:
+			ssh_port = ssh_port
+
 		self.print_header(ip_addr)
 
 		try:
 			if copy_id:
-				cmd_ci = ['ssh-copy-id', '-p', str(dev.ssh_port), f'{user}@{ip_addr}']
+				cmd_ci = ['ssh-copy-id', '-p', ssh_port, f'{user}@{ip_addr}']
 				logger.debug(' '.join(cmd_ci))
 
 				response_ci = timtools.bash.run(cmd_ci)
@@ -43,7 +75,7 @@ class Ssh:
 			if mosh:
 				cmd = ['mosh', f'{user}@{ip_addr}']
 			else:
-				cmd = ['ssh', '-t', '-p', str(dev.ssh_port), f'{user}@{ip_addr}']
+				cmd = ['ssh', '-t', '-p', ssh_port, f'{user}@{ip_addr}']
 
 			if exe:
 				cmd += [exe]
@@ -56,7 +88,7 @@ class Ssh:
 			self.print_footer()
 
 		except DeviceNotPresentError:
-			relay = dev.get_relay()
+			relay = self.device.get_relay()
 			if relay:
 				Ssh(
 					relay,
@@ -91,10 +123,8 @@ def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('target', help='Welke computer is de referentie')
 	parser.add_argument('-c', '--command', help='Uit te voeren commando')
-	parser.add_argument('-u', '--user',
-		help='Login als deze gebruiker, in plaats van de standaard gebruiker')
-	parser.add_argument('-i', '--copy-id', help='Voert ssh-copy-id uit voor de verbinden',
-		action='store_true')
+	parser.add_argument('-u', '--user', help='Login als deze gebruiker, in plaats van de standaard gebruiker')
+	parser.add_argument('-i', '--copy-id', help='Voert ssh-copy-id uit voor de verbinden', action='store_true')
 	parser.add_argument('-m', '--mosh', help='Gebruik MOSH in plaats van SSH', action='store_true')
 	parser.add_argument('-s', '--ssh', help='Gebruik MOSH in plaats van SSH', action='store_true')
 	parser.add_argument('-v', '--verbose', help='Geef feedback', action='store_true')

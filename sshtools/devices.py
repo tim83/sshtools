@@ -7,7 +7,7 @@ import subprocess
 from configparser import ConfigParser, NoSectionError, RawConfigParser
 from collections import OrderedDict
 from os.path import dirname, expanduser, join
-from typing import List
+from typing import List,Optional,Union
 
 import psutil
 from timtools import bash
@@ -34,8 +34,8 @@ def get_ips():
 			if interface_name[:3] in ["eth", "wla", "enp", "wlo", "wlp"]:
 				ip_addr = next(
 					address.address
-						for address in interfaces[interface_name]
-						if address.family == socket.AF_INET
+					for address in interfaces[interface_name]
+					if address.family == socket.AF_INET
 				)
 				addresses.append(ip_addr)
 		except StopIteration:
@@ -65,8 +65,8 @@ class Device:  # pylint: disable=too-many-instance-attributes
 	wlan = str
 	eth: str
 	present: bool
-	sync: str
-	ssh: bool
+	sync: bool
+	ssh: Union[str,bool]
 	ssh_port: int
 	mosh: bool
 	emac: str
@@ -74,7 +74,8 @@ class Device:  # pylint: disable=too-many-instance-attributes
 	user: str
 	relay: str
 	relay_to: str
-	ip_addr: str
+	ip_addr: Optional[str]
+	mdns: str
 
 	@staticmethod
 	def get_devices(extra_config=None):
@@ -146,6 +147,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
 			self.user = self.config.get(name, 'user', fallback='tim')
 			self.relay = self.config.get(name, 'relay', fallback=None)
 			self.relay_to = self.config.get(name, 'relay_to', fallback=None)
+			self.mdns = self.hostname + ".local"
 			self.ip_addr = None
 			if isinstance(self.sync, str):
 				if self.sync == 'True':
@@ -165,7 +167,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
 
 		for ips in [
 			list(reversed(ips))
-			for ips in [self.eth, self.wlan, [self.hostname + ".local"]]
+			for ips in [self.eth, self.wlan, [self.mdns]]
 			if ips is not None
 		]:
 			alive_ips = check_ips(ips)

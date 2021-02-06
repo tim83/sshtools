@@ -2,6 +2,7 @@
 Downloads/*.iso
 Downloads/*.img
 Documenten/ISO
+ISO
 *.part
 VirtualBox VMs
 Video's/Downloads
