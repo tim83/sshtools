@@ -1,19 +1,15 @@
 *__pycache__*
+*.part
 Downloads/*.iso
 Downloads/*.img
 Documenten/ISO
 ISO
-*.part
-VirtualBox VMs
-Video's/Downloads
 Video's/Media
 Video's/Media_bu
-Video's/Torrent
 snap
 PlayOnLinux's virtual drives
 nosync
 Bureaublad
-tmp/torrent-download
 Openbaar/Dropbox
 Openbaar/Nextcloud
 Private
