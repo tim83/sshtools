@@ -114,7 +114,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
 			config_files.append(join(project_dir, 'home-tim.ini'))
 
 		Device.config_all = RawConfigParser(dict_type=MultiOrderedDict, strict=False)
-		Device.config = ConfigParser()
+		Device.config = ConfigParser(strict=False)
 		for config in [Device.config_all, Device.config]:
 			config.read(config_files)
 		Device.devices = Device.config.sections()
