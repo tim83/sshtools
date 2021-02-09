@@ -5,9 +5,19 @@ from setuptools import setup
 
 # from distutils.core import setup
 
+ini_files = [
+	f'sshtools/{filename}.ini'
+	for filename in ["devices", "kot", "kot-tim", "home", "home-tim"]
+]
+
+txt_files = [
+	f'sshtools/{filename}.txt'
+	for filename in ["exclude", "include", "limited"]
+]
+
 setup(
 	name='sshtools',
-	version='2.13.4',
+	version='2.13.5',
 	packages=['sshtools'],
 	url='',
 	license='',
@@ -30,9 +40,5 @@ setup(
 		"bin/smount",
 	],
 	include_package_data=True,
-	# data_files=[(
-	# 	'',
-	# 	[f'sshtools/{filename}.ini' for filename in ["devices", "kot", "kot-tim", "home", "home-tim"]] +
-	# 	[f'sshtools/{filename}.txt' for filename in ["exclude", "include", "limited"]]
-	# )]
+	data_files=ini_files + txt_files
 )
