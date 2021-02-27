@@ -2,6 +2,7 @@
 *.part
 Downloads/*.iso
 Downloads/*.img
+Downloads/*.raw*
 Documenten/ISO
 ISO
 Video's/Media
