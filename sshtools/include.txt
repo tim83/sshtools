@@ -3,3 +3,4 @@
 .pylintrc
 .idea
 .directory
+.vscode/**
