@@ -95,7 +95,7 @@ class Sync:
 			f"--include-from={infile}",
 			f'--exclude-from={exfile}',
 			f"--include-from={in2file}",
-			"--exclude=.*"
+			"--exclude=/.*"
 		]
 
 		if slave.sync == 'Limited' or master.sync == 'Limited':
