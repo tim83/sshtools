@@ -25,7 +25,7 @@ class Sync:
 	username:str
 	hostname:str
 
-	def __init__(self, master, slaves):
+	def __init__(self, master, slaves, dryrun=False):
 		self.hostname = os.uname().nodename
 		self.username = os.environ['USER']
 		self.dir = expanduser('~')
@@ -53,6 +53,8 @@ class Sync:
 				elif not master.is_self():
 					port = master.ssh_port
 					cmd += ["-e", f"ssh -p {port}"]
+				if dryrun:
+					cmd += ["--dry-run"]
 				cmd += self.backup_parm()
 				cmd += self.inex_parm(master, slave)
 				cmd += self.get_source(master)
@@ -144,8 +146,16 @@ def main():
 	parser.add_argument('-v', '--verbose', help='Geef feedback', action='store_true')
 	parser.add_argument('-f', '--from', help='Manuele referentie (heeft --to nodig)')
 	parser.add_argument('-t', '--to', help='Maneel doel (heeft --from nodig)')
-	parser.add_argument('-l', '--limited', help='Synchroniseer het minimum aan bestanden',
-		action='store_true')
+	parser.add_argument(
+		'-l', '--limited',
+		help='Synchroniseer het minimum aan bestanden',
+		action='store_true'
+	)
+	parser.add_argument(
+		'-d', '--dry-run',
+		help='Voer de sync niet echt uit',
+		action='store_true'
+	)
 	args = parser.parse_args()
 
 	timtools.log.set_verbose(args.verbose)
@@ -185,7 +195,7 @@ def main():
 
 	logger.info("%s -> %s", master.hostname, ', '.join([s.hostname for s in slave]))
 
-	Sync(master, slave)
+	Sync(master, slave, dryrun=args.dry_run)
 
 
 if __name__ == '__main__':
