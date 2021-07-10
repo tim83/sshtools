@@ -112,6 +112,9 @@ class Device:  # pylint: disable=too-many-instance-attributes
 			# Own home network
 			logger.info("Detected Tims Home network.")
 			config_files.append(join(project_dir, 'home-tim.ini'))
+		if ip_id in ["192.168.193"] or "ztuga6wg3j" in ifaces:
+			logger.info("Detected ZeroTier One VPN")
+			config_files.append(join(project_dir, 'zerotier.ini'))
 
 		Device.config_all = RawConfigParser(dict_type=MultiOrderedDict, strict=False)
 		Device.config = ConfigParser(strict=False)
