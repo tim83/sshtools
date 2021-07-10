@@ -7,7 +7,7 @@ from setuptools import setup
 
 ini_files = [
 	f'sshtools/{filename}.ini'
-	for filename in ["devices", "kot", "kot-tim", "home", "home-tim"]
+	for filename in ["devices", "kot", "kot-tim", "home", "home-tim", "zerotier"]
 ]
 
 txt_files = [
@@ -17,7 +17,7 @@ txt_files = [
 
 setup(
 	name='sshtools',
-	version='2.16',
+	version='2.16.1',
 	packages=['sshtools'],
 	url='',
 	license='',
