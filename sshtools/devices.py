@@ -4,8 +4,9 @@
 import os
 import socket
 import subprocess
-from configparser import ConfigParser, NoSectionError, RawConfigParser
+import threading
 from collections import OrderedDict
+from configparser import ConfigParser, NoSectionError, RawConfigParser
 from os.path import dirname, expanduser, join
 from typing import List, Optional, Union
 
@@ -168,16 +169,27 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		if self.hostname == os.uname().nodename:
 			return self.hostname
 
-		ip_lists: List[str] = [
+		ip_threads = IPThreads()
+		ip_threads.inputs = [
 			list(reversed(ips))
-			for ips in [self.eth, self.wlan, [self.mdns]]
+			for ips in [self.eth, self.wlan, [self.hostname, self.mdns]]
 			if ips is not None
 		]
 
-		logger.debug(f"Trying IP lists {ip_lists}")
+		ip_threads.threads = [
+			threading.Thread(target=check_ips, args=(ip_threads, i), daemon=True)
+			for i in range(len(ip_threads.inputs))
+		]
 
-		for ips in ip_lists: # TODO: Parrallellize
-			alive_ips = check_ips(ips)
+		# Start all threads
+		ip_threads.start_all()
+
+		logger.debug(f"Trying IP lists {ip_threads.inputs}")
+
+		for index in range(ip_threads.num_threads):
+			ip_threads.threads[index].join()
+			alive_ips = ip_threads.output[index]
+			logger.debug(f"Found active IPs: {alive_ips}")
 			if len(alive_ips) > 0:
 				return alive_ips[0]
 
@@ -206,10 +218,27 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		return '<Device({name})>'.format(name=self.hostname)
 
 
-def check_ips(ip_addrs: List[str]) -> List[str]:
+class IPThreads:
+	num_threads = 3
+	inputs: List[Optional[List[str]]] = [None] * num_threads
+	output: List[Optional[List[str]]] = [None] * num_threads
+	threads: List[Optional[threading.Thread]] = [None] * num_threads
+
+	def start_all(self):
+		for thread in self.threads:
+			thread.start()
+
+	@property
+	def num_threads(self):
+		return len(self.threads)
+
+
+def check_ips(ip_threads: IPThreads, index: int):
 	"""Returns the IPs from a list that are reachable
-	:param ip_addrs: A list of the IPs that need to be tested
-	:returns: A list of reachable IPs"""
+	:param ip_threads: The object containing the threads, inputs and outputs for this job
+	:param index: The index of this thread"""
+
+	ip_addrs: List[str] = ip_threads.inputs[index]
 
 	ping_cmd = [
 		"fping",
@@ -227,4 +256,4 @@ def check_ips(ip_addrs: List[str]) -> List[str]:
 	if '' in alive_ips:
 		alive_ips.remove('')
 
-	return alive_ips
+	ip_threads.output[index] = alive_ips
