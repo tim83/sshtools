@@ -7,7 +7,7 @@ import subprocess
 from configparser import ConfigParser, NoSectionError, RawConfigParser
 from collections import OrderedDict
 from os.path import dirname, expanduser, join
-from typing import List,Optional,Union
+from typing import List, Optional, Union
 
 import psutil
 from timtools import bash
@@ -34,8 +34,8 @@ def get_ips():
 			if interface_name[:3] in ["eth", "wla", "enp", "wlo", "wlp"]:
 				ip_addr = next(
 					address.address
-					for address in interfaces[interface_name]
-					if address.family == socket.AF_INET
+						for address in interfaces[interface_name]
+						if address.family == socket.AF_INET
 				)
 				addresses.append(ip_addr)
 		except StopIteration:
@@ -66,7 +66,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
 	eth: str
 	present: bool
 	sync: bool
-	ssh: Union[str,bool]
+	ssh: Union[str, bool]
 	ssh_port: int
 	mosh: bool
 	emac: str
@@ -168,11 +168,15 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		if self.hostname == os.uname().nodename:
 			return self.hostname
 
-		for ips in [
+		ip_lists: List[str] = [
 			list(reversed(ips))
 			for ips in [self.eth, self.wlan, [self.mdns]]
 			if ips is not None
-		]:
+		]
+
+		logger.debug(f"Trying IP lists {ip_lists}")
+
+		for ips in ip_lists: # TODO: Parrallellize
 			alive_ips = check_ips(ips)
 			if len(alive_ips) > 0:
 				return alive_ips[0]
