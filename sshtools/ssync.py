@@ -21,17 +21,17 @@ logger = timtools.log.get_logger(__name__)
 
 class Sync:
 	"""Sync devices"""
-	dir:str
-	username:str
-	hostname:str
+	dir: str
+	username: str
+	hostname: str
 
-	def __init__(self, master, slaves, dryrun=False):
+	def __init__(self, master, slaves, dry_run=False):
 		self.hostname = os.uname().nodename
 		self.username = os.environ['USER']
 		self.dir = expanduser('~')
 
 		for slave in slaves:
-			if not slave.sync or not slave.present:
+			if not slave.sync or not slave.is_present():
 				continue
 			print()
 			print(master.name + ' -> ' + slave.name)
@@ -53,7 +53,7 @@ class Sync:
 				elif not master.is_self():
 					port = master.ssh_port
 					cmd += ["-e", f"ssh -p {port}"]
-				if dryrun:
+				if dry_run:
 					cmd += ["--dry-run"]
 				cmd += self.backup_parm()
 				cmd += self.inex_parm(master, slave)
@@ -179,13 +179,11 @@ def main():
 		slave = [Device(args.to.replace(' ', ''))]
 	elif args.master:
 		master = Device(args.master)
-		slave = [Device(name) for name in devices if
-			name != args.master]  # pylint: disable=not-an-iterable
+		slave = [Device(name) for name in devices if name != args.master]
 	else:
 		mastername = os.uname().nodename.replace('-tim', '')
 		master = Device(mastername)
-		slave = [Device(name) for name in devices if
-			name != mastername]  # pylint: disable=not-an-iterable
+		slave = [Device(name) for name in devices if name != mastername]
 
 	if master in slave:
 		raise argparse.ArgumentError(args.master, 'Master kan geen slave zijn')
@@ -195,7 +193,7 @@ def main():
 
 	logger.info("%s -> %s", master.hostname, ', '.join([s.hostname for s in slave]))
 
-	Sync(master, slave, dryrun=args.dry_run)
+	Sync(master, slave, dry_run=args.dry_run)
 
 
 if __name__ == '__main__':

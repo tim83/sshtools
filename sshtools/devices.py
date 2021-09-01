@@ -214,6 +214,14 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		except ErrorHandler:
 			return False
 
+	def is_present(self) -> bool:
+		"""Checks if the device is reachable"""
+		try:
+			ip_addr: str = self.get_ip()
+			return ip_addr is not None
+		except ErrorHandler:
+			return False
+
 	def __repr__(self):
 		return '<Device({name})>'.format(name=self.hostname)
 
