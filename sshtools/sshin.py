@@ -72,7 +72,7 @@ class Ssh:
 
 				response_ci = timtools.bash.run(cmd_ci)
 				logger.info('SSH-COPY-ID exited with code %s', response_ci)
-			if mosh:
+			if mosh and self.device.is_local():
 				cmd = ['mosh', f'{user}@{ip_addr}']
 			else:
 				cmd = ['ssh', '-t', '-p', ssh_port, f'{user}@{ip_addr}']
