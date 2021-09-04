@@ -1,6 +1,7 @@
 #! /usr/bin/python3
 """Classes for managing devices used by other files"""
 
+import datetime as dt
 import os
 import socket
 import subprocess
@@ -129,6 +130,8 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		self.log = get_logger('ssh-tool.devices', verbose=verbose)
 		self.name = name
 		self.get_config(name)
+		self.last_ip_addr: Optional[str] = None
+		self.last_ip_addr_update: Optional[dt.datetime] = None
 
 	def get_config(self, name, relay=None):
 		"""Loads and stores the device's config"""
@@ -152,7 +155,6 @@ class Device:  # pylint: disable=too-many-instance-attributes
 			self.relay = self.config.get(name, 'relay', fallback=None)
 			self.relay_to = self.config.get(name, 'relay_to', fallback=None)
 			self.mdns = self.hostname + ".local"
-			self.ip_addr = None
 			if isinstance(self.sync, str):
 				if self.sync == 'True':
 					self.sync = True
@@ -191,9 +193,19 @@ class Device:  # pylint: disable=too-many-instance-attributes
 			alive_ips = ip_threads.output[index]
 			logger.debug(f"Found active IPs: {alive_ips}")
 			if len(alive_ips) > 0:
-				return alive_ips[0]
+				self.last_ip_addr = alive_ips[0]
+				self.last_ip_addr_update = dt.datetime.now()
+				return self.ip_addr
 
 		raise NotReachableError(self.name)
+
+	@property
+	def ip_addr(self) -> str:
+		if self.last_ip_addr is not None and self.last_ip_addr_update is not None:
+			td_update: dt.timedelta = dt.datetime.now() - self.last_ip_addr_update
+			if td_update < dt.timedelta(seconds=30):
+				return self.last_ip_addr
+		return self.get_ip()
 
 	def get_relay(self):
 		"""Return the relay device to be used when connecting to this device"""
@@ -209,16 +221,16 @@ class Device:  # pylint: disable=too-many-instance-attributes
 	def is_local(self) -> bool:
 		"""Checks if the device is present on the local LAN"""
 		try:
-			ip_addr: str = self.get_ip()
-			return ip_addr is not None and ip_addr.startswith("192.168")
+			return self.ip_addr is not None and (
+					self.ip_addr.startswith("192.168") or self.ip_addr.endswith(".local")
+			)
 		except ErrorHandler:
 			return False
 
 	def is_present(self) -> bool:
 		"""Checks if the device is reachable"""
 		try:
-			ip_addr: str = self.get_ip()
-			return ip_addr is not None
+			return self.ip_addr is not None
 		except ErrorHandler:
 			return False
 
