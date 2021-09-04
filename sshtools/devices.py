@@ -172,7 +172,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		ip_threads = IPThreads()
 		ip_threads.inputs = [
 			list(reversed(ips))
-			for ips in [self.eth, self.wlan, [self.hostname, self.mdns]]
+			for ips in [[self.mdns], self.eth, self.wlan]
 			if ips is not None
 		]
 
