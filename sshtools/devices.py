@@ -31,9 +31,10 @@ def get_ips():
 	interfaces = psutil.net_if_addrs()
 	interface_names = sorted(interfaces.keys())
 	addresses = []
+	logger.debug(f"Networkinterfaces: {interface_names}")
 	for interface_name in interface_names:
 		try:
-			if interface_name[:3] in ["eth", "wla", "enp", "wlo", "wlp"]:
+			if interface_name[:3] in ["eth", "wla", "enp", "wlo", "wlp", "eno"]:
 				ip_addr = next(
 					address.address
 						for address in interfaces[interface_name]
