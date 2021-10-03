@@ -76,7 +76,7 @@ class Sync:
 		"""Returns the rsync paramters pertaining to the backup of files"""
 		now = dt.datetime.now()
 		backup_dir = expanduser(join(
-			'~/.cache/ssync',
+			'~/.cache/ssync_backup',
 			str(now.year), str(now.month), str(now.day),
 			str(now.strftime("%H%M%S")) + "-" + str(uuid.uuid4()).split('-')[0]
 		))
