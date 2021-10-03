@@ -4,6 +4,7 @@
 import argparse
 import datetime as dt
 import os
+import uuid
 import subprocess
 from os.path import abspath, dirname, expanduser, join
 from typing import List
@@ -74,7 +75,11 @@ class Sync:
 	def backup_parm(cls) -> list:
 		"""Returns the rsync paramters pertaining to the backup of files"""
 		now = dt.datetime.now()
-		backup_dir = join('/var/tmp/sync', str(now.year), str(now.month), str(now.day))
+		backup_dir = expanduser(join(
+			'~/.cache/ssync',
+			str(now.year), str(now.month), str(now.day),
+			str(now.strftime("%H%M%S")) + "-" + str(uuid.uuid4()).split('-')[0]
+		))
 		return ['--backup', '--backup-dir={dir}'.format(dir=backup_dir)]
 
 	def inex_parm(self, master: Device, slave: Device) -> list:
