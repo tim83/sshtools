@@ -100,7 +100,7 @@ def main():
 	devices = Device.get_devices()
 	logger.debug(devices)
 
-	target = Device(args.target)
+	target = Device.get_device(args.target)
 	source = args.source
 	mountpoint = args.mountpoint
 

@@ -80,6 +80,8 @@ class Device:  # pylint: disable=too-many-instance-attributes
 	ip_addr: Optional[str]
 	mdns: str
 
+	unique_devices: dict[str, "Device"] = dict()
+
 	@staticmethod
 	def get_devices(extra_config=None):
 		"""Returns and stores the configured devices"""
@@ -91,7 +93,8 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		config_files = [general_devices_config, local_devices_config] + extra_config
 
 		try:
-			ssid = subprocess.check_output(['/usr/sbin/iwgetid', '-r'], shell=True).decode().strip("\n")
+			ssid = subprocess.check_output(['/usr/sbin/iwgetid', '-r'], shell=True).decode().strip(
+				"\n")
 			if ssid == "WiFi-Home":
 				config_files.append(join(project_dir, 'home.ini'))
 			elif "Predikerinnenstraat 10" in ssid:
@@ -127,8 +130,20 @@ class Device:  # pylint: disable=too-many-instance-attributes
 
 		return Device.devices
 
-	def __init__(self, name, verbose=False):
-		self.log = get_logger('ssh-tool.devices', verbose=verbose)
+	@staticmethod
+	def get_device(name: str, verbose: bool = False):
+		if name in Device.unique_devices.keys():
+			return Device.unique_devices[name]
+
+		return Device(name, verbose)
+
+	def __init__(self, name: str, verbose: bool = False):
+		self.logger = get_logger('ssh-tool.devices', verbose=verbose)
+		if name not in Device.unique_devices.keys():
+			Device.unique_devices[name] = self
+		else:
+			raise ValueError("A device object for this machine already exists")
+
 		self.name = name
 		self.get_config(name)
 		self.last_ip_addr: Optional[str] = None
@@ -211,7 +226,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
 	def get_relay(self):
 		"""Return the relay device to be used when connecting to this device"""
 		if self.relay:
-			return Device(self.relay)
+			return Device.get_device(self.relay)
 		return None
 
 	def is_self(self) -> bool:

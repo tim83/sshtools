@@ -12,14 +12,14 @@ logger = timtools.log.get_logger('ssh-tools.getip')
 
 def get_ip(target: str) -> str:
 	"""Return the IP address of a target device"""
-	dev = Device(target)
+	dev = Device.get_device(target)
 	ip_addr = dev.get_ip()
 	return ip_addr
 
 
 def get_string(target: str) -> str:
 	"""Return the full address of the user on the device"""
-	dev = Device(target)
+	dev = Device.get_device(target)
 	ip_addr = dev.get_ip()
 	return f"{dev.user}@{ip_addr}"
 

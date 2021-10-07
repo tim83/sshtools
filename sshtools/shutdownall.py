@@ -49,7 +49,7 @@ class Main:  # pylint: disable=too-few-public-methods
 		names = [name for name in devices if name not in (master_name, 'media', 'imbit')]  # pylint: disable=not-an-iterable
 		self.slave = []
 		for name in names:
-			dev = Device(name)
+			dev = Device.get_device(name)
 			try:
 				dev.get_ip()
 				self.slave.append(dev)

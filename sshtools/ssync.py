@@ -170,25 +170,25 @@ def main():
 
 	if getattr(args, 'from') and args.to:
 		# Define both SLAVE and MASTER
-		master = Device(getattr(args, 'from').replace(' ', ''))
-		slave = [Device(args.to.replace(' ', ''))]
+		master = Device.get_device(getattr(args, 'from').replace(' ', ''))
+		slave = [Device.get_device(args.to.replace(' ', ''))]
 	elif getattr(args, 'from') and not args.to:
 		# Define only MASTER
-		master = Device(getattr(args, 'from').replace(' ', ''))
+		master = Device.get_device(getattr(args, 'from').replace(' ', ''))
 		slavename = os.uname().nodename.replace('-tim', '')
-		slave = [Device(slavename)]
+		slave = [Device.get_device(slavename)]
 	elif not getattr(args, 'from') and args.to:
 		# Define only SLAVE
 		mastername = os.uname().nodename.replace('-tim', '')
-		master = Device(mastername)
-		slave = [Device(args.to.replace(' ', ''))]
+		master = Device.get_device(mastername)
+		slave = [Device.get_device(args.to.replace(' ', ''))]
 	elif args.master:
-		master = Device(args.master)
-		slave = [Device(name) for name in devices if name != args.master]
+		master = Device.get_device(args.master)
+		slave = [Device.get_device(name) for name in devices if name != args.master]
 	else:
 		mastername = os.uname().nodename.replace('-tim', '')
-		master = Device(mastername)
-		slave = [Device(name) for name in devices if name != mastername]
+		master = Device.get_device(mastername)
+		slave = [Device.get_device(name) for name in devices if name != mastername]
 
 	if master in slave:
 		raise argparse.ArgumentError(args.master, 'Master kan geen slave zijn')
