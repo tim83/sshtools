@@ -1,3 +1,5 @@
 #! /bin/bash
 
-python3 -m sshtools.getip "$@"
+# python3 -m sshtools.getip "$@"
+cd $HOME/Programs/python/sshtools || exit 1
+poetry run getip "$@"

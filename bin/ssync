@@ -1,3 +1,6 @@
 #! /bin/bash
 
-python3 -m sshtools.ssync "$@"
+#python3 -m sshtools.ssync "$@"
+
+cd $HOME/Programs/python/sshtools || exit 1
+poetry run ssync "$@"
