@@ -24,12 +24,14 @@ def get_string(target: str) -> str:
 	return f"{dev.user}@{ip_addr}"
 
 
-if __name__ == "__main__":
+def run():
 	# Arguments
 	parser = argparse.ArgumentParser()
-	parser.add_argument('target', help='Computer voor wie het ip adres moet worden bepaald', nargs='?')
+	parser.add_argument('target', help='Computer voor wie het ip adres moet worden bepaald',
+		nargs='?')
 	parser.add_argument('-v', '--verbose', help='Geef feedback', action='store_true')
-	parser.add_argument('-s', '--ssh-string', help='Geeft de volledige string voor SSH ([USER]@[IP])', action='store_true')
+	parser.add_argument('-s', '--ssh-string',
+		help='Geeft de volledige string voor SSH ([USER]@[IP])', action='store_true')
 	args = parser.parse_args()
 
 	timtools.log.set_verbose(args.verbose)
@@ -38,3 +40,7 @@ if __name__ == "__main__":
 		print(get_string(args.target))
 	else:
 		print(get_ip(args.target))
+
+
+if __name__ == "__main__":
+	run()

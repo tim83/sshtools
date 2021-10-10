@@ -36,7 +36,7 @@ def wake(device: Device):
 		logger.critical('%s kan niet bereikt worden', device.hostname)
 
 
-def main():
+def run():
 	"""Main executable for wake-up"""
 	parser = argparse.ArgumentParser()
 	parser.add_argument('target', help='Welke computer is de referentie', nargs='?')
@@ -52,4 +52,4 @@ def main():
 
 
 if __name__ == '__main__':
-	main()
+	run()

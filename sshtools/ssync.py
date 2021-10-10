@@ -143,7 +143,7 @@ class Sync:
 		return target
 
 
-def main():
+def run():
 	"""Main executable for ssync"""
 	# Arguments
 	parser = argparse.ArgumentParser()
@@ -202,4 +202,4 @@ def main():
 
 
 if __name__ == '__main__':
-	main()
+	run()

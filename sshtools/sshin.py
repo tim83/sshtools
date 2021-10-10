@@ -117,7 +117,7 @@ class Ssh:
 		print('\n' + '-' * twidth + '\n')
 
 
-def main():
+def run():
 	"""Main executable for sshin"""
 	logger.debug(sys.argv)
 	parser = argparse.ArgumentParser()
@@ -148,4 +148,4 @@ def main():
 
 
 if __name__ == '__main__':
-	main()
+	run()

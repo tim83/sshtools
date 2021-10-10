@@ -83,7 +83,7 @@ class Mount:
 		print('\n' + '-' * twidth + '\n')
 
 
-def main():
+def run():
 	"""Main executable class for smount"""
 	parser = argparse.ArgumentParser()
 	parser.add_argument('target', help='Welke computer is de referentie')
@@ -108,4 +108,4 @@ def main():
 
 
 if __name__ == "__main__":
-	main()
+	run()
