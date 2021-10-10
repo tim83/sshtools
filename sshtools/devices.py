@@ -283,7 +283,7 @@ def check_ips(ip_threads: IPThreads, index: int):
 		"-a"  # only print alive ips
 	]
 
-	ping_out: str = bash.run(
+	ping_out: str = bash.get_output(
 		ping_cmd + ip_addrs,
 		passable_exit_codes=[1, 2],
 		capture_stdout=True

@@ -3,9 +3,9 @@
 
 import argparse
 import os
-import subprocess
 import sys
 
+import timtools.bash
 import timtools.log
 
 from sshtools.devices import Device
@@ -26,7 +26,8 @@ class Ssh:
 			connect: bool = True
 	):
 		if connect:
-			logger.debug('Device: %s ; Executable: %s ; Mosh: %s ; Copy ID: %s', dev.hostname, exe, mosh, copy_id)
+			logger.debug('Device: %s ; Executable: %s ; Mosh: %s ; Copy ID: %s', dev.hostname, exe,
+				mosh, copy_id)
 		else:
 			logger.debug('Device: %s', dev.hostname)
 
@@ -63,7 +64,8 @@ class Ssh:
 		else:
 			ssh_port = ssh_port
 
-		self.print_header(ip_addr)
+		if exe is None:
+			self.print_header(ip_addr)
 
 		try:
 			if copy_id:
@@ -72,29 +74,34 @@ class Ssh:
 
 				response_ci = timtools.bash.run(cmd_ci)
 				logger.info('SSH-COPY-ID exited with code %s', response_ci)
-			if mosh and self.device.is_local():
+			if mosh and self.device.is_local() and not exe:
 				cmd = ['mosh', f'{user}@{ip_addr}']
 			else:
-				cmd = ['ssh', '-t', '-p', str(ssh_port), f'{user}@{ip_addr}']
+				cmd = ['ssh', '-p', str(ssh_port), f'{user}@{ip_addr}']
 
-			if exe:
-				cmd += [exe]
+				if exe:
+					cmd += [exe]
+				else:
+					cmd += ['-t']
 
 			logger.debug(' '.join(cmd))
-			timtools.bash.run(cmd, passable_exit_codes=[255, 100, 127])
+			cmd_result = timtools.bash.run(cmd, passable_exit_codes=[255, 100, 127])
+			sys.exit(cmd_result.exit_code)
+
 		except ConnectionError:
 			pass
-
-			self.print_footer()
 
 		except DeviceNotPresentError:
 			relay = self.device.get_relay()
 			if relay:
 				Ssh(
 					relay,
-					exe=["python3 -m sshtools.sshin"] + [f"\"{arg}\"" for arg in sys.argv[1:]],
+					exe=["python -m sshtools.sshin"] + [f"\"{arg}\"" for arg in sys.argv[1:]],
 					mosh=mosh, copy_id=copy_id
 				)
+
+		if exe is None:
+			self.print_header(ip_addr)
 
 	def print_header(self, ip_addr: str):
 		"""Prints a header to the terminal"""
@@ -123,8 +130,10 @@ def run():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('target', help='Welke computer is de referentie')
 	parser.add_argument('-c', '--command', help='Uit te voeren commando')
-	parser.add_argument('-u', '--user', help='Login als deze gebruiker, in plaats van de standaard gebruiker')
-	parser.add_argument('-i', '--copy-id', help='Voert ssh-copy-id uit voor de verbinden', action='store_true')
+	parser.add_argument('-u', '--user',
+		help='Login als deze gebruiker, in plaats van de standaard gebruiker')
+	parser.add_argument('-i', '--copy-id', help='Voert ssh-copy-id uit voor de verbinden',
+		action='store_true')
 	parser.add_argument('-m', '--mosh', help='Gebruik MOSH in plaats van SSH', action='store_true')
 	parser.add_argument('-s', '--ssh', help='Gebruik MOSH in plaats van SSH', action='store_true')
 	parser.add_argument('-v', '--verbose', help='Geef feedback', action='store_true')
