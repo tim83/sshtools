@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sshtools"
-version = "2.17.9"
+version = "2.18.1"
 description = ""
 authors = ["Tim Mees <tim.mees83@gmail.com>"]
 homepage = "https://github.com/tim83/sshtools"
@@ -22,7 +22,7 @@ getip = "sshtools.getip:run"
 smount = "sshtools.smount:run"
 sshin = "sshtools.sshin:run"
 ssync = "sshtools.ssync:run"
-wake-up = "sshtools.wake-up:run"
+wake-up = "sshtools.wakeup:run"
 
 [tool.poetry.dependencies]
 python = "^3.9"
