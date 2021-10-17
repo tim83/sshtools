@@ -65,8 +65,8 @@ class Device:  # pylint: disable=too-many-instance-attributes
 	current_ips: list = get_ips()
 	# Config
 	hostname: str
-	wlan = str
-	eth: str
+	wlan: Union[str, list[str]]
+	eth: Union[str, list[str]]
 	present: bool
 	sync: bool
 	ssh: Union[str, bool]
@@ -78,7 +78,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
 	relay: str
 	relay_to: str
 	ip_addr: Optional[str]
-	mdns: str
+	mdns: Optional[str]
 
 	unique_devices: dict[str, "Device"] = dict()
 
@@ -157,7 +157,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
 			self.get_devices()
 
 		try:
-			self.hostname = self.config.get(name, 'hostname', fallback=self.name)
+			self.hostname = self.config.get(name, 'hostname', fallback=None)
 			self.wlan = self.config_all.get(name, 'wlan', fallback=None)
 			self.eth = self.config_all.get(name, 'eth', fallback=None)
 			self.present = self.wlan is not None or self.eth is not None
@@ -170,7 +170,10 @@ class Device:  # pylint: disable=too-many-instance-attributes
 			self.user = self.config.get(name, 'user', fallback='tim')
 			self.relay = self.config.get(name, 'relay', fallback=None)
 			self.relay_to = self.config.get(name, 'relay_to', fallback=None)
-			self.mdns = self.hostname + ".local"
+			if self.hostname is not None:
+				self.mdns = self.hostname + ".local"
+			else:
+				self.mdns = None
 			if isinstance(self.sync, str):
 				if self.sync == 'True':
 					self.sync = True
@@ -187,33 +190,65 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		if self.hostname == os.uname().nodename:
 			return self.hostname
 
-		ip_threads = IPThreads()
-		ip_threads.inputs = [
-			list(reversed(ips))
-			for ips in [[self.mdns], self.eth, self.wlan]
-			if ips is not None
-		]
-
-		ip_threads.threads = [
-			threading.Thread(target=check_ips, args=(ip_threads, i), daemon=True)
-			for i in range(len(ip_threads.inputs))
-		]
-
-		# Start all threads
-		ip_threads.start_all()
-
-		logger.debug(f"Trying IP lists {ip_threads.inputs}")
-
-		for index in range(ip_threads.num_threads):
-			ip_threads.threads[index].join()
-			alive_ips = ip_threads.output[index]
-			logger.debug(f"Found active IPs: {alive_ips}")
-			if len(alive_ips) > 0:
-				self.last_ip_addr = alive_ips[0]
-				self.last_ip_addr_update = dt.datetime.now()
-				return self.ip_addr
+		alive_ips = self.get_active_ips()
+		if len(alive_ips) > 0:
+			ip_addr = self.sort_ips(alive_ips)[0]
+			logger.info(f"Found ip {ip_addr} for {self.name}")
+			self.last_ip_addr = alive_ips[0]
+			self.last_ip_addr_update = dt.datetime.now()
+			return ip_addr
 
 		raise NotReachableError(self.name)
+
+	def sort_ips(self, ip_addrs: list[str]) -> list[str]:
+		sorted_ips = {}
+		# mDNS
+		sorted_ips |= dict.fromkeys(filter(lambda ip: ip.endswith(".local"), ip_addrs))
+		# Local IPs
+		sorted_ips |= dict.fromkeys(filter(lambda ip: ip.startswith("192.168.2"), ip_addrs))
+		# Zerotier IPs
+		sorted_ips |= dict.fromkeys(filter(
+			lambda ip: ip.startswith("192.168.193") or ip == self.hostname,
+			ip_addrs
+		))
+		# Rest
+		sorted_ips |= dict.fromkeys(ip_addrs)
+		print(list(sorted_ips.keys()))
+		return list(sorted_ips.keys())
+
+	def get_possible_ips(
+			self,
+			include_mdns: bool = True,
+			include_hostname: bool = True,
+			include_eth: bool = True,
+			include_wlan: bool = True
+	) -> list[str]:
+		"""Returns all possible IPs that could be reached, within the given parameters"""
+
+		possible_ips: list[str] = []
+
+		def clean_ip_group(ip_group: Optional[list[str]]) -> list[str]:
+			if ip_group is not None:
+				return [ip for ip in ip_group if ip is not None and ip not in ['']]
+			return []
+
+		if include_eth:
+			possible_ips += clean_ip_group(self.eth)
+		if include_wlan:
+			possible_ips += clean_ip_group(self.wlan)
+		if include_mdns:
+			possible_ips += clean_ip_group([self.mdns])
+		if include_hostname:
+			possible_ips += clean_ip_group([self.hostname])
+
+		return possible_ips
+
+	def get_active_ips(self) -> list[str]:
+		"""Returns the list of all active ips"""
+		possible_ips: list[str] = self.get_possible_ips()
+		alive_ips: list[str] = check_ips(possible_ips)
+		logger.info(f"Found {len(alive_ips)} alive IPs for device {self.name}: {alive_ips}")
+		return alive_ips
 
 	@property
 	def ip_addr(self) -> str:
@@ -234,12 +269,26 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		hostname_machine = os.uname().nodename
 		return self.hostname == hostname_machine
 
-	def is_local(self) -> bool:
-		"""Checks if the device is present on the local LAN"""
+	def is_local(self, include_vpn: bool = True) -> bool:
+		"""
+		Checks if the device is present on the local LAN
+		:param include_vpn: Does a VPN (e.g. zerotier) count as part of the LAN?
+		"""
+		on_lan = lambda ip: ip.startswith("192.168") or ip.endswith(".local")
+		vpn_used = lambda ip: ip.startswith("192.168.193")
+
 		try:
-			return self.ip_addr is not None and (
-					self.ip_addr.startswith("192.168") or self.ip_addr.endswith(".local")
-			)
+			if self.ip_addr is not None:
+				if on_lan(self.ip_addr):
+					if include_vpn or not vpn_used(self.ip_addr):
+						return True
+
+				active_ips: list[str] = self.get_active_ips()
+				local_ips = filter(on_lan, active_ips)
+				for ip in local_ips:
+					if not vpn_used(ip):
+						return True
+			return False
 		except ErrorHandler:
 			return False
 
@@ -269,18 +318,20 @@ class IPThreads:
 		return len(self.threads)
 
 
-def check_ips(ip_threads: IPThreads, index: int):
+def check_ips_threading(ip_threads: IPThreads, index: int):
 	"""Returns the IPs from a list that are reachable
 	:param ip_threads: The object containing the threads, inputs and outputs for this job
 	:param index: The index of this thread"""
 
 	ip_addrs: List[str] = ip_threads.inputs[index]
+	logger.debug(f"Trying {ip_addrs} [THREAD {index}]")
 
 	ping_cmd = [
 		"/usr/sbin/fping",
 		"-q",  # don't report failed pings
 		"-r 1",  # only try once
-		"-a"  # only print alive ips
+		"-a",  # only print alive ips
+		"--timeout=250" # limit timeout
 	]
 
 	ping_out: str = bash.get_output(
@@ -293,3 +344,29 @@ def check_ips(ip_threads: IPThreads, index: int):
 		alive_ips.remove('')
 
 	ip_threads.output[index] = alive_ips
+
+
+def check_ips(possible_ips: list[str]) -> list[str]:
+	"""Returns the IPs from a list that are reachable
+	:param possible_ips: The list of IPs to try
+	"""
+
+	logger.debug(f"Trying {possible_ips}")
+
+	ping_cmd = [
+		"/usr/sbin/fping",
+		"-q",  # don't report failed pings
+		"-r 1",  # only try once
+		"-a"  # only print alive ips
+	]
+
+	ping_out: str = bash.get_output(
+		ping_cmd + possible_ips,
+		passable_exit_codes=[1, 2],
+		capture_stdout=True
+	)
+	alive_ips: list = ping_out.split('\n')
+	if '' in alive_ips:
+		alive_ips.remove('')
+
+	return alive_ips
