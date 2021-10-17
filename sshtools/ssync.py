@@ -1,13 +1,14 @@
 #! /usr/bin/python3
 """Syncs devices over LAN"""
 
+from __future__ import annotations  # python -3.9 compatibility
+
 import argparse
 import datetime as dt
 import os
-import uuid
 import subprocess
+import uuid
 from os.path import abspath, dirname, expanduser, join
-from typing import List
 
 import timtools.bash
 import timtools.log
@@ -90,14 +91,14 @@ class Sync:
 		in2file: str = abspath(join(TMP_DIR, 'include_rest.txt'))
 
 		with open(in2file, "w") as fobj:
-			rules: List[str] = [
+			rules: list[str] = [
 				f"{d}/**\n"
 				for d in os.listdir(self.dir)
 				if not d.startswith(".")
 			]
 			fobj.writelines(rules)
 
-		parm: list = [
+		parm: list[str] = [
 			"--exclude=*.sock",
 			f"--include-from={infile}",
 			f'--exclude-from={exfile}',
@@ -106,7 +107,7 @@ class Sync:
 		]
 
 		if slave.sync == 'Limited' or master.sync == 'Limited':
-			parm: list = [
+			parm: list[str] = [
 				'--exclude=__pycache__',
 				'--exclude=Config/VMs',
 				'--exclude=Config/oh-my-zsh/log',
