@@ -326,12 +326,19 @@ def check_ips_threading(ip_threads: IPThreads, index: int):
 	ip_addrs: List[str] = ip_threads.inputs[index]
 	logger.debug(f"Trying {ip_addrs} [THREAD {index}]")
 
-	ping_cmd = [
-		"/usr/sbin/fping",
+	for cmd_dir in ["/usr/bin", "/usr/sbin"]:
+		cmd_location = os.path.join(cmd_dir, "fping")
+		if os.path.exists(cmd_location):
+			ping_cmd: list[str] = [cmd_location]
+			break
+	else:
+		raise FileNotFoundError("Cannot find fping, is it installed?")
+
+	ping_cmd += [
 		"-q",  # don't report failed pings
 		"-r 1",  # only try once
 		"-a",  # only print alive ips
-		"--timeout=250" # limit timeout
+		"--timeout=250"  # limit timeout
 	]
 
 	ping_out: str = bash.get_output(
