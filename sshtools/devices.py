@@ -95,8 +95,10 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		config_files = [general_devices_config, local_devices_config] + extra_config
 
 		try:
-			ssid = subprocess.check_output(['/usr/sbin/iwgetid', '-r'], shell=True).decode().strip(
-				"\n")
+			ssid = subprocess.check_output(
+				['/usr/sbin/iwgetid', '-r'],
+				shell=True
+			).decode().strip("\n")
 			if ssid == "WiFi-Home":
 				config_files.append(join(project_dir, 'home.ini'))
 			elif "Predikerinnenstraat 10" in ssid:
@@ -275,8 +277,8 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		Checks if the device is present on the local LAN
 		:param include_vpn: Does a VPN (e.g. zerotier) count as part of the LAN?
 		"""
-		on_lan = lambda ip: ip.startswith("192.168") or ip.endswith(".local")
-		vpn_used = lambda ip: ip.startswith("192.168.193")
+		on_lan = lambda ip_addr: ip_addr.startswith("192.168") or ip_addr.endswith(".local")
+		vpn_used = lambda ip_addr: ip_addr.startswith("192.168.193")
 
 		try:
 			if self.ip_addr is not None:
