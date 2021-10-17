@@ -196,8 +196,6 @@ def run():
 	if args.limited and master.sync:
 		master.sync = 'Limited'
 
-	logger.info("%s -> %s", master.hostname, ', '.join([s.hostname for s in slave]))
-
 	Sync(master, slave, dry_run=args.dry_run)
 
 

@@ -213,7 +213,6 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		))
 		# Rest
 		sorted_ips |= dict.fromkeys(ip_addrs)
-		print(list(sorted_ips.keys()))
 		return list(sorted_ips.keys())
 
 	def get_possible_ips(
