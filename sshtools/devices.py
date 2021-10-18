@@ -7,11 +7,10 @@ import datetime as dt
 import os
 import socket
 import subprocess
-import threading
 from collections import OrderedDict
 from configparser import ConfigParser, NoSectionError, RawConfigParser
 from os.path import dirname, expanduser, join
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import psutil
 from timtools import bash
@@ -303,57 +302,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
 			return False
 
 	def __repr__(self):
-		return '<Device({name})>'.format(name=self.hostname)
-
-
-class IPThreads:
-	num_threads = 3
-	inputs: List[Optional[List[str]]] = [None] * num_threads
-	output: List[Optional[List[str]]] = [None] * num_threads
-	threads: List[Optional[threading.Thread]] = [None] * num_threads
-
-	def start_all(self):
-		for thread in self.threads:
-			thread.start()
-
-	@property
-	def num_threads(self):
-		return len(self.threads)
-
-
-def check_ips_threading(ip_threads: IPThreads, index: int):
-	"""Returns the IPs from a list that are reachable
-	:param ip_threads: The object containing the threads, inputs and outputs for this job
-	:param index: The index of this thread"""
-
-	ip_addrs: List[str] = ip_threads.inputs[index]
-	logger.debug(f"Trying {ip_addrs} [THREAD {index}]")
-
-	for cmd_dir in ["/usr/bin", "/usr/sbin"]:
-		cmd_location = os.path.join(cmd_dir, "fping")
-		if os.path.exists(cmd_location):
-			ping_cmd: list[str] = [cmd_location]
-			break
-	else:
-		raise FileNotFoundError("Cannot find fping, is it installed?")
-
-	ping_cmd += [
-		"-q",  # don't report failed pings
-		"-r 1",  # only try once
-		"-a",  # only print alive ips
-		"--timeout=250"  # limit timeout
-	]
-
-	ping_out: str = bash.get_output(
-		ping_cmd + ip_addrs,
-		passable_exit_codes=[1, 2],
-		capture_stdout=True
-	)
-	alive_ips: list = ping_out.split('\n')
-	if '' in alive_ips:
-		alive_ips.remove('')
-
-	ip_threads.output[index] = alive_ips
+		return '<Device({name})>'.format(name=self.hostname or self.name)
 
 
 def check_ips(possible_ips: list[str]) -> list[str]:
