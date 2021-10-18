@@ -363,8 +363,15 @@ def check_ips(possible_ips: list[str]) -> list[str]:
 
 	logger.debug(f"Trying {possible_ips}")
 
-	ping_cmd = [
-		"/usr/sbin/fping",
+	for cmd_dir in ["/usr/bin", "/usr/sbin"]:
+		cmd_location = os.path.join(cmd_dir, "fping")
+		if os.path.exists(cmd_location):
+			ping_cmd: list[str] = [cmd_location]
+			break
+	else:
+		raise FileNotFoundError("Cannot find fping, is it installed?")
+
+	ping_cmd += [
 		"-q",  # don't report failed pings
 		"-r 1",  # only try once
 		"-a"  # only print alive ips
