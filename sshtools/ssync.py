@@ -7,8 +7,10 @@ import argparse
 import datetime as dt
 import os
 import subprocess
+import threading
 import uuid
 from os.path import abspath, dirname, expanduser, join
+from typing import Optional
 
 import timtools.bash
 import timtools.log
@@ -27,12 +29,14 @@ class Sync:
 	username: str
 	hostname: str
 
-	def __init__(self, master, slaves, dry_run=False):
+	def __init__(self, master: Device, slaves: list[Device], dry_run: bool = False):
 		self.hostname = os.uname().nodename
 		self.username = os.environ['USER']
 		self.dir = expanduser('~')
 
-		for slave in slaves:
+		active_slaves = get_active_devices(slaves)
+
+		for slave in active_slaves:
 			if not slave.sync or not slave.is_present():
 				continue
 			print()
@@ -144,6 +148,27 @@ class Sync:
 		return target
 
 
+def get_active_devices(possible_devices: list[Device], limit_sync: bool = True) -> list[Device]:
+	"""Returns a list of the devices that are active from within an given list"""
+	active_devices_dict: dict[str, Optional[Device]] = {dev.name: None for dev in possible_devices}
+
+	def test_device(dev: Device):
+		if (limit_sync and dev.sync) or (not limit_sync):
+			if dev.is_present():
+				active_devices_dict[dev.name] = dev
+
+	threads: list[threading.Thread] = []
+	for device in possible_devices:
+		thread = threading.Thread(target=test_device, args=(device,))
+		threads.append(thread)
+		thread.start()
+
+	# Wait until all threads have completed
+	[t.join(timeout=1.5) for t in threads]
+	active_devices: list[Device] = list(filter(None, active_devices_dict.values()))
+	return active_devices
+
+
 def run():
 	"""Main executable for ssync"""
 	# Arguments
@@ -196,6 +221,11 @@ def run():
 
 	if args.limited and master.sync:
 		master.sync = 'Limited'
+
+	if Device.get_device("laptop") in slave:
+		answer = input("Ben je zeker dat je naar laptop wilt synchroniseren? (y/N) ")
+		if answer.lower() not in ["y", "j"]:
+			return
 
 	Sync(master, slave, dry_run=args.dry_run)
 
