@@ -206,16 +206,16 @@ class Device:  # pylint: disable=too-many-instance-attributes
 	def sort_ips(self, ip_addrs: list[str]) -> list[str]:
 		sorted_ips = {}
 		# mDNS
-		sorted_ips |= dict.fromkeys(filter(lambda ip: ip.endswith(".local"), ip_addrs))
+		sorted_ips.update(dict.fromkeys(filter(lambda ip: ip.endswith(".local"), ip_addrs)))
 		# Local IPs
-		sorted_ips |= dict.fromkeys(filter(lambda ip: ip.startswith("192.168.2"), ip_addrs))
+		sorted_ips.update(dict.fromkeys(filter(lambda ip: ip.startswith("192.168.2"), ip_addrs)))
 		# Zerotier IPs
-		sorted_ips |= dict.fromkeys(filter(
+		sorted_ips.update(dict.fromkeys(filter(
 			lambda ip: ip.startswith("192.168.193") or ip == self.hostname,
 			ip_addrs
-		))
+		)))
 		# Rest
-		sorted_ips |= dict.fromkeys(ip_addrs)
+		sorted_ips.update(dict.fromkeys(ip_addrs))
 		return list(sorted_ips.keys())
 
 	def get_possible_ips(
