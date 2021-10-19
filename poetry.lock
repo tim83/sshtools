@@ -164,7 +164,7 @@ grpcio-gcp = ["grpcio-gcp (>=0.2.2)"]
 
 [[package]]
 name = "google-api-python-client"
-version = "2.26.1"
+version = "2.27.0"
 description = "Google API Client Library for Python"
 category = "main"
 optional = false
@@ -559,7 +559,7 @@ test = ["pytest (>=3.6)", "pytest-cov", "pytest-django", "zope.component", "sybi
 
 [[package]]
 name = "timtools"
-version = "0.33.1"
+version = "0.33.2"
 description = ""
 category = "main"
 optional = false
@@ -584,7 +584,7 @@ validators = "^0.18.2"
 type = "git"
 url = "https://github.com/tim83/timtools"
 reference = "master"
-resolved_reference = "bce7d3c90c20ff967bd45433b545af5e004ec986"
+resolved_reference = "490132c18fd32e97f9f5bf2749bf67cf8369ea25"
 
 [[package]]
 name = "toml"
@@ -773,8 +773,8 @@ google-api-core = [
     {file = "google_api_core-2.1.1-py2.py3-none-any.whl", hash = "sha256:39ae7ca2208090c2942ebe1b38ca2928441a14b795c725717d38d7e30adb5fbf"},
 ]
 google-api-python-client = [
-    {file = "google-api-python-client-2.26.1.tar.gz", hash = "sha256:66389e23fdd23dc7fabf3235afc4bd9bf4d1332e960aa7c058f17ea8848dae35"},
-    {file = "google_api_python_client-2.26.1-py2.py3-none-any.whl", hash = "sha256:faac5b276f90de1258d553b4dcf1cad92827b047ea31819927514b60e62616da"},
+    {file = "google-api-python-client-2.27.0.tar.gz", hash = "sha256:659e9955f0f1e02fcce5dec85622eb5af1807572ef0f09c49d68d8426da670e7"},
+    {file = "google_api_python_client-2.27.0-py2.py3-none-any.whl", hash = "sha256:0b1bd4fe6cbe3c22e4ed264cadf257bc981ebc745e959bdf8fd9ae7c3fffb984"},
 ]
 google-auth = [
     {file = "google-auth-2.3.0.tar.gz", hash = "sha256:2800f6dfad29c6ced5faf9ca0c38ea8ba1ebe2559b10c029bd021e3de3301627"},
