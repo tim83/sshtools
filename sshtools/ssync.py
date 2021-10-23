@@ -35,7 +35,6 @@ class Sync:
 		self.dir = expanduser('~')
 
 		active_slaves = get_active_devices(slaves)
-		print(active_slaves)
 
 		for slave in active_slaves:
 			if not slave.sync or not slave.is_present():
