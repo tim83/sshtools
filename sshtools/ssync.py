@@ -35,6 +35,7 @@ class Sync:
 		self.dir = expanduser('~')
 
 		active_slaves = get_active_devices(slaves)
+		print(active_slaves)
 
 		for slave in active_slaves:
 			if not slave.sync or not slave.is_present():
@@ -164,7 +165,7 @@ def get_active_devices(possible_devices: list[Device], limit_sync: bool = True) 
 		thread.start()
 
 	# Wait until all threads have completed
-	[t.join(timeout=1.5) for t in threads]
+	[t.join() for t in threads]
 	active_devices: list[Device] = list(filter(None, active_devices_dict.values()))
 	return active_devices
 
