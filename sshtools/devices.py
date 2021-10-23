@@ -78,8 +78,10 @@ class Device:  # pylint: disable=too-many-instance-attributes
 	user: str
 	relay: str
 	relay_to: str
-	ip_addr: Optional[str]
 	mdns: Optional[str]
+
+	last_ip_addr: Optional[str]
+	last_ip_addr_update: Optional[dt.datetime]
 
 	unique_devices: dict[str, "Device"] = dict()
 
@@ -149,8 +151,8 @@ class Device:  # pylint: disable=too-many-instance-attributes
 
 		self.name = name
 		self.get_config(name)
-		self.last_ip_addr: Optional[str] = None
-		self.last_ip_addr_update: Optional[dt.datetime] = None
+		self.last_ip_addr = None
+		self.last_ip_addr_update = None
 
 	def get_config(self, name, relay=None):
 		"""Loads and stores the device's config"""
@@ -185,19 +187,22 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		except NoSectionError as error:
 			raise DeviceNotFoundError(name) from error
 
-	def get_ip(self) -> str:
-		"""Returns the IP to used for the device"""
+	def get_ip(self, strict_ip: bool = False) -> str:
+		"""
+		Returns the IP to used for the device
+		:param strict_ip: Only return an actual IP address (no DNS or hostnames allowed)
+		"""
 		if not self.eth and not self.wlan:
 			raise DeviceNotPresentError(self.name)
 
 		if self.hostname == os.uname().nodename:
 			return self.hostname
 
-		alive_ips = self.get_active_ips()
+		alive_ips = self.get_active_ips(strict_ip=strict_ip)
 		if len(alive_ips) > 0:
 			ip_addr = self.sort_ips(alive_ips)[0]
 			logger.info(f"Found ip {ip_addr} for {self.name}")
-			self.last_ip_addr = alive_ips[0]
+			self.last_ip_addr = ip_addr
 			self.last_ip_addr_update = dt.datetime.now()
 			return ip_addr
 
@@ -245,9 +250,17 @@ class Device:  # pylint: disable=too-many-instance-attributes
 
 		return possible_ips
 
-	def get_active_ips(self) -> list[str]:
-		"""Returns the list of all active ips"""
-		possible_ips: list[str] = self.get_possible_ips()
+	def get_active_ips(self, strict_ip: bool = False) -> list[str]:
+		"""
+		Returns the list of all active ips
+		:param strict_ip: Only return an actual IP address (no DNS or hostnames allowed)
+		"""
+		possible_ips: list[str]
+		if strict_ip:
+			possible_ips = self.get_possible_ips(include_mdns=False, include_hostname=False)
+		else:
+			possible_ips = self.get_possible_ips()
+
 		alive_ips: list[str] = check_ips(possible_ips)
 		logger.info(f"Found {len(alive_ips)} alive IPs for device {self.name}: {alive_ips}")
 		return alive_ips
@@ -329,7 +342,7 @@ def check_ips(possible_ips: list[str]) -> list[str]:
 	ping_out: str = bash.get_output(
 		ping_cmd + possible_ips,
 		passable_exit_codes=[1, 2],
-		capture_stdout=True
+		capture_stdout=True,
 	)
 	alive_ips: list = ping_out.split('\n')
 	if '' in alive_ips:
