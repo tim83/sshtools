@@ -7,6 +7,7 @@ import datetime as dt
 import os
 import socket
 import subprocess
+import threading
 from collections import OrderedDict
 from configparser import ConfigParser, NoSectionError, RawConfigParser
 from os.path import dirname, expanduser, join
@@ -225,7 +226,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
 
 	def get_possible_ips(
 			self,
-			include_mdns: bool = True,
+			include_dns: bool = True,
 			include_hostname: bool = True,
 			include_eth: bool = True,
 			include_wlan: bool = True
@@ -243,7 +244,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
 			possible_ips += clean_ip_group(self.eth)
 		if include_wlan:
 			possible_ips += clean_ip_group(self.wlan)
-		if include_mdns:
+		if include_dns:
 			possible_ips += clean_ip_group([self.mdns])
 		if include_hostname:
 			possible_ips += clean_ip_group([self.hostname])
@@ -257,11 +258,27 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		"""
 		possible_ips: list[str]
 		if strict_ip:
-			possible_ips = self.get_possible_ips(include_mdns=False, include_hostname=False)
+			possible_ips = self.get_possible_ips(include_dns=False, include_hostname=False)
 		else:
-			possible_ips = self.get_possible_ips()
+			possible_ips = self.get_possible_ips(include_dns=False)
 
-		alive_ips: list[str] = check_ips(possible_ips)
+		alive_ips: list[str] = []
+
+		def check_ip_thread(ips: list[str], alive_ip_list):
+			alive_ip_list += check_ips(ips)
+
+		general_ip_check = threading.Thread(target=check_ip_thread, args=(possible_ips, alive_ips))
+		general_ip_check.start()
+
+		check_timeout: float = 0.5  # the total  number of seconds to wait for the check
+		if not strict_ip:
+			dns_ip_check = threading.Thread(target=check_ip_thread, args=([self.mdns], alive_ips))
+			dns_ip_check.start()
+			dns_ip_check.join(timeout=check_timeout)
+
+		general_ip_check.join(timeout=check_timeout)
+
+		# alive_ips: list[str] = check_ips(possible_ips)
 		logger.info(f"Found {len(alive_ips)} alive IPs for device {self.name}: {alive_ips}")
 		return alive_ips
 
