@@ -3,3 +3,4 @@ bin/***
 Documenten
 Config/***
 texmf/***
+Documenten/Jobs/AcademieEerstelijn/Backup/***
