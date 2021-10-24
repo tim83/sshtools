@@ -17,7 +17,7 @@ txt_files = [
 
 setup(
 	name='sshtools',
-	version='2.19.9',
+	version='2.19.10',
 	packages=['sshtools'],
 	url='',
 	license='',
