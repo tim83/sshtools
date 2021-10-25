@@ -270,8 +270,8 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		general_ip_check = threading.Thread(target=check_ip_thread, args=(possible_ips, alive_ips))
 		general_ip_check.start()
 
-		check_timeout: float = 1.0  # the total  number of seconds to wait for the check
-		if not strict_ip:
+		check_timeout: float = 1.5  # the total  number of seconds to wait for the check
+		if not strict_ip and self.mdns is not None:
 			dns_ip_check = threading.Thread(target=check_ip_thread, args=([self.mdns], alive_ips))
 			dns_ip_check.start()
 			dns_ip_check.join(timeout=check_timeout)
