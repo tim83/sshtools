@@ -43,21 +43,18 @@ def run():
 
 	target_names: list[str]
 	if len(args.target) == 0:
-		# target_names = Device.get_devices()
-		target_names = ["laptop", "thinkcentre", "fujitsu", "probook", "serverpi", "camerapi"]
+		target_names = Device.get_devices()
+		# target_names = ["laptop", "thinkcentre", "fujitsu", "probook", "serverpi", "camerapi"]
 	else:
 		target_names = args.target
 
-	targets: list[Device] = [Device.get_device(target_name) for target_name in target_names]
+	targets_all: list[Device] = [Device.get_device(target_name) for target_name in target_names]
 
 	# Lookup IPs in multithreading
-	sshtools.ssync.get_active_devices(targets)
+	targets = sshtools.ssync.get_active_devices(targets_all, limit_sync=True)
 
 	target: Device
 	for target in targets:
-		if args.ip:
-			target.get_ip(strict_ip=True)
-
 		ip_string: str
 		try:
 			if args.ssh_string:
