@@ -6,6 +6,7 @@ import argparse
 import timtools.log
 
 import sshtools.errors
+import sshtools.ssync
 from sshtools.devices import Device
 
 logger = timtools.log.get_logger('ssh-tools.getip')
@@ -47,9 +48,13 @@ def run():
 	else:
 		target_names = args.target
 
-	for target_name in target_names:
-		target: Device = Device.get_device(target_name)
+	targets: list[Device] = [Device.get_device(target_name) for target_name in target_names]
 
+	# Lookup IPs in multithreading
+	sshtools.ssync.get_active_devices(targets)
+
+	target: Device
+	for target in targets:
 		if args.ip:
 			target.get_ip(strict_ip=True)
 
