@@ -5,6 +5,7 @@ import argparse
 
 import timtools.log
 
+import sshtools.errors
 from sshtools.devices import Device
 
 logger = timtools.log.get_logger('ssh-tools.getip')
@@ -22,7 +23,7 @@ def run():
 	parser.add_argument(
 		'target',
 		help='Computer voor wie het ip adres moet worden bepaald',
-		nargs='?'
+		nargs='*'
 	)
 	parser.add_argument('-v', '--verbose', help='Geef feedback', action='store_true')
 	parser.add_argument(
@@ -39,15 +40,32 @@ def run():
 
 	timtools.log.set_verbose(args.verbose)
 
-	target: Device = Device.get_device(args.target)
-
-	if args.ip:
-		target.get_ip(strict_ip=True)
-
-	if args.ssh_string:
-		print(get_string(target))
+	target_names: list[str]
+	if len(args.target) == 0:
+		# target_names = Device.get_devices()
+		target_names = ["laptop", "thinkcentre", "fujitsu", "probook", "serverpi", "camerapi"]
 	else:
-		print(target.ip_addr)
+		target_names = args.target
+
+	for target_name in target_names:
+		target: Device = Device.get_device(target_name)
+
+		if args.ip:
+			target.get_ip(strict_ip=True)
+
+		ip_string: str
+		try:
+			if args.ssh_string:
+				ip_string = get_string(target)
+			else:
+				ip_string = target.ip_addr
+		except (sshtools.errors.NotReachableError, sshtools.errors.DeviceNotPresentError):
+			ip_string = "none"
+
+		if len(target_names) == 1:
+			print(ip_string)
+		else:
+			print(f"{target.name}:\t{ip_string}")
 
 
 if __name__ == "__main__":
