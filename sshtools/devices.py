@@ -7,6 +7,7 @@ import datetime as dt
 import os
 import socket
 import subprocess
+import sys
 import threading
 from collections import OrderedDict
 from configparser import ConfigParser, NoSectionError, RawConfigParser
@@ -262,20 +263,16 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		else:
 			possible_ips = self.get_possible_ips(include_dns=False)
 
-		alive_ips: list[str] = []
-
-		def check_ip_thread(ips: list[str], alive_ip_list):
-			alive_ip_list += check_ips(ips)
-
-		general_ip_check = threading.Thread(target=check_ip_thread, args=(possible_ips, alive_ips))
+		general_ip_check = CheckIPs(possible_ips)
 		general_ip_check.start()
 
+		dns_ip_check = CheckIPs([self.mdns])
 		if not strict_ip and self.mdns is not None:
-			dns_ip_check = threading.Thread(target=check_ip_thread, args=([self.mdns], alive_ips))
-			dns_ip_check.start()
-			dns_ip_check.join(timeout=0.5)
+			dns_ip_check.join_timeout(0.5)
 
 		general_ip_check.join()
+
+		alive_ips: list[str] = general_ip_check.alive_ips + dns_ip_check.alive_ips
 
 		# alive_ips: list[str] = check_ips(possible_ips)
 		logger.info(f"Found {len(alive_ips)} alive IPs for device {self.name}: {alive_ips}")
@@ -334,6 +331,65 @@ class Device:  # pylint: disable=too-many-instance-attributes
 		return '<Device({name})>'.format(name=self.hostname or self.name)
 
 
+class CheckIPs(threading.Thread):
+	process: subprocess.Popen = None
+	stdout: str = None
+	stderr: str = None
+	return_code: int = None
+	alive_ips: list[str] = []
+
+	def __init__(self, possible_ips: list[str]):
+		super(CheckIPs, self).__init__()
+
+		logger.debug(f"Trying {possible_ips}")
+
+		for cmd_dir in ["/usr/bin", "/usr/sbin"]:
+			cmd_location = os.path.join(cmd_dir, "fping")
+			if os.path.exists(cmd_location):
+				ping_cmd: list[str] = [cmd_location]
+				break
+		else:
+			raise FileNotFoundError("Cannot find fping, is it installed?")
+
+		ping_cmd += [
+			"-q",  # don't report failed pings
+			"-r 1",  # only try once
+			"-a"  # only print alive ips
+		] + possible_ips
+
+		self.cmd: list[str] = ping_cmd
+
+	def run(self):
+		self.process = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		self.process.wait()
+
+		stdout_enc, stderr_enc = self.process.communicate()
+		self.return_code = self.process.poll()
+		if stdout_enc is None:
+			self.stdout = ""
+		else:
+			self.stdout = stdout_enc.decode(sys.stdout.encoding)
+
+		if stderr_enc is None:
+			self.stderr = ""
+		else:
+			self.stderr = stderr_enc.decode(sys.stderr.encoding)
+
+		alive_ips: list[str] = self.stdout.split('\n')
+		if '' in alive_ips:
+			alive_ips.remove('')
+		self.alive_ips = alive_ips
+
+	def join_timeout(self, timeout: float):
+		self.start()
+		self.join(timeout)
+
+		if self.is_alive():
+			logger.debug(f"Terminating command {self.cmd}")
+			self.process.terminate()
+			self.join()
+
+
 def check_ips(possible_ips: list[str]) -> list[str]:
 	"""Returns the IPs from a list that are reachable
 	:param possible_ips: The list of IPs to try
@@ -358,7 +414,7 @@ def check_ips(possible_ips: list[str]) -> list[str]:
 	ping_out: str = bash.get_output(
 		ping_cmd + possible_ips,
 		passable_exit_codes=[1, 2],
-		capture_stdout=True,
+		capture_stdout=True
 	)
 	alive_ips: list = ping_out.split('\n')
 	if '' in alive_ips:
