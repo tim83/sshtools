@@ -1,6 +1,8 @@
 #! /bin/bash
 
-# python3 -m sshtools.smount "$@"
-
-cd $HOME/Programs/python/sshtools || exit 1
-poetry run smount "$@"
+if [ -d "/home/tim/.cache/pypoetry/virtualenvs/sshtools*" ] ; then
+	cd $HOME/Programs/python/sshtools || exit 1
+	poetry run smount "$@"
+else
+	python3 -m sshtools.smount "$@"
+fi

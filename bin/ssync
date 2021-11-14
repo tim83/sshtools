@@ -1,6 +1,8 @@
 #! /bin/bash
 
-#python3 -m sshtools.ssync "$@"
-
-cd $HOME/Programs/python/sshtools || exit 1
-poetry run ssync "$@"
+if [ -d "/home/tim/.cache/pypoetry/virtualenvs/sshtools*" ] ; then
+	cd $HOME/Programs/python/sshtools || exit 1
+	poetry run ssync "$@"
+else
+	python3 -m sshtools.ssync "$@"
+fi

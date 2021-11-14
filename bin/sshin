@@ -1,6 +1,8 @@
 #! /bin/bash
 
-# python3 -m sshtools.sshin "$@"
-
-cd $HOME/Programs/python/sshtools || exit 1
-poetry run sshin "$@"
+if [ -d "/home/tim/.cache/pypoetry/virtualenvs/sshtools*" ] ; then
+	cd $HOME/Programs/python/sshtools || exit 1
+	poetry run sshin "$@"
+else
+	python3 -m sshtools.sshin "$@"
+fi
