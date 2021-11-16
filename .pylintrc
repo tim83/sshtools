@@ -1,6 +1,0 @@
-[MASTER]
-jobs=0
-
-[FORMAT]
-indent-string=\t
-max-line-length=130
