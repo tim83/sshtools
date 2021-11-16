@@ -6,6 +6,7 @@ from __future__ import annotations  # python -3.9 compatibility
 import argparse
 import datetime as dt
 import os
+import shutil
 import subprocess
 import tempfile
 import threading
@@ -31,18 +32,19 @@ class Sync:
     hostname: str
 
     def __init__(self, master: Device, slaves: list[Device], dry_run: bool = False):
-        self.hostname: str = os.uname().nodename
-        self.username: str = os.environ["USER"]
-        self.dir: str = expanduser("~")
-        self.tmp_dir: str = tempfile.mkdtemp()
+        self.hostname = os.uname().nodename
+        self.username = os.environ["USER"]
+        self.dir = expanduser("~")
 
         active_slaves = get_active_devices(slaves)
 
+        tmp_dir: str
         for slave in active_slaves:
             if not slave.sync or not slave.is_present():
                 continue
             print()
             print(master.name + " -> " + slave.name)
+            tmp_dir = tempfile.mkdtemp()
             try:
                 cmd = ["rsync"]
                 cmd += [
@@ -64,7 +66,7 @@ class Sync:
                 if dry_run:
                     cmd += ["--dry-run"]
                 cmd += self.backup_parm()
-                cmd += self.inex_parm(master, slave)
+                cmd += self.inex_parm(master, slave, tmp_dir)
                 cmd += self.get_source(master)
                 cmd += self.get_target(slave)
 
@@ -78,7 +80,7 @@ class Sync:
             except NotReachableError:
                 pass
             finally:
-                os.rmdir(self.tmp_dir)
+                shutil.rmtree(tmp_dir)
 
     @classmethod
     def backup_parm(cls) -> list:
@@ -95,12 +97,12 @@ class Sync:
         )
         return ["--backup", "--backup-dir={dir}".format(dir=backup_dir)]
 
-    def inex_parm(self, master: Device, slave: Device) -> list:
+    def inex_parm(self, master: Device, slave: Device, tmp_dir: str) -> list:
         """Retruns the rsync parameters for excluding and including files"""
         infile: str = abspath(join(PROJECT_DIR, "include.txt"))
         exfile: str = abspath(join(PROJECT_DIR, "exclude.txt"))
         limfile: str = abspath(join(PROJECT_DIR, "limited.txt"))
-        in2file: str = abspath(join(self.tmp_dir, "include_rest.txt"))
+        in2file: str = abspath(join(tmp_dir, "include_rest.txt"))
 
         with open(in2file, "w") as fobj:
             rules: list[str] = [
