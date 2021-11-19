@@ -79,15 +79,13 @@ class Ssh:
 
                 response_ci = timtools.bash.run(cmd_ci)
                 logger.info("SSH-COPY-ID exited with code %s", response_ci)
-            if mosh and self.device.is_local() and not exe:
+            if mosh and self.device.is_local():
                 cmd = ["mosh", f"{user}@{ip_addr}"]
             else:
-                cmd = ["ssh", "-p", str(ssh_port), f"{user}@{ip_addr}"]
+                cmd = ["ssh", "-t", "-p", str(ssh_port), f"{user}@{ip_addr}"]
 
-                if exe:
-                    cmd += [exe]
-                else:
-                    cmd += ["-t"]
+            if exe:
+                cmd += [exe]
 
             logger.debug(" ".join(cmd))
             cmd_result = timtools.bash.run(cmd, passable_exit_codes=[255, 100, 127])
