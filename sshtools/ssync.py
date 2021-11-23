@@ -233,7 +233,8 @@ def run():
     if args.limited and master.sync:
         master.sync = "Limited"
 
-    if Device.get_device("laptop") in slave:
+    laptop_dev: Device = Device.get_device("laptop")
+    if laptop_dev in slave and laptop_dev.sync and laptop_dev.is_present():
         answer = input("Ben je zeker dat je naar laptop wilt synchroniseren? (y/N) ")
         if answer.lower() not in ["y", "j"]:
             return
