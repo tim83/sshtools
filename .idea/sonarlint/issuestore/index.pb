@@ -1,21 +1,4 @@
 
-E
-ssh_tools/kot-tim.ini,1/4/144291a2e63c879d1b1f593eb18fd83db290c353
-F
-ssh_tools/home-tim.ini,a/e/aecc317e7f731af3069b732d3b9dfd2a91c967a6
-8
-setup.py,8/e/8e2edce0d507e1297474f25c00cae94258db38d8
-B
-ssh_tools/home.ini,c/d/cd8d112dead3170d8a89130aa764963b554aca61
-B
-ssh_tools/sshin.py,0/8/0881c7e2eb9af1af84205becca5ada0290134d8c
-D
-ssh_tools/devices.py,d/b/dbb5e6b48e0423e7b6d6eac6f879809a6f730bcf
-:
-
-install.sh,c/0/c0fffa6dab38719637f643131f704750033ea1a6
-A
-ssh_tools/kot.ini,4/b/4b48aef67b4661c992f55393d85192550d7d2f79
 9
 	bin/getip,d/e/de391bf6104e5f3fda2742591908ab5fc05e41a4
 9
@@ -24,42 +7,8 @@ A
 	bin/ssync,d/6/d6f95dbfb5eb084afc1668f109f211dd7fa9b303
 ;
 bin/wake-up,1/f/1f6f2261a5a8d14c5f263c4cd70654fbe6a8615f
-B
-ssh_tools/getip.py,f/9/f969c4143723f7ef1aed90411edd218e0319c586
-B
-ssh_tools/ssync.py,0/3/0388ea81dd7c8fdfdea046f76c0a3dfbae0a728b
-D
-ssh_tools/wake-up.py,c/c/cc557a57b0007bd35317c1d81e981c6d083e7980
-E
-ssh_tools/__init__.py,8/5/85db21be186934e2f8a4462637cc67d6c29b628d
-E
-ssh_tools/__main__.py,1/0/10794f415be60305de03a08c87f284cd0801516e
-E
-ssh_tools/devices.ini,e/8/e883d7e74c46a079c50f5a2529b71f465afb1e4e
-E
-ssh_tools/exclude.txt,6/c/6ce5999c60d7eb749c748f0f4f6625430eda0e08
-E
-ssh_tools/include.txt,a/d/adf3f57cb5a781d6039f1b91e70872e06a36f3f1
-E
-ssh_tools/limited.txt,6/f/6f80bd52f4f0712347ecc2fca160bd281ede7803
-I
-ssh_tools/shutdown-all.py,e/4/e40115eefd17d1a256d4eae53ba38ae58fe64897
-K
-ssh_tools.egg-info/PKG-INFO,d/8/d81b331cd637b89319f873854d462145fa03a84f
-N
-ssh_tools.egg-info/SOURCES.txt,d/d/ddbe8448ee1aff9d200889ac969d965c81ec65c5
-O
-ssh_tools.egg-info/requires.txt,6/1/6149f225cbdccb64ea7ef7edac77f0df1a05e8d1
-P
- ssh_tools.egg-info/top_level.txt,c/f/cf50f00f0a7f799bd5f08c1ffccc115a937a821c
-W
-'ssh_tools.egg-info/dependency_links.txt,8/c/8c51a757f742f03e3a3a303cf62d6cb18c27901d
-@
-ssh_tools/log.py,f/5/f59eb93f0c7f7054aad6fa44aebcd234004397c8
 :
 
 bin/smount,a/b/ab51dd92be275446c81b662f70b73e82bab74585
-C
-ssh_tools/smount.py,e/2/e2470599e0567f3118f2cbfba0f61119a609158d
->
-install-all.sh,3/2/3218ad9fef21f5445ec5e5d5aed2b94b5441d6f9
+D
+sshtools/limited.txt,7/c/7c9a8c34bc832796819aede65abc6162cd5a7e93
