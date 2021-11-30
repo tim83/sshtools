@@ -232,14 +232,17 @@ class Device:  # pylint: disable=too-many-instance-attributes
         sorted_ips.update(
             dict.fromkeys(
                 filter(
-                    lambda ip: ip.startswith("192.168.193") or ip == self.hostname,
+                    lambda ip: ip.startswith("192.168.193")
+                    or (ip == self.hostname and not self.hostname.endswith(".be")),
                     ip_addrs,
                 )
             )
         )
         # Rest
-        sorted_ips.update(dict.fromkeys(ip_addrs))
-        return list(sorted_ips.keys())
+        sorted_ips.update(dict.fromkeys(sorted(ip_addrs)))
+        sorted_ips_list: list[str] = list(sorted_ips.keys())
+        logger.debug(f"Sorted IPs: {sorted_ips_list}")
+        return sorted_ips_list
 
     def get_possible_ips(
         self,

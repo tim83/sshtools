@@ -42,8 +42,10 @@ def run():
     timtools.log.set_verbose(args.verbose)
 
     target_names: list[str]
+    limit_sync: bool = False
     if len(args.target) == 0:
         target_names = Device.get_devices()
+        limit_sync = True
         # target_names = ["laptop", "thinkcentre", "fujitsu", "probook", "serverpi", "camerapi"]
     else:
         target_names = args.target
@@ -53,7 +55,7 @@ def run():
     ]
 
     # Lookup IPs in multithreading
-    targets = sshtools.ssync.get_active_devices(targets_all, limit_sync=True)
+    targets = sshtools.ssync.get_active_devices(targets_all, limit_sync=limit_sync)
 
     target: Device
     for target in targets:
