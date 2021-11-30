@@ -104,17 +104,13 @@ class Device:  # pylint: disable=too-many-instance-attributes
         config_files = [general_devices_config, local_devices_config] + extra_config
 
         try:
-            ssid = (
-                subprocess.check_output(["/usr/sbin/iwgetid", "-r"])
-                .decode()
-                .strip("\n")
-            )
+            ssid = subprocess.check_output(["iwgetid", "-r"]).decode().strip("\n")
             if ssid == "WiFi-Home":
                 config_files.append(join(project_dir, "home.ini"))
             elif "Predikerinnenstraat 10" in ssid:
                 config_files.append(join(project_dir, "kot.ini"))
         except subprocess.CalledProcessError:
-            logger.debug("WiFi not connected (or iwgetid can not be called)")
+            logger.debug("WiFi not connected")
 
         ips = Device.current_ips
         ifaces = sorted(psutil.net_if_addrs().keys())
