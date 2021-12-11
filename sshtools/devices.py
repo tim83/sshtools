@@ -105,11 +105,11 @@ class Device:  # pylint: disable=too-many-instance-attributes
 
         try:
             ssid = subprocess.check_output(["iwgetid", "-r"]).decode().strip("\n")
-            if ssid == "WiFi-Home":
+            if "WiFi-Home" in ssid:
                 config_files.append(join(project_dir, "home.ini"))
             elif "Predikerinnenstraat 10" in ssid:
                 config_files.append(join(project_dir, "kot.ini"))
-        except subprocess.CalledProcessError:
+        except (subprocess.CalledProcessError, FileNotFoundError):
             logger.debug("WiFi not connected")
 
         ips = Device.current_ips
