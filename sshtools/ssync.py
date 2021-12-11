@@ -202,7 +202,7 @@ def run():
 
     timtools.log.set_verbose(args.verbose)
 
-    devices: list = Device.get_devices()
+    devices: list = Device.get_device_names()
     logger.debug(devices)
 
     if getattr(args, "from") and args.to:

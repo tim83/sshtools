@@ -42,7 +42,7 @@ class Main:  # pylint: disable=too-few-public-methods
 
         log.set_verbose(args.verbose)
 
-        devices: list = Device.get_devices()
+        devices: list = Device.get_device_names()
         logger.debug(devices)
 
         master_name = os.uname().nodename.replace("-tim", "")

@@ -89,7 +89,8 @@ class Ssh:
 
             logger.debug(" ".join(cmd))
             cmd_result = timtools.bash.run(cmd, passable_exit_codes=[255, 100, 127])
-            sys.exit(cmd_result.exit_code)
+            if __name__ == "__main__":
+                sys.exit(cmd_result.exit_code)
 
         except ConnectionError:
             pass
@@ -158,7 +159,7 @@ def run():
 
     timtools.log.set_verbose(args.verbose)
 
-    devices = Device.get_devices()
+    devices = Device.get_device_names()
     logger.debug(devices)
 
     target = Device.get_device(args.target)

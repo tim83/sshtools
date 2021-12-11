@@ -126,7 +126,7 @@ def run():
 
     log.set_verbose(args.verbose)
 
-    devices = Device.get_devices()
+    devices = Device.get_device_names()
     logger.debug(devices)
 
     target = Device.get_device(args.target)

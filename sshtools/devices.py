@@ -94,7 +94,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
     unique_devices: dict[str, "Device"] = dict()
 
     @staticmethod
-    def get_devices(extra_config=None):
+    def get_device_names(extra_config=None):
         """Returns and stores the configured devices"""
         if not extra_config:
             extra_config = []
@@ -163,9 +163,9 @@ class Device:  # pylint: disable=too-many-instance-attributes
     def get_config(self, name, relay=None):
         """Loads and stores the device's config"""
         if relay:
-            self.get_devices(extra_config=[expanduser(relay.relay_to)])
+            self.get_device_names(extra_config=[expanduser(relay.relay_to)])
         elif not self.config:
-            self.get_devices()
+            self.get_device_names()
 
         try:
             self.hostname = self.config.get(name, "hostname", fallback=None)

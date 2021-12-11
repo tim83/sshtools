@@ -2,10 +2,13 @@
 """Module to obtain the IP adress of a device"""
 
 import argparse
+import datetime as dt
+import os
 
 import timtools.log
 
 import sshtools.errors
+import sshtools.sshin
 import sshtools.ssync
 from sshtools.devices import Device
 
@@ -37,6 +40,12 @@ def run():
         help="Gebruik alleen IP adressen en geen DNS of hostnamen",
         action="store_true",
     )
+    parser.add_argument(
+        "-w",
+        "--write-log",
+        help="Maak een logentry bij de target",
+        action="store_true",
+    )
     args = parser.parse_args()
 
     timtools.log.set_verbose(args.verbose)
@@ -44,7 +53,7 @@ def run():
     target_names: list[str]
     limit_sync: bool = False
     if len(args.target) == 0:
-        target_names = Device.get_devices()
+        target_names = Device.get_device_names()
         limit_sync = True
         # target_names = ["laptop", "thinkcentre", "fujitsu", "probook", "serverpi", "camerapi"]
     else:
@@ -71,10 +80,20 @@ def run():
         ):
             ip_string = "none"
 
-        if len(target_names) == 1:
-            print(ip_string)
+        if args.write_log:
+            sshtools.sshin.Ssh(
+                dev=target,
+                exe=[
+                    "echo",
+                    f"{os.uname().nodename} accessed this device on {dt.datetime.now()}",
+                    ">> /tmp/sshtools_access.txt",
+                ],
+            )
         else:
-            print(f"{target.name}:\t{ip_string}")
+            if len(target_names) == 1:
+                print(ip_string)
+            else:
+                print(f"{target.name}:\t{ip_string}")
 
 
 if __name__ == "__main__":

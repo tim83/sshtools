@@ -15,7 +15,7 @@ project_dir = os.path.dirname(__file__)
 
 def forget_device(target: Device):
     config_files = [f for f in os.listdir(project_dir) if f.endswith(".ini")]
-    target.get_devices(extra_config=config_files)
+    target.get_device_names(extra_config=config_files)
     ips = target.get_possible_ips(
         include_dns=True, include_wlan=True, include_eth=True, include_hostname=True
     )
