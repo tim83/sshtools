@@ -13,7 +13,14 @@ logger = log.get_logger(__name__)
 
 def wake(device: Device):
     """Wake up a device"""
-    ip_addr: str = device.sort_ips(device.eth)[0]
+    ip_addr: str = device.sort_ips(
+        device.get_possible_ips(
+            include_dns=False,
+            include_wlan=False,
+            include_hostname=False,
+            include_eth=True,
+        )
+    )[0]
     mac_addr: str = device.emac
 
     try:
