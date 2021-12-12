@@ -13,14 +13,14 @@ logger = log.get_logger(__name__)
 
 def wake(device: Device):
     """Wake up a device"""
-    ip_addr: str = device.eth[0]
+    ip_addr: str = device.sort_ips(device.eth)[0]
     mac_addr: str = device.emac
 
     try:
         cmd: list
         if ip_addr.startswith("192.168.2"):
             cmd = ["wol", mac_addr]
-        elif ip_addr is not None and device.name != "serverpi":
+        elif ip_addr is not None:
             cmd = ["wol", "-p", str(device.ssh_port), "-i", ip_addr, mac_addr]
         else:
             raise ConnectionError()
