@@ -18,10 +18,10 @@ def wake(device: Device):
 
     try:
         cmd: list
-        if ip_addr[:7] == "192.168":
+        if ip_addr.startswith("192.168.2"):
             cmd = ["wol", mac_addr]
-        elif ip_addr is not None:
-            cmd = ["wol", "-p", device.ssh_port, "-i", ip_addr, mac_addr]
+        elif ip_addr is not None and device.name != "serverpi":
+            cmd = ["wol", "-p", str(device.ssh_port), "-i", ip_addr, mac_addr]
         else:
             raise ConnectionError()
 
