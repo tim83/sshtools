@@ -15,13 +15,12 @@ from os.path import dirname, expanduser, join
 from typing import Optional, Union
 
 import psutil
-from timtools import bash
 from timtools.log import get_logger
 
+from sshtools import ip
 from sshtools.errors import (
     DeviceNotFoundError,
     DeviceNotPresentError,
-    ErrorHandler,
     NetworkError,
     NotReachableError,
 )
@@ -88,7 +87,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
     relay_to: str
     mdns: Optional[str]
 
-    last_ip_addr: Optional[str]
+    last_ip_addr: Optional[ip.IPAddress]
     last_ip_addr_update: Optional[dt.datetime]
 
     unique_devices: dict[str, "Device"] = dict()
@@ -208,7 +207,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
         if len(alive_ips) > 0:
             ip_addr = self.sort_ips(alive_ips)[0]
             logger.info(f"Found ip {ip_addr} for {self.name}")
-            self.last_ip_addr = ip_addr
+            self.last_ip_addr = ip.IPAddress(ip_addr)
             self.last_ip_addr_update = dt.datetime.now()
             return ip_addr
 
@@ -291,7 +290,6 @@ class Device:  # pylint: disable=too-many-instance-attributes
 
         alive_ips: list[str] = general_ip_check.alive_ips + dns_ip_check.alive_ips
 
-        # alive_ips: list[str] = check_ips(possible_ips)
         logger.info(
             f"Found {len(alive_ips)} alive IPs for device {self.name}: {alive_ips}"
         )
@@ -302,8 +300,16 @@ class Device:  # pylint: disable=too-many-instance-attributes
         if self.last_ip_addr is not None and self.last_ip_addr_update is not None:
             td_update: dt.timedelta = dt.datetime.now() - self.last_ip_addr_update
             if td_update < dt.timedelta(seconds=30):
-                return self.last_ip_addr
+                return self.last_ip_addr.ip_address
         return self.get_ip()
+
+    @property
+    def ip_address_obj(self) -> ip.IPAddress:
+        if self.last_ip_addr is not None and self.last_ip_addr_update is not None:
+            td_update: dt.timedelta = dt.datetime.now() - self.last_ip_addr_update
+            if td_update < dt.timedelta(seconds=30):
+                return self.last_ip_addr
+        return ip.IPAddress(self.get_ip())
 
     def get_relay(self):
         """Return the relay device to be used when connecting to this device"""
@@ -321,34 +327,11 @@ class Device:  # pylint: disable=too-many-instance-attributes
         Checks if the device is present on the local LAN
         :param include_vpn: Does a VPN (e.g. zerotier) count as part of the LAN?
         """
-
-        def on_lan(ip_addr: str) -> bool:
-            return ip_addr.startswith("192.168") or ip_addr.endswith(".local")
-
-        def vpn_used(ip_addr: str) -> bool:
-            return ip_addr.startswith("192.168.193")
-
-        try:
-            if self.ip_addr is not None:
-                if on_lan(self.ip_addr):
-                    if include_vpn or not vpn_used(self.ip_addr):
-                        return True
-
-                active_ips: list[str] = self.get_active_ips()
-                local_ips = filter(on_lan, active_ips)
-                for ip in local_ips:
-                    if not vpn_used(ip):
-                        return True
-            return False
-        except ErrorHandler:
-            return False
+        return self.ip_address_obj.is_local(include_vpn=include_vpn)
 
     def is_present(self) -> bool:
         """Checks if the device is reachable"""
-        try:
-            return self.ip_addr is not None
-        except ErrorHandler:
-            return False
+        return self.ip_address_obj.is_alive()
 
     def __repr__(self):
         return "<Device({name})>".format(name=self.hostname or self.name)
@@ -413,34 +396,3 @@ class CheckIPs(threading.Thread):
             logger.debug(f"Terminating command {self.cmd}")
             self.process.terminate()
             self.join()
-
-
-def check_ips(possible_ips: list[str]) -> list[str]:
-    """Returns the IPs from a list that are reachable
-    :param possible_ips: The list of IPs to try
-    """
-
-    logger.debug(f"Trying {possible_ips}")
-
-    for cmd_dir in ["/usr/bin", "/usr/sbin"]:
-        cmd_location = os.path.join(cmd_dir, "fping")
-        if os.path.exists(cmd_location):
-            ping_cmd: list[str] = [cmd_location]
-            break
-    else:
-        raise FileNotFoundError("Cannot find fping, is it installed?")
-
-    ping_cmd += [
-        "-q",  # don't report failed pings
-        "-r 1",  # only try once
-        "-a",  # only print alive ips
-    ]
-
-    ping_out: str = bash.get_output(
-        ping_cmd + possible_ips, passable_exit_codes=[1, 2], capture_stdout=True
-    )
-    alive_ips: list = ping_out.split("\n")
-    if "" in alive_ips:
-        alive_ips.remove("")
-
-    return alive_ips

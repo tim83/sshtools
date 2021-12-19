@@ -33,6 +33,7 @@ configparser = "^5.0.2"
 psutil = "^5.8.0"
 fping = "^0.0.1-alpha.2"
 timtools = {git = "https://github.com/tim83/timtools"}
+ipaddress = "^1.0.23"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^4.0.1"
@@ -43,6 +44,7 @@ isort = "^5.10.1"
 safety = "^1.10.3"
 bandit = "^1.7.1"
 pre-commit = "^2.15.0"
+pytest = "^6.2.5"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
