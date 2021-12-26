@@ -277,7 +277,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
         return None
 
     def is_self(self) -> bool:
-        """Checks if the device is the currenct machine"""
+        """Checks if the device is the current machine"""
         hostname_machine = os.uname().nodename
         return self.hostname == hostname_machine
 
