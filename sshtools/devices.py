@@ -28,25 +28,29 @@ project_dir = dirname(__file__)
 logger = get_logger(__name__)
 
 
-def get_ips():
+def get_ips() -> ip.IPAddressList:
     """Get the IPs that the current device has assigned"""
     interfaces = psutil.net_if_addrs()
     interface_names = sorted(interfaces.keys())
-    addresses = []
+    addresses = ip.IPAddressList()
     logger.debug(f"Networkinterfaces: {interface_names}")
     for interface_name in interface_names:
         try:
             if interface_name[:3] in ["eth", "wla", "enp", "wlo", "wlp", "eno"]:
-                ip_addr = next(
-                    address.address
-                    for address in interfaces[interface_name]
-                    if address.family == socket.AF_INET
+                ip_addr = ip.IPAddress(
+                    next(
+                        address.address
+                        for address in interfaces[interface_name]
+                        if address.family == socket.AF_INET
+                    )
                 )
-                addresses.append(ip_addr)
+                addresses.add(ip_addr)
         except StopIteration:
             pass
-    if len(addresses) == 0:
+    if addresses.length() == 0:
         raise NetworkError()
+    else:
+        logger.debug("Found %s  ips for this machine.", addresses.length())
 
     return addresses
 
@@ -69,7 +73,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
     config: ConfigParser = None
     config_all: ConfigParser = None
     devices: list = None
-    current_ips: list = get_ips()
+    current_ips: ip.IPAddressList = get_ips()
     # Config
     hostname: str
     wlan: Union[str, list[str]]
@@ -114,7 +118,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
         ifaces = sorted(psutil.net_if_addrs().keys())
         # Give priority to my own routers (192.168.{23,24}.*) over the home routers (
         # 192.168.20.*)
-        ip_id = ips[0][:10]
+        ip_id = str(ips.get_first())[:10]
         if ip_id in ["192.168.23"] or "tun0" in ifaces:
             # own kot network
             logger.info("Detected Tims Kot network.")
@@ -259,15 +263,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
         return possible_ips.get_alive_addresses()
 
     @property
-    def ip_addr(self) -> str:
-        if self.last_ip_addr is not None and self.last_ip_addr_update is not None:
-            td_update: dt.timedelta = dt.datetime.now() - self.last_ip_addr_update
-            if td_update < dt.timedelta(seconds=30):
-                return self.last_ip_addr.ip_address
-        return str(self.get_ip())
-
-    @property
-    def ip_address_obj(self) -> ip.IPAddress:
+    def ip_address(self) -> ip.IPAddress:
         if self.last_ip_addr is not None and self.last_ip_addr_update is not None:
             td_update: dt.timedelta = dt.datetime.now() - self.last_ip_addr_update
             if td_update < dt.timedelta(seconds=30):
@@ -290,12 +286,12 @@ class Device:  # pylint: disable=too-many-instance-attributes
         Checks if the device is present on the local LAN
         :param include_vpn: Does a VPN (e.g. zerotier) count as part of the LAN?
         """
-        return self.ip_address_obj.is_local(include_vpn=include_vpn)
+        return self.ip_address.is_local(include_vpn=include_vpn)
 
     def is_present(self) -> bool:
         """Checks if the device is reachable"""
         try:
-            return self.ip_address_obj.is_alive()
+            return self.ip_address.is_alive()
         except sshtools.errors.NotReachableError:
             return False
 

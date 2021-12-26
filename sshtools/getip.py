@@ -17,7 +17,7 @@ logger = timtools.log.get_logger("ssh-tools.getip")
 
 def get_string(target: Device) -> str:
     """Return the full address of the user on the device"""
-    ip_addr = target.ip_addr
+    ip_addr = target.ip_address
     return f"{target.user}@{ip_addr}"
 
 
@@ -73,7 +73,7 @@ def run():
             if args.ssh_string:
                 ip_string = get_string(target)
             else:
-                ip_string = target.ip_addr
+                ip_string = target.ip_address
         except (
             sshtools.errors.NotReachableError,
             sshtools.errors.DeviceNotPresentError,

@@ -31,7 +31,6 @@ DateTime = "^4.3"
 argparse = "^1.4.0"
 configparser = "^5.0.2"
 psutil = "^5.8.0"
-fping = "^0.0.1-alpha.2"
 timtools = {git = "https://github.com/tim83/timtools"}
 ipaddress = "^1.0.23"
 
