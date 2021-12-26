@@ -10,9 +10,12 @@ logger = log.get_logger("sshtools.ip")
 
 
 class IPAddress:
+    """An IP address. IP objects with the same IP address will behave like singletons"""
+
     ip_address: str
     version: int
     __ip_obj: ipaddress.ip_address
+    __instances: dict[str, "IPAddress"] = {}
 
     def __init__(self, ip_address: str):
         if type(ip_address) != str:
@@ -23,6 +26,14 @@ class IPAddress:
         except ValueError:
             self.__ip_obj = None
         self.version = self._determine_version()
+
+    def __new__(cls, ip_address: str, *args, **kwargs):
+        if ip_address in cls.__instances.keys():
+            return cls.__instances[ip_address]
+
+        instance = super(IPAddress, cls).__new__(cls)
+        cls.__instances[ip_address] = instance
+        return instance
 
     def _determine_version(self) -> int:
         """
@@ -99,10 +110,16 @@ class IPAddressList:
             self._ip_addresses = []
 
     def add(self, ip_address: IPAddress):
-        self._ip_addresses.append(ip_address)
+        if type(ip_address) == IPAddress:
+            self._ip_addresses.append(ip_address)
+        else:
+            raise ValueError("Only IPAddress objects can be added to a IPAddressList")
 
     def add_list(self, ip_addresses: list[IPAddress]):
-        self._ip_addresses += ip_addresses
+        if all(type(ip) == IPAddress for ip in ip_addresses):
+            self._ip_addresses += ip_addresses
+        else:
+            raise ValueError("Only IPAddress objects can be added to a IPAddressList")
 
     def get_alive_addresses(self) -> "IPAddressList":
         alive_ips: IPAddressList = IPAddressList()
@@ -152,3 +169,25 @@ class IPAddressList:
 
     def length(self) -> int:
         return len(self._ip_addresses)
+
+    def __iter__(self):
+        """Enables iterating over the list"""
+        return IPAddressListIterator(self)
+
+
+class IPAddressListIterator:
+    """Iterator class for IPAddressLists"""
+
+    def __init__(self, ip_address_list: IPAddressList):
+        self._ip_address_list = ip_address_list
+        # variable to keep track of current index
+        self._index = 0
+
+    def __next__(self):
+        """'Returns the next value from the object's lists"""
+        if self._index < len(self._ip_address_list._ip_addresses):
+            result = self._ip_address_list._ip_addresses[self._index]
+            self._index += 1
+            return result
+
+        raise StopIteration

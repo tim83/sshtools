@@ -31,6 +31,11 @@ def test_create_ipv6():
         ip.IPAddress("fe80::94b6:ff97:1c37::3f66")
 
 
+def test_singleton():
+    """Tests wheter mutliple object with the same IP are singletons"""
+    assert ip.IPAddress("localhost") == ip.IPAddress("localhost")
+
+
 def test_create_hostname():
     """Tests the creation of an IPAddress model with a hostname"""
     for ip_str in ["localhost", "laptop-tim.local", "mees.vip"]:
