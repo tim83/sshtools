@@ -97,18 +97,33 @@ def test_list_add_list():
     ip_list.add_list(example_ip_list)
     assert ip_list._ip_addresses == [init_ip] + example_ip_list
 
+    ip_list = ip.IPAddressList([init_ip])
+    ip_list.add_list(ip.IPAddressList(example_ip_list))
+    assert ip_list._ip_addresses == [init_ip] + example_ip_list
+
 
 def test_sort_ips():
     loc_ip = ip.IPAddress("localhost")
+    loop_ip = ip.IPAddress("127.0.0.1")
     mdns_ip = ip.IPAddress("hostname.local")
     lan_ip = ip.IPAddress("192.168.20.15")
     zt_ip = ip.IPAddress("192.168.193.150")
     pub_ip = ip.IPAddress("32.102.39.10")
     dns_ip = ip.IPAddress("mees.vip")
-    ip_list = ip.IPAddressList([dns_ip, mdns_ip, lan_ip, loc_ip, zt_ip, pub_ip])
+    ip_list = ip.IPAddressList(
+        [dns_ip, mdns_ip, lan_ip, loc_ip, zt_ip, pub_ip, loop_ip]
+    )
     ip_list.sort_ips()
-    assert ip_list._ip_addresses == [loc_ip, mdns_ip, lan_ip, zt_ip, pub_ip, dns_ip]
-    assert ip_list.get_first() == loc_ip
+    assert ip_list._ip_addresses == [
+        loop_ip,
+        loc_ip,
+        mdns_ip,
+        lan_ip,
+        zt_ip,
+        pub_ip,
+        dns_ip,
+    ]
+    assert ip_list.get_first() == loop_ip
 
 
 def test_list_alive():

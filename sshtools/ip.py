@@ -2,6 +2,7 @@ import concurrent.futures
 import ipaddress
 import re
 import socket
+from typing import Union
 
 import cachetools.func
 from timtools import bash, log
@@ -115,7 +116,7 @@ class IPAddressList:
         else:
             raise ValueError("Only IPAddress objects can be added to a IPAddressList")
 
-    def add_list(self, ip_addresses: list[IPAddress]):
+    def add_list(self, ip_addresses: Union[list[IPAddress], "IPAddressList"]):
         if all(type(ip) == IPAddress for ip in ip_addresses):
             self._ip_addresses += ip_addresses
         else:
@@ -135,32 +136,44 @@ class IPAddressList:
 
     def sort_ips(self):
         sorted_ips = {}
+
+        def sort_list(ip_list):
+            return sorted(ip_list, key=lambda ip: str(ip))
+
         # Loopback
         sorted_ips.update(
-            dict.fromkeys(filter(lambda ip: ip.is_loopback(), self._ip_addresses))
+            dict.fromkeys(
+                sort_list(filter(lambda ip: ip.is_loopback(), self._ip_addresses))
+            )
         )
         # mDNS
         sorted_ips.update(
             dict.fromkeys(
-                filter(lambda ip: str(ip).endswith(".local"), self._ip_addresses)
+                sort_list(
+                    filter(lambda ip: str(ip).endswith(".local"), self._ip_addresses)
+                )
             )
         )
         # Local IPs
         sorted_ips.update(
             dict.fromkeys(
-                filter(lambda ip: ip.is_local(include_vpn=False), self._ip_addresses)
+                sort_list(
+                    filter(
+                        lambda ip: ip.is_local(include_vpn=False), self._ip_addresses
+                    )
+                )
             )
         )
         # Zerotier IPs
         sorted_ips.update(
             dict.fromkeys(
-                filter(lambda ip: ip.is_local(include_vpn=True), self._ip_addresses)
+                sort_list(
+                    filter(lambda ip: ip.is_local(include_vpn=True), self._ip_addresses)
+                )
             )
         )
         # Rest
-        sorted_ips.update(
-            dict.fromkeys(sorted(self._ip_addresses, key=lambda ip: str(ip)))
-        )
+        sorted_ips.update(dict.fromkeys(sort_list(self._ip_addresses)))
         self._ip_addresses: list[str] = list(sorted_ips.keys())
 
     def get_first(self) -> IPAddress:
