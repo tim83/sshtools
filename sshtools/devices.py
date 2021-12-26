@@ -7,8 +7,6 @@ import datetime as dt
 import os
 import socket
 import subprocess
-import sys
-import threading
 from collections import OrderedDict
 from configparser import ConfigParser, NoSectionError, RawConfigParser
 from os.path import dirname, expanduser, join
@@ -17,6 +15,7 @@ from typing import Optional, Union
 import psutil
 from timtools.log import get_logger
 
+import sshtools.errors
 from sshtools import ip
 from sshtools.errors import (
     DeviceNotFoundError,
@@ -192,7 +191,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
         except NoSectionError as error:
             raise DeviceNotFoundError(name) from error
 
-    def get_ip(self, strict_ip: bool = False) -> str:
+    def get_ip(self, strict_ip: bool = False) -> ip.IPAddress:
         """
         Returns the IP to used for the device
         :param strict_ip: Only return an actual IP address (no DNS or hostnames allowed)
@@ -200,44 +199,18 @@ class Device:  # pylint: disable=too-many-instance-attributes
         if not self.eth and not self.wlan:
             raise DeviceNotPresentError(self.name)
 
-        if self.hostname == os.uname().nodename:
-            return self.hostname
+        if self.hostname == socket.gethostname():
+            return ip.IPAddress(self.hostname)
 
         alive_ips = self.get_active_ips(strict_ip=strict_ip)
-        if len(alive_ips) > 0:
-            ip_addr = self.sort_ips(alive_ips)[0]
+        if alive_ips.length() > 0:
+            ip_addr = alive_ips.get_first()
             logger.info(f"Found ip {ip_addr} for {self.name}")
-            self.last_ip_addr = ip.IPAddress(ip_addr)
+            self.last_ip_addr = ip_addr
             self.last_ip_addr_update = dt.datetime.now()
             return ip_addr
 
         raise NotReachableError(self.name)
-
-    def sort_ips(self, ip_addrs: list[str]) -> list[str]:
-        sorted_ips = {}
-        # mDNS
-        sorted_ips.update(
-            dict.fromkeys(filter(lambda ip: ip.endswith(".local"), ip_addrs))
-        )
-        # Local IPs
-        sorted_ips.update(
-            dict.fromkeys(filter(lambda ip: ip.startswith("192.168.2"), ip_addrs))
-        )
-        # Zerotier IPs
-        sorted_ips.update(
-            dict.fromkeys(
-                filter(
-                    lambda ip: ip.startswith("192.168.193")
-                    or (ip == self.hostname and not self.hostname.endswith(".be")),
-                    ip_addrs,
-                )
-            )
-        )
-        # Rest
-        sorted_ips.update(dict.fromkeys(sorted(ip_addrs)))
-        sorted_ips_list: list[str] = list(sorted_ips.keys())
-        logger.debug(f"Sorted IPs: {sorted_ips_list}")
-        return sorted_ips_list
 
     def get_possible_ips(
         self,
@@ -245,55 +218,45 @@ class Device:  # pylint: disable=too-many-instance-attributes
         include_hostname: bool = True,
         include_eth: bool = True,
         include_wlan: bool = True,
-    ) -> list[str]:
+    ) -> ip.IPAddressList:
         """Returns all possible IPs that could be reached, within the given parameters"""
 
-        possible_ips: list[str] = []
+        possible_ips: ip.IPAddressList = ip.IPAddressList()
 
-        def clean_ip_group(ip_group: Optional[list[str]]) -> list[str]:
+        def clean_ip_group(ip_group: Optional[list[str]]) -> list[ip.IPAddress]:
             if ip_group is not None:
-                return [ip for ip in ip_group if ip is not None and ip not in [""]]
+                return [
+                    ip.IPAddress(ipaddr)
+                    for ipaddr in ip_group
+                    if ipaddr is not None and ipaddr not in [""]
+                ]
             return []
 
         if include_eth:
-            possible_ips += clean_ip_group(self.eth)
+            possible_ips.add_list(clean_ip_group(self.eth))
         if include_wlan:
-            possible_ips += clean_ip_group(self.wlan)
+            possible_ips.add_list(clean_ip_group(self.wlan))
         if include_dns:
-            possible_ips += clean_ip_group([self.mdns])
+            possible_ips.add_list(clean_ip_group([self.mdns]))
         if include_hostname:
-            possible_ips += clean_ip_group([self.hostname])
+            possible_ips.add_list(clean_ip_group([self.hostname]))
 
         return possible_ips
 
-    def get_active_ips(self, strict_ip: bool = False) -> list[str]:
+    def get_active_ips(self, strict_ip: bool = False) -> ip.IPAddressList:
         """
         Returns the list of all active ips
         :param strict_ip: Only return an actual IP address (no DNS or hostnames allowed)
         """
-        possible_ips: list[str]
+        possible_ips: ip.IPAddressList
         if strict_ip:
             possible_ips = self.get_possible_ips(
                 include_dns=False, include_hostname=False
             )
         else:
-            possible_ips = self.get_possible_ips(include_dns=False)
+            possible_ips = self.get_possible_ips()
 
-        general_ip_check = CheckIPs(possible_ips)
-        general_ip_check.start()
-
-        dns_ip_check = CheckIPs([self.mdns])
-        if not strict_ip and self.mdns is not None:
-            dns_ip_check.join_timeout(0.5)
-
-        general_ip_check.join()
-
-        alive_ips: list[str] = general_ip_check.alive_ips + dns_ip_check.alive_ips
-
-        logger.info(
-            f"Found {len(alive_ips)} alive IPs for device {self.name}: {alive_ips}"
-        )
-        return alive_ips
+        return possible_ips.get_alive_addresses()
 
     @property
     def ip_addr(self) -> str:
@@ -301,7 +264,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
             td_update: dt.timedelta = dt.datetime.now() - self.last_ip_addr_update
             if td_update < dt.timedelta(seconds=30):
                 return self.last_ip_addr.ip_address
-        return self.get_ip()
+        return str(self.get_ip())
 
     @property
     def ip_address_obj(self) -> ip.IPAddress:
@@ -309,7 +272,7 @@ class Device:  # pylint: disable=too-many-instance-attributes
             td_update: dt.timedelta = dt.datetime.now() - self.last_ip_addr_update
             if td_update < dt.timedelta(seconds=30):
                 return self.last_ip_addr
-        return ip.IPAddress(self.get_ip())
+        return self.get_ip()
 
     def get_relay(self):
         """Return the relay device to be used when connecting to this device"""
@@ -331,68 +294,10 @@ class Device:  # pylint: disable=too-many-instance-attributes
 
     def is_present(self) -> bool:
         """Checks if the device is reachable"""
-        return self.ip_address_obj.is_alive()
+        try:
+            return self.ip_address_obj.is_alive()
+        except sshtools.errors.NotReachableError:
+            return False
 
     def __repr__(self):
         return "<Device({name})>".format(name=self.hostname or self.name)
-
-
-class CheckIPs(threading.Thread):
-    process: subprocess.Popen = None
-    stdout: str = None
-    stderr: str = None
-    return_code: int = None
-    alive_ips: list[str] = []
-
-    def __init__(self, possible_ips: list[str]):
-        super(CheckIPs, self).__init__()
-
-        logger.debug(f"Trying {possible_ips}")
-
-        for cmd_dir in ["/usr/bin", "/usr/sbin"]:
-            cmd_location = os.path.join(cmd_dir, "fping")
-            if os.path.exists(cmd_location):
-                ping_cmd: list[str] = [cmd_location]
-                break
-        else:
-            raise FileNotFoundError("Cannot find fping, is it installed?")
-
-        ping_cmd += [
-            "-q",  # don't report failed pings
-            "-r 1",  # only try once
-            "-a",  # only print alive ips
-        ] + possible_ips
-
-        self.cmd: list[str] = ping_cmd
-
-    def run(self):
-        self.process = subprocess.Popen(
-            self.cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
-        self.process.wait()
-
-        stdout_enc, stderr_enc = self.process.communicate()
-        self.return_code = self.process.poll()
-        if stdout_enc is None:
-            self.stdout = ""
-        else:
-            self.stdout = stdout_enc.decode(sys.stdout.encoding)
-
-        if stderr_enc is None:
-            self.stderr = ""
-        else:
-            self.stderr = stderr_enc.decode(sys.stderr.encoding)
-
-        alive_ips: list[str] = self.stdout.split("\n")
-        if "" in alive_ips:
-            alive_ips.remove("")
-        self.alive_ips = alive_ips
-
-    def join_timeout(self, timeout: float):
-        self.start()
-        self.join(timeout)
-
-        if self.is_alive():
-            logger.debug(f"Terminating command {self.cmd}")
-            self.process.terminate()
-            self.join()

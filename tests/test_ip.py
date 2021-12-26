@@ -1,4 +1,4 @@
-import os
+import socket
 
 import pytest
 from timtools import log
@@ -42,21 +42,84 @@ def test_create_hostname():
 def test_local():
     """Tests the check whether the IP is local"""
     test_ips = [
-        ("localhost", True, False),
-        (os.uname().nodename, True, False),
-        ("127.0.0.1", True, False),
-        ("::1", True, False),
-        ("192.168.193.116", True, True),
-        ("143.169.210.13", False, False),
-        ("ff80::94b6:ff97:1c37:3f66", False, False),
+        ("localhost", True, False, True),
+        (socket.gethostname(), True, False, True),
+        ("127.0.0.1", True, False, True),
+        ("::1", True, False, True),
+        ("192.168.193.116", True, True, False),
+        ("143.169.210.13", False, False, False),
+        ("ff80::94b6:ff97:1c37:3f66", False, False, False),
+        ("arandomcomputer.local", True, False, False),
     ]
-    for ip_str, is_local, is_vpn in test_ips:
+    for ip_str, is_local, is_vpn, is_loopback in test_ips:
         ip_addr = ip.IPAddress(ip_str)
         assert ip_addr.is_local(include_vpn=True) == is_local
         assert ip_addr.is_local(include_vpn=False) == (is_local and not is_vpn)
+        assert ip_addr.is_loopback() == is_loopback
 
 
 def test_alive():
     """Tests the check whether the IP is alive"""
     assert ip.IPAddress("localhost").is_alive()
     assert not ip.IPAddress("doesnotexists").is_alive()
+
+
+def test_str_conversion():
+    """Tests that convert an instance to a string returns the ip address"""
+    assert str(ip.IPAddress("localhost")) == "localhost"
+    assert str(ip.IPAddress("192.168.23.2")) == "192.168.23.2"
+
+
+def test_list_creation():
+    """Tests the creation of ip lists"""
+    assert ip.IPAddressList()._ip_addresses == []
+    example_ip = ip.IPAddress("127.0.0.1")
+    assert ip.IPAddressList(ip_addresses=[example_ip])._ip_addresses == [example_ip]
+
+
+def test_list_add():
+    init_ip = ip.IPAddress("localhost")
+    ip_list = ip.IPAddressList([init_ip])
+    example_ip = ip.IPAddress("127.0.0.1")
+    ip_list.add(example_ip)
+    assert ip_list._ip_addresses == [init_ip, example_ip]
+
+
+def test_list_add_list():
+    init_ip = ip.IPAddress("localhost")
+    ip_list = ip.IPAddressList([init_ip])
+    example_ip_list = [ip.IPAddress("127.0.0.1"), ip.IPAddress("::1")]
+    ip_list.add_list(example_ip_list)
+    assert ip_list._ip_addresses == [init_ip] + example_ip_list
+
+
+def test_sort_ips():
+    loc_ip = ip.IPAddress("localhost")
+    mdns_ip = ip.IPAddress("hostname.local")
+    lan_ip = ip.IPAddress("192.168.20.15")
+    zt_ip = ip.IPAddress("192.168.193.150")
+    pub_ip = ip.IPAddress("32.102.39.10")
+    dns_ip = ip.IPAddress("mees.vip")
+    ip_list = ip.IPAddressList([dns_ip, mdns_ip, lan_ip, loc_ip, zt_ip, pub_ip])
+    ip_list.sort_ips()
+    assert ip_list._ip_addresses == [loc_ip, mdns_ip, lan_ip, zt_ip, pub_ip, dns_ip]
+    assert ip_list.get_first() == loc_ip
+
+
+def test_list_alive():
+    alive_ips = [ip.IPAddress("127.0.0.1"), ip.IPAddress("localhost")]
+    ip_list = ip.IPAddressList(alive_ips + [ip.IPAddress("doesnotexists.local")])
+    alive_list = ip_list.get_alive_addresses()
+    alive_list.sort_ips()
+    assert alive_list._ip_addresses == alive_ips
+
+
+def test_list_length():
+    ip_list = ip.IPAddressList(
+        [
+            ip.IPAddress("127.0.0.1"),
+            ip.IPAddress("localhost"),
+            ip.IPAddress("doesnotexists.local"),
+        ]
+    )
+    assert ip_list.length() == 3
