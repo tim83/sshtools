@@ -7,18 +7,16 @@ import os
 import timtools.bash
 import timtools.log
 
-from sshtools.devices import Device
+from sshtools.device import Device
 
 logger = timtools.log.get_logger("ssh-tools.remove-keys")
 project_dir = os.path.dirname(__file__)
 
 
 def forget_device(target: Device):
-    config_files = [f for f in os.listdir(project_dir) if f.endswith(".ini")]
-    target.get_device_names(extra_config=config_files)
     ips = target.get_possible_ips(
-        include_dns=True, include_wlan=True, include_eth=True, include_hostname=True
-    )
+        include_dns=True, include_ips=True, include_hostname=True
+    ).add_list(target.ip_address_list_all)
     for ip in ips:
         timtools.bash.run(
             ["ssh-keygen", "-R", ip], capture_stderr=True, capture_stdout=True
