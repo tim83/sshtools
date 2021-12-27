@@ -73,11 +73,11 @@ class Device:
             ip_address = ip.IPAddress(ip_data.get("ip_address"))
             ip_address.config = connection.IPConnectionConfig(
                 sync=ip_data.get("sync", self.config.ssh),
-                ssh=config.get("ssh", self.config.ssh),
-                ssh_port=config.get("ssh_port", self.config.ssh_port),
-                mosh=config.get("mosh", self.config.mosh),
-                user=config.get("user", self.config.user),
-                network=connection.Network(config.get("network", "public")),
+                ssh=ip_data.get("ssh", self.config.ssh),
+                ssh_port=ip_data.get("ssh_port", self.config.ssh_port),
+                mosh=ip_data.get("mosh", self.config.mosh),
+                user=ip_data.get("user", self.config.user),
+                network=connection.Network(ip_data.get("network", "public")),
             )
             self.ip_address_list_all.add(ip_address)
 
@@ -110,13 +110,11 @@ class Device:
 
     @property
     def reachable_ip_addresses(self) -> ip.IPAddressList:
-        return ip.IPAddressList(
-            list(
-                filter(
-                    lambda ip: ip.config.network.is_connected, self.ip_address_list_all
-                )
-            )
-        )
+        reachable_ips = ip.IPAddressList()
+        for ip_address in self.ip_address_list_all:
+            if ip_address.config.network.is_connected:
+                reachable_ips.add(ip_address)
+        return reachable_ips
 
     def get_ip(self, strict_ip: bool = False) -> ip.IPAddress:
         """
@@ -125,10 +123,11 @@ class Device:
         """
         if self.is_self():
             if strict_ip:
-                return ip.IPAddress("127.0.0.1")
-            return ip.IPAddress("localhost")
+                return ip.IPAddress("127.0.0.1", config_device=self)
+            return ip.IPAddress("localhost", config_device=self)
 
         if self.reachable_ip_addresses.length() == 0:
+            logger.info(f"Found no reachable ips for {self.name}")
             raise errors.DeviceNotPresentError(self.name)
 
         alive_ips = self.get_active_ips(strict_ip=strict_ip)
@@ -154,7 +153,7 @@ class Device:
         def clean_ip_group(ip_group: Optional[list[str]]) -> list[ip.IPAddress]:
             if ip_group is not None:
                 return [
-                    ip.IPAddress(ipaddr)
+                    ip.IPAddress(ipaddr, config_device=self)
                     for ipaddr in ip_group
                     if ipaddr is not None and ipaddr not in [""]
                 ]
@@ -182,13 +181,17 @@ class Device:
         else:
             possible_ips = self.get_possible_ips()
 
+        logger.info(
+            f"Trying {possible_ips.length()} ips for {self.name}: {possible_ips.to_list()}"
+        )
+
         return possible_ips.get_alive_addresses()
 
     @property
     def ip_address(self) -> ip.IPAddress:
         if self.last_ip_address is not None and self.last_ip_address_update is not None:
             td_update: dt.timedelta = dt.datetime.now() - self.last_ip_address_update
-            if td_update < dt.timedelta(seconds=30):
+            if td_update < dt.timedelta(seconds=5):
                 return self.last_ip_address
         return self.get_ip()
 

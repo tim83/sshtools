@@ -8,7 +8,7 @@ import sys
 import timtools.bash
 import timtools.log
 
-from sshtools.devices import Device
+from sshtools.device import Device
 from sshtools.errors import ConfigError, DeviceNotPresentError
 
 logger = timtools.log.get_logger(__name__)
@@ -52,8 +52,8 @@ class Ssh:
         mosh: bool = False,
     ):
 
-        user = self.device.user
-        if not self.device.ssh:
+        user = self.device.config.user
+        if not self.device.config.ssh:
             raise ConfigError(self.device.name)
 
         if isinstance(exe, list):

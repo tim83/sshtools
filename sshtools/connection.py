@@ -90,6 +90,9 @@ class Network:
     @property
     def is_connected(self) -> bool:
         ip_list = get_current_ips()
+        if self.name == "public":
+            return True
+
         if self.ip_start is not None:
             if any(str(ip_address).startswith(self.ip_start) for ip_address in ip_list):
                 return True
@@ -98,6 +101,8 @@ class Network:
         if self.interface is not None:
             if self.interface in interfaces:
                 return True
+
+        return False
 
     @classmethod
     def get_networks(cls) -> list[Network]:
@@ -111,6 +116,9 @@ class Network:
                 connected_networks.append(network)
 
         return connected_networks
+
+    def __repr__(self) -> str:
+        return f"<sshtools.connection.Network '{self.name}'>"
 
 
 @dataclasses.dataclass

@@ -2,23 +2,39 @@
 """Module to obtain the IP adress of a device"""
 
 import argparse
+import concurrent.futures
 import datetime as dt
 import os
 
 import timtools.log
+from tabulate import tabulate
 
 import sshtools.errors
 import sshtools.sshin
-import sshtools.ssync
-from sshtools.devices import Device
+from sshtools.device import Device
 
 logger = timtools.log.get_logger("ssh-tools.getip")
 
 
-def get_string(target: Device) -> str:
+def get_ip_string(
+    target: Device, ssh_string: bool = False, strict_ip: bool = False
+) -> str:
     """Return the full address of the user on the device"""
-    ip_addr = target.ip_address
-    return f"{target.user}@{ip_addr}"
+
+    try:
+        ip_address = target.get_ip(strict_ip=strict_ip)
+        if ssh_string:
+            print(ip_address, ip_address.config)
+            user = ip_address.config.user
+            print(user)
+            return f"{user}@{ip_address}"
+        else:
+            return str(ip_address)
+    except (
+        sshtools.errors.NotReachableError,
+        sshtools.errors.DeviceNotPresentError,
+    ):
+        return "x"
 
 
 def run():
@@ -50,50 +66,40 @@ def run():
 
     timtools.log.set_verbose(args.verbose)
 
-    target_names: list[str]
-    limit_sync: bool = False
+    targets: list[Device]
     if len(args.target) == 0:
-        target_names = Device.get_device_names()
-        limit_sync = True
-        # target_names = ["laptop", "thinkcentre", "fujitsu", "probook", "serverpi", "camerapi"]
+        targets = list(filter(lambda dev: dev.config.sync, Device.get_devices()))
     else:
-        target_names = args.target
-
-    targets_all: list[Device] = [
-        Device.get_device(target_name) for target_name in target_names
-    ]
-
-    # Lookup IPs in multithreading
-    targets = sshtools.ssync.get_active_devices(targets_all, limit_sync=limit_sync)
+        targets = [Device(name) for name in args.target]
 
     target: Device
-    for target in targets:
-        ip_string: str
-        try:
-            if args.ssh_string:
-                ip_string = get_string(target)
-            else:
-                ip_string = target.ip_address
-        except (
-            sshtools.errors.NotReachableError,
-            sshtools.errors.DeviceNotPresentError,
-        ):
-            ip_string = "none"
+    output: list[list[str]] = []
 
-        if args.write_log:
+    def device_add_row(device: Device):
+        ip_string = get_ip_string(device, ssh_string=args.ssh_string, strict_ip=args.ip)
+        output.append([device.name, ip_string])
+
+        if args.write_log and False:
             sshtools.sshin.Ssh(
-                dev=target,
+                dev=device,
                 exe=[
                     "echo",
                     f"{os.uname().nodename} accessed this device on {dt.datetime.now()}",
                     ">> /tmp/sshtools_access.txt",
                 ],
             )
-        else:
-            if len(target_names) == 1:
-                print(ip_string)
-            else:
-                print(f"{target.name}:\t{ip_string}")
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        executor.map(device_add_row, targets)
+
+    if len(output) == 1:
+        output_str = output[0][1]
+        if output_str == "x":
+            raise sshtools.errors.DeviceNotPresentError(targets[0].name)
+        print(output_str)
+    else:
+        output_sorted = sorted(output, key=lambda r: r[0])
+        print(tabulate(output_sorted, headers=["Device", "IP Address"]))
 
 
 if __name__ == "__main__":

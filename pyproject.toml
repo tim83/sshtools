@@ -6,12 +6,7 @@ authors = ["Tim Mees <tim.mees83@gmail.com>"]
 homepage = "https://github.com/tim83/sshtools"
 repository = "https://github.com/tim83/sshtools"
 include = [
-    'sshtools/devices.ini',
-    'sshtools/home.ini',
-    'sshtools/home-tim.ini',
-    'sshtools/kot.ini',
-    'sshtools/kot-tim.ini',
-    'sshtools/zerotier.ini',
+    'sshtools/config/**',
     'sshtools/exclude.txt',
     'sshtools/include.txt',
     'sshtools/limited.txt'
@@ -33,6 +28,7 @@ configparser = "^5.0.2"
 psutil = "^5.8.0"
 timtools = {git = "https://github.com/tim83/timtools"}
 ipaddress = "^1.0.23"
+tabulate = "^0.8.9"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^4.0.1"

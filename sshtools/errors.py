@@ -15,11 +15,11 @@ class ErrorHandler(Exception):
     logger = None
 
     def __init__(self, message):
-        if self.logger:
-            self.logger.critical(message)
-        else:
-            temp_log = get_logger(__name__)
-            temp_log.critical(message)
+        # if self.logger:
+        #     self.logger.critical(message)
+        # else:
+        #     temp_log = get_logger(__name__)
+        #     temp_log.critical(message)
 
         super().__init__(message)
 
