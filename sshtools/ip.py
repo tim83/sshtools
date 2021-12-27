@@ -2,10 +2,15 @@ import concurrent.futures
 import ipaddress
 import re
 import socket
-from typing import Union
+import subprocess
+from typing import TYPE_CHECKING, Union
 
 import cachetools.func
 from timtools import bash, log
+
+if TYPE_CHECKING:
+    # Circular import
+    import sshtools.connection
 
 logger = log.get_logger("sshtools.ip")
 
@@ -15,6 +20,7 @@ class IPAddress:
 
     ip_address: str
     version: int
+    config: "sshtools.connection.IPConnectionConfig" = None
     __ip_obj: ipaddress.ip_address
     __instances: dict[str, "IPAddress"] = {}
 
@@ -86,12 +92,17 @@ class IPAddress:
         ]
         ping_cmd += [self.ip_address]
 
-        ping_result: bash.CommandResult = bash.run(
-            ping_cmd,
-            capture_stdout=True,
-            capture_stderr=True,
-            passable_exit_codes=[0, 2],
-        )
+        try:
+            ping_result: bash.CommandResult = bash.run(
+                ping_cmd,
+                capture_stdout=True,
+                capture_stderr=True,
+                passable_exit_codes=[0, 2],
+                timeout=1,
+            )
+        except subprocess.TimeoutExpired:
+            return False
+
         return ping_result.exit_code == 0
 
     def __repr__(self):
@@ -106,7 +117,7 @@ class IPAddressList:
 
     def __init__(self, ip_addresses: list[IPAddress] = None):
         if ip_addresses is not None:
-            self._ip_addresses = ip_addresses
+            self._ip_addresses = ip_addresses.copy()
         else:
             self._ip_addresses = []
 
@@ -182,6 +193,9 @@ class IPAddressList:
 
     def length(self) -> int:
         return len(self._ip_addresses)
+
+    def to_list(self) -> list[IPAddress]:
+        return self._ip_addresses
 
     def __iter__(self):
         """Enables iterating over the list"""

@@ -1,3 +1,4 @@
+import datetime as dt
 import socket
 
 import pytest
@@ -127,11 +128,15 @@ def test_sort_ips():
 
 
 def test_list_alive():
+    start_time = dt.datetime.now()
     alive_ips = [ip.IPAddress("127.0.0.1"), ip.IPAddress("localhost")]
     ip_list = ip.IPAddressList(alive_ips + [ip.IPAddress("doesnotexists.local")])
     alive_list = ip_list.get_alive_addresses()
+    end_time = dt.datetime.now()
     alive_list.sort_ips()
     assert alive_list._ip_addresses == alive_ips
+    process_time = end_time - start_time
+    assert process_time.total_seconds() < 5
 
 
 def test_list_length():
@@ -143,3 +148,15 @@ def test_list_length():
         ]
     )
     assert ip_list.length() == 3
+
+
+def test_list_to_list():
+    ips = [
+        ip.IPAddress("127.0.0.1"),
+        ip.IPAddress("localhost"),
+        ip.IPAddress("doesnotexists.local"),
+    ]
+    ip_list = ip.IPAddressList(ips)
+    extra_ip = ip.IPAddress("example.com")
+    ip_list.add(extra_ip)
+    assert ip_list.to_list() == ips + [extra_ip]
