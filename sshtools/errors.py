@@ -49,7 +49,7 @@ class DeviceNotFoundError(ErrorHandler):
     """Error to be raised when the device is not configured"""
 
     def __init__(self, name):
-        super().__init__(f"Device {name} not found.")
+        super().__init__(f"Device {name} was not found in the config.")
 
 
 class DeviceNotPresentError(ErrorHandler):
@@ -64,3 +64,10 @@ class ConfigError(ErrorHandler):
 
     def __init__(self, name):
         super().__init__(f"Device {name} was not correctly configured for this action.")
+
+
+class NetworkNotFound(ErrorHandler):
+    """Error to be raised when the network is not configured"""
+
+    def __init__(self, name):
+        super().__init__(f"Network {name} was not found in the config.")

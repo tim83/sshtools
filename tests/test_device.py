@@ -7,10 +7,11 @@ def test_creation():
     dev = device.Device("laptop")
     assert dev.name == "laptop"
     assert dev.hostname == "laptop-tim"
-    assert type(dev.mosh) == bool
-    assert type(dev.ssh) == bool
-    assert dev.sync in [True, False, "limited"]
-    assert type(dev.ip_address_list) == ip.IPAddressList
+    assert type(dev.config.mosh) == bool
+    assert type(dev.config.ssh) == bool
+    assert dev.config.sync in [True, False, "limited"]
+    assert type(dev.ip_address_list_all) == ip.IPAddressList
+    assert type(dev.reachable_ip_addresses) == ip.IPAddressList
 
     with pytest.raises(errors.DeviceNotFoundError):
         device.Device("doesnotexist")

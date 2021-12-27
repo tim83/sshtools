@@ -6,81 +6,14 @@ from __future__ import annotations  # python -3.9 compatibility
 import datetime as dt
 import json
 import socket
-from pathlib import Path
-from typing import Optional, Union
+from typing import Optional
 
-import psutil
 from timtools.log import get_logger
 
-import sshtools.errors
-from sshtools import ip
-from sshtools.errors import (
-    DeviceNotFoundError,
-    DeviceNotPresentError,
-    NetworkError,
-    NotReachableError,
-)
+from sshtools import connection, errors, ip, tools
 
-project_dir = Path(__file__).parent
-config_dir = project_dir.parent / "config"
-devices_dir = config_dir / "devices"
+DEVICES_DIR = tools.CONFIG_DIR / "devices"
 logger = get_logger(__name__)
-
-
-def get_current_ips() -> ip.IPAddressList:
-    """Get the IPs that the current device has assigned"""
-    interface_data = psutil.net_if_addrs()
-    interface_names = sorted(interface_data.keys())
-    addresses = ip.IPAddressList()
-    logger.debug(f"Networkinterfaces: {interface_names}")
-    for interface_name in interface_names:
-        try:
-            if interface_name[:3] in ["eth", "wla", "enp", "wlo", "wlp", "eno"]:
-                ip_addr = ip.IPAddress(
-                    next(
-                        address.address
-                        for address in interface_data[interface_name]
-                        if address.family == socket.AF_INET
-                    )
-                )
-                addresses.add(ip_addr)
-        except StopIteration:
-            pass
-    if addresses.length() == 0:
-        raise NetworkError()
-    else:
-        logger.debug("Found %s  ips for this machine.", addresses.length())
-
-    return addresses
-
-
-def get_networks() -> list[str]:
-    """Get the IPs that the networks the current machine has access to"""
-    networks: list[str] = []
-
-    ips = get_current_ips()
-    interfaces = sorted(psutil.net_if_addrs().keys())
-
-    def check_start_ip(ip_list: ip.IPAddressList, start: str) -> bool:
-        return any(str(ip_address).startswith(start) for ip_address in ip_list)
-
-    if check_start_ip(ips, "192.168.23") or "tun0" in interfaces:
-        # own kot network
-        logger.info("Detected Tims Kot network.")
-        networks.append("kot-tim")
-    if check_start_ip(ips, "192.168.20"):
-        # Home network
-        logger.info("Detected Home network.")
-        networks.append("home")
-    if check_start_ip(ips, "192.168.24"):
-        # Own home network
-        logger.info("Detected Tims Home network.")
-        networks.append("home-tim")
-    if check_start_ip(ips, "192.168.193") or "ztuga6wg3j" in interfaces:
-        logger.info("Detected ZeroTier One VPN")
-        networks.append("zerotier")
-
-    return networks
 
 
 class Device:
@@ -90,13 +23,8 @@ class Device:
     __instances: dict[str, "Device"] = {}
     # Config
     hostname: str
-    sync: Union[bool, str]
-    ssh: bool
-    ssh_port: int
-    mosh: bool
-    user: str
     mdns: Optional[str]
-    ip_address_list: ip.IPAddressList
+    config: connection.ConnectionConfig
     ip_address_list_all: ip.IPAddressList
 
     last_ip_address: Optional[ip.IPAddress]
@@ -107,7 +35,7 @@ class Device:
     def _config_all(cls) -> dict:
         if Device.__config_all is None:
             Device.__config_all = {
-                dev.stem: json.load(dev.open("r")) for dev in devices_dir.iterdir()
+                dev.stem: json.load(dev.open("r")) for dev in DEVICES_DIR.iterdir()
             }
         return Device.__config_all
 
@@ -129,35 +57,40 @@ class Device:
         self.last_ip_address_update = None
 
         if name not in self._config_all.keys() and name != "localhost":
-            raise DeviceNotFoundError(name)
+            raise errors.DeviceNotFoundError(name)
 
         config = self._config_all.get(name, {})
         self.hostname = config.get("hostname", name)
-        self.sync = config.get("sync", False)
-        self.ssh = config.get("ssh", True)
-        self.ssh_port = config.get("ssh_port", "22")
-        self.mosh = config.get("mosh", True)
-        self.user = config.get("user", "tim")
-
-        current_networks = get_networks()
-        self.ip_address_list = ip.IPAddressList()
+        self.config = connection.ConnectionConfig(
+            sync=config.get("sync", False),
+            ssh=config.get("ssh", True),
+            ssh_port=config.get("ssh_port", "22"),
+            mosh=config.get("mosh", True),
+            user=config.get("user", "tim"),
+        )
         self.ip_address_list_all = ip.IPAddressList()
         for ip_data in config.get("connections", []):
             ip_address = ip.IPAddress(ip_data.get("ip_address"))
+            ip_address.config = connection.IPConnectionConfig(
+                sync=ip_data.get("sync", self.config.ssh),
+                ssh=config.get("ssh", self.config.ssh),
+                ssh_port=config.get("ssh_port", self.config.ssh_port),
+                mosh=config.get("mosh", self.config.mosh),
+                user=config.get("user", self.config.user),
+                network=connection.Network(config.get("network", "public")),
+            )
             self.ip_address_list_all.add(ip_address)
-            if ip_data.get("network", "") in current_networks:
-                self.ip_address_list.add(ip_address)
 
         if self.hostname is not None:
             self.mdns = self.hostname + ".local"
         else:
             self.mdns = None
 
-        if isinstance(self.sync, str):
-            if self.sync.lower() in ["true", "full", "yes"]:
-                self.sync = True
-            elif self.sync.lower() in ["false", "no"]:
-                self.sync = False
+        if isinstance(self.config.sync, str):
+            if self.config.sync.lower() in ["true", "full", "yes"]:
+                self.config.sync = True
+            elif self.config.sync.lower() in ["false", "no"]:
+                self.config.sync = False
 
     def __new__(cls, name: str, *args, **kwargs):
         if name in cls.__instances.keys():
@@ -172,8 +105,18 @@ class Device:
         hostname = socket.gethostname()
         try:
             return Device(hostname.rstrip("-tim"))
-        except DeviceNotFoundError:
+        except errors.DeviceNotFoundError:
             return Device("localhost")
+
+    @property
+    def reachable_ip_addresses(self) -> ip.IPAddressList:
+        return ip.IPAddressList(
+            list(
+                filter(
+                    lambda ip: ip.config.network.is_connected, self.ip_address_list_all
+                )
+            )
+        )
 
     def get_ip(self, strict_ip: bool = False) -> ip.IPAddress:
         """
@@ -185,8 +128,8 @@ class Device:
                 return ip.IPAddress("127.0.0.1")
             return ip.IPAddress("localhost")
 
-        if self.ip_address_list.length() == 0:
-            raise DeviceNotPresentError(self.name)
+        if self.reachable_ip_addresses.length() == 0:
+            raise errors.DeviceNotPresentError(self.name)
 
         alive_ips = self.get_active_ips(strict_ip=strict_ip)
         if alive_ips.length() > 0:
@@ -196,7 +139,7 @@ class Device:
             self.last_ip_address_update = dt.datetime.now()
             return ip_address
 
-        raise NotReachableError(self.name)
+        raise errors.NotReachableError(self.name)
 
     def get_possible_ips(
         self,
@@ -218,7 +161,7 @@ class Device:
             return []
 
         if include_ips:
-            possible_ips.add_list(self.ip_address_list)
+            possible_ips.add_list(self.reachable_ip_addresses)
         if include_dns:
             possible_ips.add_list(clean_ip_group([self.mdns]))
         if include_hostname:
@@ -265,7 +208,7 @@ class Device:
         """Checks if the device is reachable"""
         try:
             return self.ip_address.is_alive()
-        except sshtools.errors.NotReachableError:
+        except errors.NotReachableError:
             return False
 
     def __repr__(self):
