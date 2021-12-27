@@ -5,18 +5,9 @@ from setuptools import setup
 
 # from distutils.core import setup
 
-ini_files = [
-    f"sshtools/{filename}.ini"
-    for filename in ["devices", "kot", "kot-tim", "home", "home-tim", "zerotier"]
-]
-
-txt_files = [
-    f"sshtools/{filename}.txt" for filename in ["exclude", "include", "limited"]
-]
-
 setup(
     name="sshtools",
-    version="2.20.5",
+    version="3.0.0",
     packages=["sshtools"],
     url="",
     license="",
@@ -29,7 +20,8 @@ setup(
         "configparser",
         "psutil",
         "timtools",
-        "fping",
+        "pathlib",
+        "tabulate",
     ],
     scripts=[
         "bin/getip",
@@ -38,6 +30,4 @@ setup(
         "bin/wake-up",
         "bin/smount",
     ],
-    include_package_data=True,
-    data_files=ini_files + txt_files,
 )
