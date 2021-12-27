@@ -3,13 +3,15 @@
 
 import argparse
 import os
+import socket
 import sys
 
 import timtools.bash
 import timtools.log
 
+from sshtools import ip
 from sshtools.device import Device
-from sshtools.errors import ConfigError, DeviceNotPresentError
+from sshtools.errors import ConfigError
 
 logger = timtools.log.get_logger(__name__)
 
@@ -37,52 +39,48 @@ class Ssh:
             logger.debug("Device: %s", dev.hostname)
 
         self.device: Device = dev
-        self.hostname: str = os.uname().nodename
-        self.username: str = os.environ["USER"]  # os.getlogin()
+        self.hostname: str = socket.gethostname()
+        self.username: str = os.environ["USER"]
 
         if connect:
             self.connect(exe=exe, copy_id=copy_id, mosh=mosh)
 
     def connect(
         self,
-        ip_addr: str = None,
+        ip_address: str = None,
         exe: (str, list) = None,
         ssh_port: str = None,
         copy_id: bool = False,
         mosh: bool = False,
     ):
 
-        user = self.device.config.user
-        if not self.device.config.ssh:
+        ip_address = self.device.ip_address
+        user = ip_address.config.user
+        if not ip_address.config.ssh:
             raise ConfigError(self.device.name)
 
         if isinstance(exe, list):
             exe = " ".join(exe)
 
-        if ip_addr is None:
-            ip_addr = self.device.get_ip()
-        else:
-            ip_addr = ip_addr
-
         if ssh_port is None:
-            ssh_port = str(self.device.ssh_port)
+            ssh_port = str(ip_address.config.ssh_port)
         else:
             ssh_port = ssh_port
 
         if exe is None:
-            self.print_header(ip_addr)
+            self.print_header(ip_address)
 
         try:
             if copy_id:
-                cmd_ci = ["ssh-copy-id", "-p", str(ssh_port), f"{user}@{ip_addr}"]
+                cmd_ci = ["ssh-copy-id", "-p", str(ssh_port), f"{user}@{ip_address}"]
                 logger.debug(" ".join(cmd_ci))
 
                 response_ci = timtools.bash.run(cmd_ci)
-                logger.info("SSH-COPY-ID exited with code %s", response_ci)
+                logger.info("SSH-COPY-ID exited with code %s", response_ci.exit_code)
             if mosh and self.device.is_local():
-                cmd = ["mosh", f"{user}@{ip_addr}"]
+                cmd = ["mosh", f"{user}@{ip_address}"]
             else:
-                cmd = ["ssh", "-t", "-p", str(ssh_port), f"{user}@{ip_addr}"]
+                cmd = ["ssh", "-t", "-p", str(ssh_port), f"{user}@{ip_address}"]
 
             if exe:
                 cmd += [exe]
@@ -95,21 +93,10 @@ class Ssh:
         except ConnectionError:
             pass
 
-        except DeviceNotPresentError:
-            relay = self.device.get_relay()
-            if relay:
-                Ssh(
-                    relay,
-                    exe=["python -m sshtools.sshin"]
-                    + [f'"{arg}"' for arg in sys.argv[1:]],
-                    mosh=mosh,
-                    copy_id=copy_id,
-                )
-
         if exe is None:
-            self.print_header(ip_addr)
+            self.print_header(ip_address)
 
-    def print_header(self, ip_addr: str):
+    def print_header(self, ip_addr: ip.IPAddress):
         """Prints a header to the terminal"""
         twidth = self.get_terminal_columns()
 
@@ -159,17 +146,14 @@ def run():
 
     timtools.log.set_verbose(args.verbose)
 
-    devices = Device.get_device_names()
-    logger.debug(devices)
-
-    target = Device.get_device(args.target)
+    target = Device(args.target)
 
     if args.mosh:
         use_mosh = True
     elif args.ssh:
         use_mosh = False
     else:
-        use_mosh = target.mosh
+        use_mosh = target.config.mosh
     Ssh(target, exe=args.command, mosh=use_mosh, copy_id=args.copy_id)
 
 

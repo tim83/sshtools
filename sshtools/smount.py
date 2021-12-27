@@ -3,18 +3,14 @@
 
 import argparse
 import os
+import socket
 import subprocess
+from pathlib import Path
 
 from timtools import log
 
-from sshtools.devices import Device
-from sshtools.errors import (
-    ConfigError,
-    DeviceNotPresentError,
-    NotEmptyError,
-    NotReachableError,
-)
-from sshtools.sshin import Ssh
+from sshtools.device import Device
+from sshtools.errors import ConfigError, NotEmptyError
 
 logger = log.get_logger(__name__)
 
@@ -26,66 +22,41 @@ class Mount:
         self,
         device: Device,
         src: str,
-        mountpoint: str,
+        mountpoint: Path,
         open_mountpoint: bool = False,
         be_root: bool = False,
     ):
         logger.debug("Device: %s ; Source %s ; Mountpoint %s", device, src, mountpoint)
 
-        self.hostname = os.uname().nodename
+        self.hostname = socket.gethostname()
         self.username = os.environ["USER"]
-        if not device.ssh:
+        if not device.config.ssh:
             raise ConfigError(device.name)
-        try:
-            ip_addr = device.get_ip()
+        ip_addr = device.get_ip()
 
-            try:
-                os.makedirs(mountpoint, exist_ok=True)
-                if len(os.listdir(mountpoint)) > 0:
-                    raise NotEmptyError(mountpoint)
+        mountpoint.mkdir(parents=True, exist_ok=True)
+        if any(mountpoint.iterdir()):
+            raise NotEmptyError(mountpoint)
 
-                cmd = [
-                    "mount",
-                    "-t",
-                    "fuse.sshfs",
-                    "-o",
-                    "user,_netdev,reconnect,uid=1000,gid=1000,allow_other",
-                    f"{device.user}@{ip_addr}:{src}",
-                    f"{mountpoint}",
-                ]
-                if be_root:
-                    cmd.insert(0, "sudo")
+        cmd = [
+            "mount",
+            "-t",
+            "fuse.sshfs",
+            "-o",
+            "user,_netdev,reconnect,uid=1000,gid=1000,allow_other",
+            f"{ip_addr.config.user}@{ip_addr}:{src}",
+            f"{mountpoint}",
+        ]
+        if be_root:
+            cmd.insert(0, "sudo")
 
-                logger.debug(" ".join(cmd))
-                response = subprocess.call(cmd)
-                if response != 0:
-                    print(f"Responsecode from SSH: {response}")
-                else:
-                    if open_mountpoint:
-                        subprocess.call(["xdg-open", mountpoint])
-            except NotReachableError:
-                logger.critical(device.name)
-
-        except DeviceNotPresentError:
-            relay = device.get_relay()
-            dest: str
-            if mountpoint[0] == "/":
-                dest = mountpoint[1:]
-            else:
-                dest = mountpoint
-            relay_mount = os.path.join("/tmp/smount", device.name, dest)
-            Ssh(
-                relay,
-                exe=[
-                    "python3",
-                    "-m",
-                    "sshtools.smount",
-                    device.name,
-                    f'"{src}"',
-                    f'"{relay_mount}"',
-                ],
-            )
-            Mount(relay, relay_mount, mountpoint)
+        logger.debug(" ".join(cmd))
+        response = subprocess.call(cmd)
+        if response != 0:
+            print(f"Responsecode from SSH: {response}")
+        else:
+            if open_mountpoint:
+                subprocess.call(["xdg-open", mountpoint])
 
     @classmethod
     def print_header(cls, ip_addr: str):
@@ -126,10 +97,7 @@ def run():
 
     log.set_verbose(args.verbose)
 
-    devices = Device.get_device_names()
-    logger.debug(devices)
-
-    target = Device.get_device(args.target)
+    target = Device(args.target)
     source = args.source
     mountpoint = args.mountpoint
 
