@@ -128,6 +128,7 @@ class ConnectionConfig:
     ssh_port: int
     mosh: bool
     user: str
+    priority: int
 
 
 @dataclasses.dataclass

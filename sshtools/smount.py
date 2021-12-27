@@ -30,9 +30,9 @@ class Mount:
 
         self.hostname = socket.gethostname()
         self.username = os.environ["USER"]
-        if not device.config.ssh:
+        if not device.ssh:
             raise ConfigError(device.name)
-        ip_addr = device.get_ip()
+        ip_addr = device.ip_address
 
         mountpoint.mkdir(parents=True, exist_ok=True)
         if any(mountpoint.iterdir()):
@@ -44,7 +44,7 @@ class Mount:
             "fuse.sshfs",
             "-o",
             "user,_netdev,reconnect,uid=1000,gid=1000,allow_other",
-            f"{ip_addr.config.user}@{ip_addr}:{src}",
+            f"{device.user}@{ip_addr}:{src}",
             f"{mountpoint}",
         ]
         if be_root:

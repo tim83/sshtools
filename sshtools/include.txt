@@ -1,8 +1,0 @@
-*blendcache*
-.git/**
-.pylintrc
-.idea
-.directory
-.vscode/**
-.gitignore
-.git-credentials

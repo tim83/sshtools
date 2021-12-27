@@ -24,9 +24,7 @@ def get_ip_string(
     try:
         ip_address = target.get_ip(strict_ip=strict_ip)
         if ssh_string:
-            print(ip_address, ip_address.config)
-            user = ip_address.config.user
-            print(user)
+            user = target.user
             return f"{user}@{ip_address}"
         else:
             return str(ip_address)
@@ -68,7 +66,7 @@ def run():
 
     targets: list[Device]
     if len(args.target) == 0:
-        targets = list(filter(lambda dev: dev.config.sync, Device.get_devices()))
+        targets = list(filter(lambda dev: dev.sync, Device.get_devices()))
     else:
         targets = [Device(name) for name in args.target]
 

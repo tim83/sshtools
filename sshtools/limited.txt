@@ -1,5 +1,0 @@
-Programs/***
-bin/***
-Documenten
-Config/***
-texmf/***

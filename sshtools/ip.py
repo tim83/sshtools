@@ -25,7 +25,7 @@ class IPAddress:
     __ip_obj: ipaddress.ip_address
     __instances: dict[str, "IPAddress"] = {}
 
-    def __init__(self, ip_address: str, config_device: "sshtools.device.Device" = None):
+    def __init__(self, ip_address: str):
         if type(ip_address) != str:
             raise ValueError("IP address must by a string.")
         self.ip_address = ip_address
@@ -34,9 +34,6 @@ class IPAddress:
         except ValueError:
             self.__ip_obj = None
         self.version = self._determine_version()
-
-        if config_device is not None and self.config is None:
-            self.config = config_device.config
 
     def __new__(cls, ip_address: str, *args, **kwargs):
         if ip_address in cls.__instances.keys():

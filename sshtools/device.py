@@ -6,11 +6,11 @@ from __future__ import annotations  # python -3.9 compatibility
 import datetime as dt
 import json
 import socket
-from typing import Optional
+from typing import Optional, Union
 
 from timtools.log import get_logger
 
-from sshtools import connection, errors, ip, tools
+from sshtools import connection, errors, interface, ip, tools
 
 DEVICES_DIR = tools.CONFIG_DIR / "devices"
 logger = get_logger(__name__)
@@ -26,6 +26,7 @@ class Device:
     mdns: Optional[str]
     config: connection.ConnectionConfig
     ip_address_list_all: ip.IPAddressList
+    interfaces = list[interface.Interface]
 
     last_ip_address: Optional[ip.IPAddress]
     last_ip_address_update: Optional[dt.datetime]
@@ -67,16 +68,26 @@ class Device:
             ssh_port=config.get("ssh_port", "22"),
             mosh=config.get("mosh", True),
             user=config.get("user", "tim"),
+            priority=config.get("priority", 80),
         )
+
+        self.interfaces = []
+        for iface_data in config.get("interfaces", []):
+            iface = interface.Interface(
+                self, iface_data.get("name"), iface_data.get("mac", None)
+            )
+            self.interfaces.append(iface)
+
         self.ip_address_list_all = ip.IPAddressList()
         for ip_data in config.get("connections", []):
             ip_address = ip.IPAddress(ip_data.get("ip_address"))
             ip_address.config = connection.IPConnectionConfig(
-                sync=ip_data.get("sync", self.config.ssh),
+                sync=ip_data.get("sync", self.config.sync),
                 ssh=ip_data.get("ssh", self.config.ssh),
                 ssh_port=ip_data.get("ssh_port", self.config.ssh_port),
                 mosh=ip_data.get("mosh", self.config.mosh),
                 user=ip_data.get("user", self.config.user),
+                priority=ip_data.get("priority", self.config.priority),
                 network=connection.Network(ip_data.get("network", "public")),
             )
             self.ip_address_list_all.add(ip_address)
@@ -123,8 +134,8 @@ class Device:
         """
         if self.is_self():
             if strict_ip:
-                return ip.IPAddress("127.0.0.1", config_device=self)
-            return ip.IPAddress("localhost", config_device=self)
+                return ip.IPAddress("127.0.0.1")
+            return ip.IPAddress("localhost")
 
         if self.reachable_ip_addresses.length() == 0:
             logger.info(f"Found no reachable ips for {self.name}")
@@ -153,7 +164,7 @@ class Device:
         def clean_ip_group(ip_group: Optional[list[str]]) -> list[ip.IPAddress]:
             if ip_group is not None:
                 return [
-                    ip.IPAddress(ipaddr, config_device=self)
+                    ip.IPAddress(ipaddr)
                     for ipaddr in ip_group
                     if ipaddr is not None and ipaddr not in [""]
                 ]
@@ -213,6 +224,38 @@ class Device:
             return self.ip_address.is_alive()
         except errors.NotReachableError:
             return False
+
+    def get_config_value(self, key: str):
+        if self.is_present() and self.ip_address.config is not None:
+            config = self.ip_address.config
+        else:
+            config = self.config
+
+        return getattr(config, key)
+
+    @property
+    def sync(self) -> Union[str, bool]:
+        return self.get_config_value("sync")
+
+    @property
+    def user(self) -> str:
+        return self.get_config_value("user")
+
+    @property
+    def ssh(self) -> bool:
+        return self.get_config_value("ssh")
+
+    @property
+    def mosh(self) -> bool:
+        return self.get_config_value("mosh")
+
+    @property
+    def ssh_port(self) -> bool:
+        return self.get_config_value("ssh_port")
+
+    @property
+    def priority(self) -> int:
+        return self.get_config_value("priority")
 
     def __repr__(self):
         return "<Device({name})>".format(name=self.hostname or self.name)

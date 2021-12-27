@@ -2,7 +2,6 @@
 """Module to remove all entries of a machine in .ssh/known_hosts"""
 
 import argparse
-import os
 
 import timtools.bash
 import timtools.log
@@ -10,7 +9,6 @@ import timtools.log
 from sshtools.device import Device
 
 logger = timtools.log.get_logger("ssh-tools.remove-keys")
-project_dir = os.path.dirname(__file__)
 
 
 def forget_device(target: Device):

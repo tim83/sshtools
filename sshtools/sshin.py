@@ -55,15 +55,15 @@ class Ssh:
     ):
 
         ip_address = self.device.ip_address
-        user = ip_address.config.user
-        if not ip_address.config.ssh:
+        user = self.device.user
+        if not self.device.ssh:
             raise ConfigError(self.device.name)
 
         if isinstance(exe, list):
             exe = " ".join(exe)
 
         if ssh_port is None:
-            ssh_port = str(ip_address.config.ssh_port)
+            ssh_port = str(self.device.ssh_port)
         else:
             ssh_port = ssh_port
 
