@@ -84,7 +84,7 @@ class IPAddress:
             socket.gethostname(),
         ]
 
-    @cachetools.func.ttl_cache(ttl=3)  # cache value for 3 seconds
+    @cachetools.func.ttl_cache(ttl=5)  # cache value for 3 seconds
     def is_alive(self) -> bool:
         ping_cmd = [
             "ping",
@@ -99,7 +99,7 @@ class IPAddress:
                 capture_stdout=True,
                 capture_stderr=True,
                 passable_exit_codes=[0, 2],
-                timeout=1,
+                timeout=0.5,
             )
         except subprocess.TimeoutExpired:
             return False

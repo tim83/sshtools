@@ -8,7 +8,7 @@
       <excludeFolder url="file://$MODULE_DIR$/dist" />
       <excludeFolder url="file://$MODULE_DIR$/ssh_tools.egg-info" />
     </content>
-    <orderEntry type="jdk" jdkName="Poetry (sshtools)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Poetry (sshtools) (2)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
