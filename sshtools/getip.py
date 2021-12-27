@@ -21,18 +21,15 @@ def get_ip_string(
 ) -> str:
     """Return the full address of the user on the device"""
 
-    try:
-        ip_address = target.get_ip(strict_ip=strict_ip)
-        if ssh_string:
-            user = target.user
-            return f"{user}@{ip_address}"
-        else:
-            return str(ip_address)
-    except (
-        sshtools.errors.NotReachableError,
-        sshtools.errors.DeviceNotPresentError,
-    ):
+    if not target.is_present():
         return "x"
+
+    ip_address = target.get_ip(strict_ip=strict_ip)
+    if ssh_string:
+        user = target.user
+        return f"{user}@{ip_address}"
+    else:
+        return str(ip_address)
 
 
 def run():
