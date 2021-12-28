@@ -910,7 +910,7 @@ validators = "^0.18.2"
 type = "git"
 url = "https://github.com/tim83/timtools"
 reference = "master"
-resolved_reference = "4abaed79d1e7408f5e5ccd26c9b539d8827ca16f"
+resolved_reference = "ea5d9e5d3f2b8ec587e37fcae6abc80b2eb6b736"
 
 [[package]]
 name = "toml"
