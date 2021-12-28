@@ -26,15 +26,14 @@ def get_current_ips() -> ip.IPAddressList:
     addresses = ip.IPAddressList()
     for interface_name in interface_names:
         try:
-            if interface_name[:3] in ["eth", "wla", "enp", "wlo", "wlp", "eno"]:
-                ip_addr = ip.IPAddress(
-                    next(
-                        address.address
-                        for address in interface_data[interface_name]
-                        if address.family == socket.AF_INET
-                    )
-                )
-                addresses.add(ip_addr)
+            ip_addr_list = ip.IPAddressList(
+                [
+                    ip.IPAddress(address.address)
+                    for address in interface_data[interface_name]
+                    if address.family == socket.AF_INET
+                ]
+            )
+            addresses.add_list(ip_addr_list)
         except StopIteration:
             pass
     if addresses.length() == 0:
