@@ -63,7 +63,7 @@ def run():
 
     targets: list[Device]
     if len(args.target) == 0:
-        targets = list(filter(lambda dev: dev.sync, Device.get_devices()))
+        targets = list(filter(lambda dev: dev.config.sync, Device.get_devices()))
     else:
         targets = [Device(name) for name in args.target]
 
@@ -74,7 +74,7 @@ def run():
         ip_string = get_ip_string(device, ssh_string=args.ssh_string, strict_ip=args.ip)
         output.append([device.name, ip_string])
 
-        if args.write_log and False:
+        if args.write_log:
             sshtools.sshin.Ssh(
                 dev=device,
                 exe=[
