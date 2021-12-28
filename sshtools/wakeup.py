@@ -1,6 +1,8 @@
 #!  /usr/bin/python3
 """Module to wake up devices using wake on lan"""
 
+from __future__ import annotations  # python -3.9 compatibility
+
 import argparse
 
 from timtools import log

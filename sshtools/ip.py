@@ -1,3 +1,5 @@
+from __future__ import annotations  # python -3.9 compatibility
+
 import concurrent.futures
 import ipaddress
 import re

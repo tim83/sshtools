@@ -1,6 +1,8 @@
 #! /usr/bin/python3
 """Module to ssh into a device"""
 
+from __future__ import annotations  # python -3.9 compatibility
+
 import argparse
 import os
 import socket

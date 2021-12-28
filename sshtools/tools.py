@@ -1,3 +1,5 @@
+from __future__ import annotations  # python -3.9 compatibility
+
 from pathlib import Path
 
 PROJECT_DIR = Path(__file__).parent

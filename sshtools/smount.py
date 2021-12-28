@@ -1,6 +1,8 @@
 #! /usr/bin/python3
 """Mounts a device using sftp"""
 
+from __future__ import annotations  # python -3.9 compatibility
+
 import argparse
 import os
 import socket

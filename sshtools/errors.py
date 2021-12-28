@@ -1,11 +1,10 @@
 #! /usr/bin/python3
 """Errors to used by the modules"""
 
-from os.path import dirname
+from __future__ import annotations  # python -3.9 compatibility
 
 from timtools.log import get_logger
 
-project_dir = dirname(__file__)
 logger = get_logger(__name__)
 
 

@@ -1,3 +1,5 @@
+from __future__ import annotations  # python -3.9 compatibility
+
 import subprocess
 from typing import TYPE_CHECKING
 

@@ -1,6 +1,8 @@
 #! /usr/bin/python3
 """Module to obtain the IP adress of a device"""
 
+from __future__ import annotations  # python -3.9 compatibility
+
 import argparse
 import concurrent.futures
 import datetime as dt

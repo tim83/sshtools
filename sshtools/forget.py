@@ -1,6 +1,8 @@
 #! /usr/bin/python3
 """Module to remove all entries of a machine in .ssh/known_hosts"""
 
+from __future__ import annotations  # python -3.9 compatibility
+
 import argparse
 
 import timtools.bash
