@@ -32,17 +32,21 @@ class Device:
     last_ip_address_update: Optional[dt.datetime]
 
     @classmethod
-    @property
-    def _config_all(cls) -> dict:
-        if Device.__config_all is None:
-            Device.__config_all = {
+    def _get_config_all(cls) -> dict[str, dict]:
+        """
+        Use getter to fix problems with python <3.9 with combined property and classmethod decorators
+        TODO: use @property when python >=3.9 can be ensured
+        """
+        if cls.__config_all is None:
+            cls.__config_all = {
                 dev.stem: json.load(dev.open("r")) for dev in DEVICES_DIR.iterdir()
             }
-        return Device.__config_all
+        return cls.__config_all
 
     @classmethod
     def get_devices(cls) -> list[Device]:
-        device_names: list[str] = cls._config_all.keys()
+        config: dict = cls._get_config_all()
+        device_names: list[str] = list(config.keys())
         return [Device(name) for name in device_names]
 
     @staticmethod
@@ -57,10 +61,10 @@ class Device:
         self.last_ip_address = None
         self.last_ip_address_update = None
 
-        if name not in self._config_all.keys() and name != "localhost":
+        if name not in self._get_config_all().keys() and name != "localhost":
             raise errors.DeviceNotFoundError(name)
 
-        config = self._config_all.get(name, {})
+        config = self._get_config_all().get(name, {})
         self.hostname = config.get("hostname", name)
         self.config = connection.ConnectionConfig(
             sync=config.get("sync", False),

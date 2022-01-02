@@ -58,10 +58,10 @@ class Network:
     def __init__(self, name: str):
         self.name = name
 
-        if name not in self._config_all.keys():
+        if name not in self._get_config_all().keys():
             raise errors.NetworkNotFound(name)
 
-        net_config: dict = self._config_all[name]
+        net_config: dict = self._get_config_all()[name]
         self.is_vpn = net_config.get("vpn", False)
         self.is_public = net_config.get("public", False)
         self.ip_start = net_config.get("ip_start", None)
@@ -76,8 +76,11 @@ class Network:
         return instance
 
     @classmethod
-    @property
-    def _config_all(cls) -> dict:
+    def _get_config_all(cls) -> dict:
+        """
+        Use getter to fix problems with python <3.9 with combined property and classmethod decorators
+        TODO: use @property when python >=3.9 can be ensured
+        """
         if cls.__config_all is None:
             cls.__config_all = {}
             for net_list_file in NETWORK_DIR.iterdir():
@@ -88,7 +91,7 @@ class Network:
 
     @property
     def is_connected(self) -> bool:
-        ip_list = get_current_ips()
+        ip_list: ip.IPAddressList = get_current_ips()
         if self.name == "public":
             return True
 
@@ -108,7 +111,7 @@ class Network:
         """Get the IPs that the networks the current machine has access to"""
         connected_networks: list[Network] = []
 
-        network_names = cls._config_all.keys()
+        network_names = cls._get_config_all().keys()
         for network_name in network_names:
             network = Network(network_name)
             if network is not None and network.is_connected:

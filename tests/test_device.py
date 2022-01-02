@@ -31,7 +31,7 @@ def test_get_ip():
 
 
 def test_device_class():
-    assert type(device.Device._config_all) == dict
+    assert type(device.Device._get_config_all()) == dict
     devices = device.Device.get_devices()
     assert type(devices) == list
     assert all(type(dev) == device.Device for dev in devices)
