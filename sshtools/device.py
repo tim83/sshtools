@@ -26,7 +26,7 @@ class Device:
     mdns: Optional[str]
     config: connection.ConnectionConfig
     ip_address_list_all: ip.IPAddressList
-    interfaces = list[interface.Interface]
+    interfaces: list[interface.Interface]
 
     last_ip_address: Optional[ip.IPAddress]
     last_ip_address_update: Optional[dt.datetime]
