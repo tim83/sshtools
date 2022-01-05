@@ -76,7 +76,7 @@ def run():
         ip_string = get_ip_string(device, ssh_string=args.ssh_string, strict_ip=args.ip)
         output.append([device.name, ip_string])
 
-        if args.write_log:
+        if args.write_log is True:
             sshtools.sshin.Ssh(
                 dev=device,
                 exe=[
@@ -89,7 +89,9 @@ def run():
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         executor.map(device_add_row, targets)
 
-    if len(output) == 1:
+    if args.write_log is True:
+        return
+    elif len(output) == 1:
         output_str = output[0][1]
         if output_str == "x":
             raise sshtools.errors.DeviceNotPresentError(targets[0].name)

@@ -49,7 +49,6 @@ class Ssh:
 
     def connect(
         self,
-        ip_address: str = None,
         exe: (str, list) = None,
         ssh_port: str = None,
         copy_id: bool = False,
@@ -88,7 +87,9 @@ class Ssh:
                 cmd += [exe]
 
             logger.debug(" ".join(cmd))
-            cmd_result = timtools.bash.run(cmd, passable_exit_codes=[255, 100, 127])
+            cmd_result = timtools.bash.run(
+                cmd, passable_exit_codes=[255, 100, 127], capture_stderr=True
+            )
             if __name__ == "__main__":
                 sys.exit(cmd_result.exit_code)
 
