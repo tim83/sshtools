@@ -101,7 +101,7 @@ class IPAddress:
                 capture_stdout=True,
                 capture_stderr=True,
                 passable_exit_codes=[0, 2],
-                timeout=0.5,
+                timeout=0.7,
             )
         except subprocess.TimeoutExpired:
             return False
