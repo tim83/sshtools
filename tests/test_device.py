@@ -35,3 +35,8 @@ def test_device_class():
     devices = device.Device.get_devices()
     assert type(devices) == list
     assert all(type(dev) == device.Device for dev in devices)
+
+
+def test_super():
+    assert device.Device("laptop").is_super is True
+    assert device.Device("probook").is_super is False

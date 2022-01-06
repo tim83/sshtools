@@ -210,6 +210,11 @@ class Device:
                 return self.last_ip_address
         return self.get_ip()
 
+    @property
+    def is_super(self) -> bool:
+        """Checks whether the device is a super device (aka daily driver)"""
+        return self.priority == 0
+
     def is_self(self) -> bool:
         """Checks if the device is the current machine"""
         hostname_machine = socket.gethostname()

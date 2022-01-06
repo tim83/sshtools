@@ -203,16 +203,20 @@ def run():
     if master in slave:
         raise argparse.ArgumentError(args.master, "Master kan geen slave zijn")
 
-    laptop_dev: Device = Device.get_device("laptop")
-    if (
-        laptop_dev in slave
-        and laptop_dev.is_present()
-        and laptop_dev.sync
-        and (not args.dry_run)
-    ):
-        answer = input("Ben je zeker dat je naar laptop wilt synchroniseren? (y/N) ")
-        if answer.lower() not in ["y", "j"]:
-            return
+    super_devs: list[Device] = [dev for dev in Device.get_devices() if dev.is_super]
+    super_dev: Device
+    for super_dev in super_devs:
+        if (
+            super_dev in slave
+            and super_dev.is_present()
+            and super_dev.sync
+            and (not args.dry_run)
+        ):
+            answer = input(
+                f"Ben je zeker dat je naar {super_dev.name} wilt synchroniseren? (y/N) "
+            )
+            if answer.lower() not in ["y", "j"]:
+                return
 
     Sync(master, slave, dry_run=args.dry_run, force_limited=args.limited)
 
