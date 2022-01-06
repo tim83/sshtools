@@ -23,7 +23,7 @@ def test_singleton():
 
 
 def test_get_networks():
-    assert type(connection.Network.get_networks()) == list
+    assert isinstance(connection.Network.get_networks(), list)
     assert all(
-        type(net) == connection.Network for net in connection.Network.get_networks()
+        isinstance(net, connection.Network) for net in connection.Network.get_networks()
     )

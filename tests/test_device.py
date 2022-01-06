@@ -7,11 +7,12 @@ def test_creation():
     dev = device.Device("laptop")
     assert dev.name == "laptop"
     assert dev.hostname == "laptop-tim"
-    assert type(dev.config.mosh) == bool
-    assert type(dev.config.ssh) == bool
+    assert isinstance(dev.config.mosh, bool)
+    assert isinstance(dev.config.ssh, bool)
     assert dev.config.sync in [True, False, "limited"]
-    assert type(dev.ip_address_list_all) == ip.IPAddressList
-    assert type(dev.reachable_ip_addresses) == ip.IPAddressList
+    assert isinstance(dev.ip_address_list_all, ip.IPAddressList)
+    assert isinstance(dev.reachable_ip_addresses, ip.IPAddressList)
+    assert isinstance(dev.is_super, bool)
 
     with pytest.raises(errors.DeviceNotFoundError):
         device.Device("doesnotexist")
@@ -31,10 +32,10 @@ def test_get_ip():
 
 
 def test_device_class():
-    assert type(device.Device._get_config_all()) == dict
+    assert isinstance(device.Device._get_config_all(), dict)
     devices = device.Device.get_devices()
-    assert type(devices) == list
-    assert all(type(dev) == device.Device for dev in devices)
+    assert isinstance(devices, list)
+    assert all(isinstance(dev, device.Device) for dev in devices)
 
 
 def test_super():
