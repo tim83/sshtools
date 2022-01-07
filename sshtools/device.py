@@ -231,7 +231,7 @@ class Device:
         """Checks if the device is reachable"""
         try:
             return self.ip_address.is_alive()
-        except errors.NotReachableError:
+        except (errors.NotReachableError, errors.DeviceNotPresentError):
             return False
 
     def get_config_value(self, key: str):

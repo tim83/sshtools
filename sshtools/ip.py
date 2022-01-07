@@ -1,6 +1,5 @@
 from __future__ import annotations  # python -3.9 compatibility
 
-import concurrent.futures
 import ipaddress
 import re
 import socket
@@ -9,6 +8,8 @@ from typing import TYPE_CHECKING, Union
 
 import cachetools.func
 from timtools import bash, log
+
+from sshtools import tools
 
 if TYPE_CHECKING:
     # Circular import
@@ -137,15 +138,8 @@ class IPAddressList:
             raise ValueError("Only IPAddress objects can be added to a IPAddressList")
 
     def get_alive_addresses(self) -> "IPAddressList":
-        alive_ips: IPAddressList = IPAddressList()
-
-        def check_ip_alive(ip_address: IPAddress):
-            if ip_address.is_alive():
-                alive_ips.add(ip_address)
-
-        with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
-            executor.map(check_ip_alive, self._ip_addresses)
-
+        alive_ips_list = tools.mt_filter(lambda i: i.is_alive(), self._ip_addresses)
+        alive_ips: IPAddressList = IPAddressList(alive_ips_list)
         return alive_ips
 
     def sort_ips(self):

@@ -4,7 +4,6 @@
 from __future__ import annotations  # python -3.9 compatibility
 
 import argparse
-import concurrent.futures
 import datetime as dt
 import os
 import shutil
@@ -42,14 +41,9 @@ class Sync:
         self.username = os.environ["USER"]
         self.dir = Path.home()
 
-        active_slaves: list[Device] = []
-        with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
-            executor.map(
-                lambda s: active_slaves.append(s)
-                if (s.is_present() and s.sync)
-                else False,
-                slaves,
-            )
+        active_slaves: list[Device] = tools.mt_filter(
+            lambda s: s.is_present() and s.sync, slaves
+        )
 
         tmp_dir: Path
         for slave in sorted(active_slaves, key=lambda d: d.priority):
@@ -203,7 +197,9 @@ def run():
     if master in slave:
         raise argparse.ArgumentError(args.master, "Master kan geen slave zijn")
 
-    super_devs: list[Device] = [dev for dev in Device.get_devices() if dev.is_super]
+    super_devs: list[Device] = tools.mt_filter(
+        lambda d: d.is_super, Device.get_devices()
+    )
     super_dev: Device
     for super_dev in super_devs:
         if (
