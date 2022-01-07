@@ -244,6 +244,10 @@ class Device:
 
     @property
     def sync(self) -> Union[str, bool]:
+        if self.config.sync is False:
+            # If sync is disabled on the device level, don't bother finding the IP
+            return self.config.sync
+
         return self.get_config_value("sync")
 
     @property

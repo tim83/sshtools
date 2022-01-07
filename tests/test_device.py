@@ -7,6 +7,7 @@ def test_creation():
     dev = device.Device("laptop")
     assert dev.name == "laptop"
     assert dev.hostname == "laptop-tim"
+    assert dev.mdns == "laptop-tim.local"
     assert isinstance(dev.config.mosh, bool)
     assert isinstance(dev.config.ssh, bool)
     assert dev.config.sync in [True, False, "limited"]

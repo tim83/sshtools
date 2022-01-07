@@ -175,6 +175,8 @@ def run():
 
     timtools.log.set_verbose(args.verbose)
 
+    master: Device
+    slave: list[Device]
     if getattr(args, "from") and args.to:
         # Define both SLAVE and MASTER
         master = Device(getattr(args, "from").replace(" ", ""))
@@ -187,12 +189,12 @@ def run():
         # Define only SLAVE
         master = Device.get_self()
         slave = [Device(args.to.replace(" ", ""))]
-    elif args.master:
-        master = Device(args.master)
-        slave = [dev for dev in Device.get_devices() if dev.name != args.master]
     else:
-        master = Device.get_self()
-        slave = [dev for dev in Device.get_devices() if dev != master]
+        if args.master:
+            master = Device(args.master)
+        else:
+            master = Device.get_self()
+        slave = tools.mt_filter(lambda d: d != master and d.sync, Device.get_devices())
 
     if master in slave:
         raise argparse.ArgumentError(args.master, "Master kan geen slave zijn")
