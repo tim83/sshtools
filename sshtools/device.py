@@ -75,6 +75,12 @@ class Device:
             priority=config.get("priority", 80),
         )
 
+        if isinstance(self.config.sync, str):
+            if self.config.sync.lower() in ["true", "full", "yes"]:
+                self.config.sync = True
+            elif self.config.sync.lower() in ["false", "no"]:
+                self.config.sync = False
+
         self.interfaces = []
         for iface_data in config.get("interfaces", []):
             iface = interface.Interface(
@@ -100,12 +106,6 @@ class Device:
             self.mdns = self.hostname + ".local"
         else:
             self.mdns = None
-
-        if isinstance(self.config.sync, str):
-            if self.config.sync.lower() in ["true", "full", "yes"]:
-                self.config.sync = True
-            elif self.config.sync.lower() in ["false", "no"]:
-                self.config.sync = False
 
     def __new__(cls, name: str, *args, **kwargs):
         if name in cls.__instances.keys():
