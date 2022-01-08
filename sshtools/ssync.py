@@ -42,7 +42,7 @@ class Sync:
         self.dir = Path.home()
 
         active_slaves: list[Device] = tools.mt_filter(
-            lambda s: s.is_present() and s.sync, slaves
+            lambda s: s.is_present() and s.sync is not False, slaves
         )
 
         tmp_dir: Path
@@ -194,7 +194,9 @@ def run():
             master = Device(args.master)
         else:
             master = Device.get_self()
-        slave = tools.mt_filter(lambda d: d != master and d.sync, Device.get_devices())
+        slave = tools.mt_filter(
+            lambda d: d != master and d.sync is not False, Device.get_devices()
+        )
 
     if master in slave:
         raise argparse.ArgumentError(args.master, "Master kan geen slave zijn")
@@ -207,7 +209,7 @@ def run():
         if (
             super_dev in slave
             and super_dev.is_present()
-            and super_dev.sync
+            and super_dev.sync is not False
             and (not args.dry_run)
         ):
             answer = input(
