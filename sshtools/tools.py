@@ -14,6 +14,8 @@ if user_config_dir.is_dir():
 else:
     CONFIG_DIR = src_config_dir
 
+IP_CACHE_TIMEOUT: int = 5
+
 
 def mt_filter(func: Callable, collection: Iterable, max_workers=20) -> list:
     filtered_collection = []

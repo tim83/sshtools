@@ -206,7 +206,7 @@ class Device:
     def ip_address(self) -> ip.IPAddress:
         if self.last_ip_address is not None and self.last_ip_address_update is not None:
             td_update: dt.timedelta = dt.datetime.now() - self.last_ip_address_update
-            if td_update < dt.timedelta(seconds=5):
+            if td_update.total_seconds() < tools.IP_CACHE_TIMEOUT:
                 return self.last_ip_address
         return self.get_ip()
 

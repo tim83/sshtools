@@ -87,7 +87,7 @@ class IPAddress:
             socket.gethostname(),
         ]
 
-    @cachetools.func.ttl_cache(ttl=5)  # cache value for 3 seconds
+    @cachetools.func.ttl_cache(ttl=tools.IP_CACHE_TIMEOUT)
     def is_alive(self) -> bool:
         ping_cmd = [
             "ping",
