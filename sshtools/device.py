@@ -24,6 +24,7 @@ class Device:
     # Config
     hostname: str
     mdns: Optional[str]
+    ip_id: int
     config: connection.ConnectionConfig
     ip_address_list_all: ip.IPAddressList
     interfaces: list[interface.Interface]
@@ -66,6 +67,8 @@ class Device:
 
         config = self._get_config_all().get(name, {})
         self.hostname = config.get("hostname", name)
+        self.ip_id = config.get("ip_id")
+
         self.config = connection.ConnectionConfig(
             sync=config.get("sync", False),
             ssh=config.get("ssh", True),
@@ -90,7 +93,19 @@ class Device:
 
         self.ip_address_list_all = ip.IPAddressList()
         for ip_data in config.get("connections", []):
-            ip_address = ip.IPAddress(ip_data.get("ip_address"))
+            config_ip_address: Optional[str] = ip_data.get("ip_address", None)
+            config_network: connection.Network = connection.Network(
+                ip_data.get("network", "public")
+            )
+            if config_ip_address is not None:
+                ip_address = ip.IPAddress(ip_data.get("ip_address"))
+            elif config_network.ip_start is not None and self.ip_id is not None:
+                ip_address = ip.IPAddress(config_network.ip_start + str(self.ip_id))
+            else:
+                raise ValueError(
+                    f"No IP address configured for {self.name} in network {config_network}"
+                )
+
             ip_address.config = connection.IPConnectionConfig(
                 sync=ip_data.get("sync", self.config.sync),
                 ssh=ip_data.get("ssh", self.config.ssh),
@@ -98,7 +113,7 @@ class Device:
                 mosh=ip_data.get("mosh", self.config.mosh),
                 user=ip_data.get("user", self.config.user),
                 priority=ip_data.get("priority", self.config.priority),
-                network=connection.Network(ip_data.get("network", "public")),
+                network=config_network,
             )
             self.ip_address_list_all.add(ip_address)
 
