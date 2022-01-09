@@ -134,6 +134,7 @@ class Device:
     def get_ip(self, strict_ip: bool = False) -> ip.IPAddress:
         """
         Returns the IP to used for the device
+
         :param strict_ip: Only return an actual IP address (no DNS or hostnames allowed)
         """
         if self.is_self():
@@ -186,6 +187,7 @@ class Device:
     def get_active_ips(self, strict_ip: bool = False) -> ip.IPAddressList:
         """
         Returns the list of all active ips
+
         :param strict_ip: Only return an actual IP address (no DNS or hostnames allowed)
         """
         possible_ips: ip.IPAddressList
@@ -223,6 +225,7 @@ class Device:
     def is_local(self, include_vpn: bool = True) -> bool:
         """
         Checks if the device is present on the local LAN
+
         :param include_vpn: Does a VPN (e.g. zerotier) count as part of the LAN?
         """
         return self.ip_address.is_local(include_vpn=include_vpn)
