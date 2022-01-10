@@ -16,10 +16,11 @@ logger = timtools.log.get_logger("ssh-tools.remove-keys")
 def forget_device(target: Device):
     ips = target.get_possible_ips(
         include_dns=True, include_ips=True, include_hostname=True
-    ).add_list(target.ip_address_list_all)
+    )
+    ips.add_list(target.ip_address_list_all)
     for ip in ips:
         timtools.bash.run(
-            ["ssh-keygen", "-R", ip], capture_stderr=True, capture_stdout=True
+            ["ssh-keygen", "-R", str(ip)], capture_stderr=True, capture_stdout=True
         )
 
 
