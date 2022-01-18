@@ -89,6 +89,9 @@ class IPAddress:
 
     @cachetools.func.ttl_cache(ttl=tools.IP_CACHE_TIMEOUT)
     def is_alive(self) -> bool:
+        if self.config and not self.config.check_online:
+            return True
+
         ping_cmd = [
             "ping",
             "-q",  # be quiet

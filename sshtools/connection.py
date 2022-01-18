@@ -136,3 +136,4 @@ class ConnectionConfig:
 @dataclasses.dataclass
 class IPConnectionConfig(ConnectionConfig):
     network: Network
+    check_online: bool

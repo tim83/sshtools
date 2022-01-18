@@ -114,6 +114,7 @@ class Device:
                 user=ip_data.get("user", self.config.user),
                 priority=ip_data.get("priority", self.config.priority),
                 network=config_network,
+                check_online=ip_data.get("check_online", True),
             )
             self.ip_address_list_all.add(ip_address)
 
