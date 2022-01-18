@@ -141,7 +141,7 @@ class Sync:
         if master.is_self():
             source = [f"{self.dir}/"]
         else:
-            source = [f"{master.user}@{master.ip_address}:{Path.home()}/"]
+            source = [f"{master.user}@{master.ip_address}:{master.home}/"]
         return source
 
     def get_target(self, slave) -> list:
@@ -150,7 +150,7 @@ class Sync:
         if slave.is_self():
             target = [f"{self.dir}"]
         else:
-            target = [f"{slave.user}@{slave.ip_address}:{Path.home()}/"]
+            target = [f"{slave.user}@{slave.ip_address}:{slave.home}/"]
         return target
 
 

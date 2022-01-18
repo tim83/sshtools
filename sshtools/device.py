@@ -6,6 +6,7 @@ from __future__ import annotations  # python -3.9 compatibility
 import datetime as dt
 import json
 import socket
+from pathlib import Path
 from typing import Optional, Union
 
 from timtools.log import get_logger
@@ -227,6 +228,10 @@ class Device:
             if td_update.total_seconds() < tools.IP_CACHE_TIMEOUT:
                 return self.last_ip_address
         return self.get_ip()
+
+    @property
+    def home(self) -> Path:
+        return Path(f"/home/{self.user}")
 
     @property
     def is_super(self) -> bool:
