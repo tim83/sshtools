@@ -60,7 +60,7 @@ class Sync:
                 "--force",
                 "--delete",
                 "--compress",
-                f'--partial-dir={self.dir / ".cache/ssync"}',
+                f'--partial-dir={self.get_cache_dir(slave) / "ssync"}',
             ]
 
             if not slave.is_self():
@@ -73,7 +73,7 @@ class Sync:
             if dry_run:
                 cmd += ["--dry-run"]
 
-            cmd += self.backup_parm()
+            cmd += self.backup_parm(slave)
             cmd += self.inex_parm(master, slave, tmp_dir, force_limited=force_limited)
             cmd += self.get_source(master)
             cmd += self.get_target(slave)
@@ -89,15 +89,17 @@ class Sync:
             finally:
                 shutil.rmtree(tmp_dir)
 
-    @classmethod
-    def backup_parm(cls) -> list:
+    def get_cache_dir(self, slave: Device) -> Path:
+        return slave.home / ".cache"
+
+    def backup_parm(self, slave: Device) -> list:
         """Returns the rsync paramters pertaining to the backup of files"""
         now = dt.datetime.now()
         random_str = str(uuid.uuid4()).split("-")[0]
         dirname = str(now.strftime("%H%M%S")) + "-" + random_str
         backup_dir = (
-            Path.home()
-            / ".cache/ssync_backup"
+            self.get_cache_dir(slave)
+            / "ssync_backup"
             / str(now.year)
             / str(now.month)
             / str(now.day)
