@@ -29,6 +29,7 @@ class Device:
     config: connection.ConnectionConfig
     ip_address_list_all: ip.IPAddressList
     interfaces: list[interface.Interface]
+    is_main_device: bool
 
     last_ip_address: Optional[ip.IPAddress]
     last_ip_address_update: Optional[dt.datetime]
@@ -78,6 +79,8 @@ class Device:
             user=config.get("user", "tim"),
             priority=config.get("priority", 80),
         )
+
+        self.is_main_device = config.get("main_device", self.config.sync is not False)
 
         if isinstance(self.config.sync, str):
             if self.config.sync.lower() in ["true", "full", "yes"]:

@@ -65,7 +65,7 @@ def run():
 
     targets: list[Device]
     if len(args.target) == 0:
-        targets = list(filter(lambda dev: dev.config.sync, Device.get_devices()))
+        targets = list(filter(lambda dev: dev.is_main_device, Device.get_devices()))
     else:
         targets = [Device(name) for name in args.target]
 

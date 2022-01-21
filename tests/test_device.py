@@ -14,9 +14,19 @@ def test_creation():
     assert isinstance(dev.ip_address_list_all, ip.IPAddressList)
     assert isinstance(dev.reachable_ip_addresses, ip.IPAddressList)
     assert isinstance(dev.is_super, bool)
+    assert isinstance(dev.is_main_device, bool)
 
     with pytest.raises(errors.DeviceNotFoundError):
         device.Device("doesnotexist")
+
+
+def test_main_device():
+    m_implied_dev = device.Device("laptop")
+    nm_specified_dev = device.Device("testvm")
+    nm_implied_dev = device.Device("desktop-ben")
+    assert m_implied_dev.is_main_device is True
+    assert nm_implied_dev.is_main_device is False
+    assert nm_specified_dev.is_main_device is False
 
 
 def test_singleton():
