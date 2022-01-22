@@ -197,7 +197,7 @@ def run():
         else:
             master = Device.get_self()
         slave = tools.mt_filter(
-            lambda d: d != master and d.main_device and d.sync is not False,
+            lambda d: d != master and d.is_main_device and d.sync is not False,
             Device.get_devices(),
         )
 
