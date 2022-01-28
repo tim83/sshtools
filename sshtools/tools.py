@@ -1,8 +1,9 @@
 from __future__ import annotations  # python -3.9 compatibility
 
-import concurrent.futures
 from pathlib import Path
 from typing import Callable, Iterable
+
+import timtools.multithreading
 
 PROJECT_DIR = Path(__file__).parent
 
@@ -18,13 +19,4 @@ IP_CACHE_TIMEOUT: int = 5
 
 
 def mt_filter(func: Callable, collection: Iterable, max_workers=20) -> list:
-    filtered_collection = []
-
-    def filter_item(item):
-        if func(item) is True:
-            filtered_collection.append(item)
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        executor.map(filter_item, collection)
-
-    return filtered_collection
+    return timtools.multithreading.mt_filter(func, collection, max_workers=max_workers)
