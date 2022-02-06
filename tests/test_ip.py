@@ -108,11 +108,12 @@ def test_sort_ips():
     loop_ip = ip.IPAddress("127.0.0.1")
     mdns_ip = ip.IPAddress("hostname.local")
     lan_ip = ip.IPAddress("192.168.20.15")
+    ztts_ip = ip.IPAddress("10.147.20.130")
     zt_ip = ip.IPAddress("192.168.193.150")
     pub_ip = ip.IPAddress("32.102.39.10")
     dns_ip = ip.IPAddress("mees.vip")
     ip_list = ip.IPAddressList(
-        [dns_ip, mdns_ip, lan_ip, loc_ip, zt_ip, pub_ip, loop_ip]
+        [dns_ip, mdns_ip, lan_ip, loc_ip, ztts_ip, zt_ip, pub_ip, loop_ip]
     )
     ip_list.sort_ips()
     assert ip_list._ip_addresses == [
@@ -121,6 +122,7 @@ def test_sort_ips():
         mdns_ip,
         lan_ip,
         zt_ip,
+        ztts_ip,
         pub_ip,
         dns_ip,
     ]

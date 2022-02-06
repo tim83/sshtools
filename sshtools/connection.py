@@ -1,49 +1,17 @@
 from __future__ import annotations  # python -3.9 compatibility
 
-import dataclasses
 import json
-import socket
 from pathlib import Path
-from typing import Union
 
 import psutil
-from cachetools.func import ttl_cache
 from timtools.log import get_logger
 
-from sshtools import errors, ip, tools
-from sshtools.errors import NetworkError
+import sshtools.ip
+from sshtools import errors, tools
 
 logger = get_logger("sshtools.connection")
 
 NETWORK_DIR: Path = tools.CONFIG_DIR / "networks"
-
-
-@ttl_cache(ttl=3)
-def get_current_ips() -> ip.IPAddressList:
-    """Get the IPs that the current device has assigned"""
-    interface_data = psutil.net_if_addrs()
-    interface_names = sorted(interface_data.keys())
-    addresses = ip.IPAddressList()
-    for interface_name in interface_names:
-        try:
-            ip_addr_list = ip.IPAddressList(
-                [
-                    ip.IPAddress(address.address)
-                    for address in interface_data[interface_name]
-                    if address.family == socket.AF_INET
-                ]
-            )
-            addresses.add_list(ip_addr_list)
-        except StopIteration:
-            pass
-    if addresses.length() == 0:
-        raise NetworkError()
-
-    logger.debug(
-        f"This machine has {addresses.length()} ip addresses: {addresses.to_list()}"
-    )
-
-    return addresses
 
 
 class Network:
@@ -91,18 +59,24 @@ class Network:
 
     @property
     def is_connected(self) -> bool:
-        ip_list: ip.IPAddressList = get_current_ips()
+        ip_list: sshtools.ip.IPAddressList = sshtools.ip.get_current_ips()
         if self.name == "public":
             return True
 
         if self.ip_start is not None:
-            if any(str(ip_address).startswith(self.ip_start) for ip_address in ip_list):
+            if any(self.has_ip_address(ip_address) for ip_address in ip_list):
                 return True
 
         interfaces = psutil.net_if_addrs().keys()
         if self.interface is not None:
             if self.interface in interfaces:
                 return True
+
+        return False
+
+    def has_ip_address(self, ip_address: sshtools.ip.IPAddress) -> bool:
+        if isinstance(self.ip_start, str):
+            return str(ip_address).startswith(self.ip_start)
 
         return False
 
@@ -121,19 +95,3 @@ class Network:
 
     def __repr__(self) -> str:
         return f"<sshtools.connection.Network '{self.name}'>"
-
-
-@dataclasses.dataclass
-class ConnectionConfig:
-    sync: Union[bool, str]
-    ssh: bool
-    ssh_port: int
-    mosh: bool
-    user: str
-    priority: int
-
-
-@dataclasses.dataclass
-class IPConnectionConfig(ConnectionConfig):
-    network: Network
-    check_online: bool

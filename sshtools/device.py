@@ -11,6 +11,7 @@ from typing import Optional, Union
 
 from timtools.log import get_logger
 
+import sshtools.config
 from sshtools import connection, errors, interface, ip, tools
 
 DEVICES_DIR = tools.CONFIG_DIR / "devices"
@@ -71,7 +72,7 @@ class Device:
         self.hostname = config.get("hostname", name)
         self.ip_id = config.get("ip_id")
 
-        self.config = connection.ConnectionConfig(
+        self.config = sshtools.config.ConnectionConfig(
             sync=config.get("sync", False),
             ssh=config.get("ssh", True),
             ssh_port=config.get("ssh_port", "22"),
@@ -110,7 +111,7 @@ class Device:
                     f"No IP address configured for {self.name} in network {config_network}"
                 )
 
-            ip_address.config = connection.IPConnectionConfig(
+            ip_address.config = ip.IPConnectionConfig(
                 sync=ip_data.get("sync", self.config.sync),
                 ssh=ip_data.get("ssh", self.config.ssh),
                 ssh_port=ip_data.get("ssh_port", self.config.ssh_port),

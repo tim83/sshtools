@@ -1,6 +1,6 @@
 import pytest
 
-from sshtools import connection, errors
+from sshtools import connection, errors, ip
 
 
 def test_creation():
@@ -27,3 +27,12 @@ def test_get_networks():
     assert all(
         isinstance(net, connection.Network) for net in connection.Network.get_networks()
     )
+
+
+def test_ip_ascosiation():
+    home = connection.Network("home")
+    assert home.has_ip_address(ip.IPAddress("192.168.20.132"))
+    zt = connection.Network("zerotier")
+    assert zt.has_ip_address(ip.IPAddress("192.168.193.150"))
+    ztts = connection.Network("zerotier-techsupport")
+    assert ztts.has_ip_address(ip.IPAddress("10.147.20.20"))
