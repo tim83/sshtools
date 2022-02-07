@@ -19,7 +19,6 @@ ssh-forget = "sshtools.forget:run"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0"
-DateTime = "^4.3"
 argparse = "^1.4.0"
 configparser = "^5.0.2"
 psutil = "^5.8.0"
