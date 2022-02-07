@@ -7,7 +7,7 @@ from setuptools import setup
 
 setup(
     name="sshtools",
-    version="3.2.1",
+    version="3.2.2",
     packages=["sshtools"],
     url="",
     license="",
@@ -15,7 +15,6 @@ setup(
     author_email="tim@mees.vip",
     description="PERSONAL USE ONLY: set of tools for connecting with SSH to my machines",
     install_requires=[
-        "datetime",
         "argparse",
         "configparser",
         "psutil",
