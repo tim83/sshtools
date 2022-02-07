@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sshtools"
-version = "3.2.0"
+version = "3.2.1"
 description = ""
 authors = ["Tim Mees <tim.mees83@gmail.com>"]
 homepage = "https://github.com/tim83/sshtools"
@@ -18,7 +18,7 @@ wake-up = "sshtools.wakeup:run"
 ssh-forget = "sshtools.forget:run"
 
 [tool.poetry.dependencies]
-python = ">=3.7.1,<4.0"
+python = ">=3.8,<4.0"
 DateTime = "^4.3"
 argparse = "^1.4.0"
 configparser = "^5.0.2"

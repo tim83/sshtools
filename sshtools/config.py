@@ -1,7 +1,8 @@
 import dataclasses
 import typing
 
-import sshtools.connection
+if typing.TYPE_CHECKING:
+    import sshtools.connection
 
 
 @dataclasses.dataclass
