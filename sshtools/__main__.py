@@ -1,5 +1,6 @@
 #! /usr/bin/python3
 """Module for interacting with machines on the network"""
+from __future__ import annotations
 
 from os.path import dirname
 
