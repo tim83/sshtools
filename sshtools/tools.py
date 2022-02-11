@@ -8,6 +8,8 @@ import timtools.multithreading
 PROJECT_DIR = Path(__file__).parent
 
 src_config_dir = PROJECT_DIR.parent / "config"
+if not src_config_dir.is_dir():
+    src_config_dir = Path("/home/tim/Programs/python/sshtools/config")
 user_config_dir = Path.home() / ".config/sshtools"
 CONFIG_DIR: Path
 if user_config_dir.is_dir():
