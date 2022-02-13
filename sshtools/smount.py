@@ -101,7 +101,7 @@ def run():
 
     target = Device(args.target)
     source = args.source
-    mountpoint = args.mountpoint
+    mountpoint = Path(args.mountpoint)
 
     Mount(target, source, mountpoint, open_mountpoint=args.open, be_root=args.root)
 
