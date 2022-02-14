@@ -12,7 +12,7 @@ from pathlib import Path
 from timtools import log
 
 from sshtools.device import Device
-from sshtools.errors import ConfigError, NotEmptyError
+from sshtools.errors import ConfigError
 
 logger = log.get_logger(__name__)
 
@@ -35,10 +35,6 @@ class Mount:
         if not device.ssh:
             raise ConfigError(device.name)
         ip_addr = device.ip_address
-
-        mountpoint.mkdir(parents=True, exist_ok=True)
-        if any(mountpoint.iterdir()):
-            raise NotEmptyError(mountpoint)
 
         cmd = [
             "mount",
