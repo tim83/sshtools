@@ -3,14 +3,17 @@ from __future__ import annotations  # python -3.9 compatibility
 from pathlib import Path
 from typing import Callable, Iterable
 
+import timtools.locations
 import timtools.multithreading
 
 PROJECT_DIR = Path(__file__).parent
 
 src_config_dir = PROJECT_DIR.parent / "config"
 if not src_config_dir.is_dir():
-    src_config_dir = Path("/home/tim/Programs/python/sshtools/config")
-user_config_dir = Path.home() / ".config/sshtools"
+    src_config_dir = (
+        timtools.locations.get_user_home("tim") / "Programs/python/sshtools/config"
+    )
+user_config_dir = timtools.locations.get_user_config_dir() / "sshtools"
 CONFIG_DIR: Path
 if user_config_dir.is_dir():
     CONFIG_DIR = user_config_dir

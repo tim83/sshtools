@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sshtools"
-version = "3.3.0"
+version = "3.3.1"
 description = ""
 authors = ["Tim Mees <tim.mees83@gmail.com>"]
 homepage = "https://github.com/tim83/sshtools"
