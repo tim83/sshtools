@@ -111,7 +111,7 @@ class IPAddressListIterator:
         self._index = 0
 
     def __next__(self):
-        """'Returns the next value from the object's lists"""
+        """Returns the next value from the object's lists"""
         if self._index < len(self._ip_address_list._ip_addresses):
             result = self._ip_address_list._ip_addresses[self._index]
             self._index += 1
