@@ -28,6 +28,7 @@ jobs:
       - name: Run flake8
         run: poetry run flake8 .
   code-test:
+    needs: code-quality
     strategy:
       fail-fast: false
       matrix:
