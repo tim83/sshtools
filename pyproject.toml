@@ -46,8 +46,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.semantic_release]
 version_variable = [
-    "pyproject.toml:version",
-    "setup.py:setup.version"
+    "pyproject.toml:version"
 ]
 branch = "master"
 upload_to_pypi = false
