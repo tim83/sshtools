@@ -7,14 +7,15 @@ import subprocess
 import typing
 
 import cachetools.func
-from timtools import bash, log
+import timtools.bash
+import timtools.log
 
 import sshtools.connection
 import sshtools.device
 from sshtools import tools
 from sshtools.config import IPConnectionConfig
 
-logger = log.get_logger("sshtools.ip_address")
+logger = timtools.log.get_logger("sshtools.ip_address")
 
 
 class IPAddress:
@@ -112,7 +113,7 @@ class IPAddress:
         ping_cmd += [self.ip_address]
 
         try:
-            ping_result: bash.CommandResult = bash.run(
+            ping_result: timtools.bash.CommandResult = timtools.bash.run(
                 ping_cmd,
                 capture_stdout=True,
                 capture_stderr=True,

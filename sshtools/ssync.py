@@ -16,9 +16,9 @@ from pathlib import Path
 import timtools.bash
 import timtools.log
 
-from sshtools import tools
-from sshtools.device import Device
-from sshtools.errors import NotReachableError
+import sshtools.device
+import sshtools.errors
+import sshtools.tools
 
 logger = timtools.log.get_logger(__name__)
 
@@ -32,8 +32,8 @@ class Sync:
 
     def __init__(
         self,
-        master: Device,
-        slaves: list[Device],
+        master: sshtools.device.Device,
+        slaves: list[sshtools.device.Device],
         dry_run: bool = False,
         force_limited: bool = False,
     ):
@@ -41,7 +41,7 @@ class Sync:
         self.username = os.environ["USER"]
         self.dir = Path.home()
 
-        active_slaves: list[Device] = tools.mt_filter(
+        active_slaves: list[sshtools.device.Device] = sshtools.tools.mt_filter(
             lambda s: s.is_present() and s.sync is not False, slaves
         )
 
@@ -83,16 +83,16 @@ class Sync:
                 timtools.bash.run(cmd)
             except subprocess.CalledProcessError as error:
                 if error.returncode == 255:
-                    raise NotReachableError(slave.name) from error
+                    raise sshtools.errors.NotReachableError(slave.name) from error
                 raise error
 
             finally:
                 shutil.rmtree(tmp_dir)
 
-    def get_cache_dir(self, slave: Device) -> Path:
+    def get_cache_dir(self, slave: sshtools.device.Device) -> Path:
         return slave.home / ".cache"
 
-    def backup_parm(self, slave: Device) -> list:
+    def backup_parm(self, slave: sshtools.device.Device) -> list:
         """Returns the rsync paramters pertaining to the backup of files"""
         now = dt.datetime.now()
         random_str = str(uuid.uuid4()).split("-")[0]
@@ -108,7 +108,11 @@ class Sync:
         return ["--backup", "--backup-dir={dir}".format(dir=backup_dir)]
 
     def inex_parm(
-        self, master: Device, slave: Device, tmp_dir: Path, force_limited: bool = False
+        self,
+        master: sshtools.device.Device,
+        slave: sshtools.device.Device,
+        tmp_dir: Path,
+        force_limited: bool = False,
     ) -> list:
         """Retruns the rsync parameters for excluding and including files"""
         in2file: Path = tmp_dir / "include_rest.txt"
@@ -133,9 +137,9 @@ class Sync:
             return inexlist
 
         if all(dev.sync is True for dev in (slave, master)) and not force_limited:
-            return inexdir(tools.CONFIG_DIR / "ssync")
+            return inexdir(sshtools.tools.CONFIG_DIR / "ssync")
         else:
-            return inexdir(tools.CONFIG_DIR / "ssync_limited")
+            return inexdir(sshtools.tools.CONFIG_DIR / "ssync_limited")
 
     def get_source(self, master) -> list:
         """Get source parameters of rsync"""
@@ -177,37 +181,37 @@ def run():
 
     timtools.log.set_verbose(args.verbose)
 
-    master: Device
-    slave: list[Device]
+    master: sshtools.device.Device
+    slave: list[sshtools.device.Device]
     if getattr(args, "from") and args.to:
         # Define both SLAVE and MASTER
-        master = Device(getattr(args, "from").replace(" ", ""))
-        slave = [Device(args.to.replace(" ", ""))]
+        master = sshtools.device.Device(getattr(args, "from").replace(" ", ""))
+        slave = [sshtools.device.Device(args.to.replace(" ", ""))]
     elif getattr(args, "from") and not args.to:
         # Define only MASTER
-        master = Device(getattr(args, "from").replace(" ", ""))
-        slave = [Device.get_self()]
+        master = sshtools.device.Device(getattr(args, "from").replace(" ", ""))
+        slave = [sshtools.device.Device.get_self()]
     elif not getattr(args, "from") and args.to:
         # Define only SLAVE
-        master = Device.get_self()
-        slave = [Device(args.to.replace(" ", ""))]
+        master = sshtools.device.Device.get_self()
+        slave = [sshtools.device.Device(args.to.replace(" ", ""))]
     else:
         if args.master:
-            master = Device(args.master)
+            master = sshtools.device.Device(args.master)
         else:
-            master = Device.get_self()
-        slave = tools.mt_filter(
+            master = sshtools.device.Device.get_self()
+        slave = sshtools.tools.mt_filter(
             lambda d: d != master and d.is_main_device and d.sync is not False,
-            Device.get_devices(),
+            sshtools.device.Device.get_devices(),
         )
 
     if master in slave:
         raise argparse.ArgumentError(args.master, "Master kan geen slave zijn")
 
-    super_devs: list[Device] = tools.mt_filter(
-        lambda d: d.is_super, Device.get_devices()
+    super_devs: list[sshtools.device.Device] = sshtools.tools.mt_filter(
+        lambda d: d.is_super, sshtools.device.Device.get_devices()
     )
-    super_dev: Device
+    super_dev: sshtools.device.Device
     for super_dev in super_devs:
         if (
             super_dev in slave

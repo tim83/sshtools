@@ -9,12 +9,12 @@ import socket
 import subprocess
 from pathlib import Path
 
-from timtools import log
+import timtools.log
 
-from sshtools.device import Device
-from sshtools.errors import ConfigError
+import sshtools.device
+import sshtools.errors
 
-logger = log.get_logger(__name__)
+logger = timtools.log.get_logger(__name__)
 
 
 class Mount:
@@ -22,7 +22,7 @@ class Mount:
 
     def __init__(
         self,
-        device: Device,
+        device: sshtools.device.Device,
         src: str,
         mountpoint: Path,
         open_mountpoint: bool = False,
@@ -33,7 +33,7 @@ class Mount:
         self.hostname = socket.gethostname()
         self.username = os.environ["USER"]
         if not device.ssh:
-            raise ConfigError(device.name)
+            raise sshtools.errors.ConfigError(device.name)
         ip_addr = device.ip_address
 
         cmd = [
@@ -93,9 +93,9 @@ def run():
     parser.add_argument("-o", "--open", help="Open het mountpoint", action="store_true")
     args = parser.parse_args()
 
-    log.set_verbose(args.verbose)
+    timtools.log.set_verbose(args.verbose)
 
-    target = Device(args.target)
+    target = sshtools.device.Device(args.target)
     source = args.source
     mountpoint = Path(args.mountpoint)
 

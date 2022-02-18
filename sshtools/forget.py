@@ -8,12 +8,12 @@ import argparse
 import timtools.bash
 import timtools.log
 
-from sshtools.device import Device
+import sshtools.device
 
 logger = timtools.log.get_logger("ssh-tools.remove-keys")
 
 
-def forget_device(target: Device):
+def forget_device(target: sshtools.device.Device):
     ips = target.get_possible_ips(
         include_dns=True, include_ips=True, include_hostname=True
     )
@@ -34,7 +34,7 @@ def run():
     timtools.log.set_verbose(args.verbose)
 
     for target in args.target:
-        forget_device(Device.get_device(target))
+        forget_device(sshtools.device.Device.get_device(target))
 
 
 if __name__ == "__main__":

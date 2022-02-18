@@ -11,15 +11,15 @@ import os
 import timtools.log
 from tabulate import tabulate
 
+import sshtools.device
 import sshtools.errors
 import sshtools.sshin
-from sshtools.device import Device
 
 logger = timtools.log.get_logger("ssh-tools.getip")
 
 
 def get_ip_string(
-    target: Device, ssh_string: bool = False, strict_ip: bool = False
+    target: sshtools.device.Device, ssh_string: bool = False, strict_ip: bool = False
 ) -> str:
     """Return the full address of the user on the device"""
 
@@ -63,16 +63,18 @@ def run():
 
     timtools.log.set_verbose(args.verbose)
 
-    targets: list[Device]
+    targets: list[sshtools.device.Device]
     if len(args.target) == 0:
-        targets = list(filter(lambda dev: dev.is_main_device, Device.get_devices()))
+        targets = list(
+            filter(lambda dev: dev.is_main_device, sshtools.device.Device.get_devices())
+        )
     else:
-        targets = [Device(name) for name in args.target]
+        targets = [sshtools.device.Device(name) for name in args.target]
 
-    target: Device
+    target: sshtools.device.Device
     output: list[list[str]] = []
 
-    def device_add_row(device: Device):
+    def device_add_row(device: sshtools.device.Device):
         ip_string = get_ip_string(device, ssh_string=args.ssh_string, strict_ip=args.ip)
         output.append([device.name, ip_string])
 

@@ -5,14 +5,14 @@ from __future__ import annotations  # python -3.9 compatibility
 
 import argparse
 
-from timtools import log
+import timtools.log
 
-from sshtools.device import Device
+import sshtools.device
 
-logger = log.get_logger(__name__)
+logger = timtools.log.get_logger(__name__)
 
 
-def wake(device: Device):
+def wake(device: sshtools.device.Device):
     """Wake up a device"""
     for iface in device.interfaces:
         iface.wake()
@@ -24,9 +24,9 @@ def run():
     parser.add_argument("target", help="Welke computer is de referentie", nargs="?")
     parser.add_argument("-v", "--verbose", help="Geef feedback", action="store_true")
     args = parser.parse_args()
-    log.set_verbose(args.verbose)
+    timtools.log.set_verbose(args.verbose)
 
-    target = Device(args.target)
+    target = sshtools.device.Device(args.target)
     wake(target)
 
 

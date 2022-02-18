@@ -3,7 +3,7 @@ from __future__ import annotations  # python -3.9 compatibility
 import subprocess
 from typing import TYPE_CHECKING
 
-from timtools import bash
+import timtools.bash
 
 if TYPE_CHECKING:
     # Circular import
@@ -30,6 +30,6 @@ class Interface:
 
     def wake(self):
         try:
-            bash.run(["wol", self.mac])
+            timtools.bash.run(["wol", self.mac])
         except subprocess.CalledProcessError:
-            bash.run(["sudo", "wakeonlan", self.mac])
+            timtools.bash.run(["sudo", "wakeonlan", self.mac])

@@ -4,14 +4,14 @@ import socket
 from typing import Union
 
 import psutil
+import timtools.log
 from cachetools.func import ttl_cache
-from timtools import log
 
+import sshtools.errors
 import sshtools.ip_address
-from sshtools import tools
-from sshtools.errors import NetworkError
+import sshtools.tools
 
-logger = log.get_logger("sshtools.ip")
+logger = timtools.log.get_logger("sshtools.ip")
 
 IPConnectionConfig = sshtools.ip_address.IPConnectionConfig
 IPAddress = sshtools.ip_address.IPAddress
@@ -39,7 +39,9 @@ class IPAddressList:
             raise ValueError("Only IPAddress objects can be added to a IPAddressList")
 
     def get_alive_addresses(self) -> "IPAddressList":
-        alive_ips_list = tools.mt_filter(lambda i: i.is_alive(), self._ip_addresses)
+        alive_ips_list = sshtools.tools.mt_filter(
+            lambda i: i.is_alive(), self._ip_addresses
+        )
         alive_ips: IPAddressList = IPAddressList(alive_ips_list)
         return alive_ips
 
@@ -137,7 +139,7 @@ def get_current_ips() -> IPAddressList:
         except StopIteration:
             pass
     if addresses.length() == 0:
-        raise NetworkError()
+        raise sshtools.errors.NetworkError()
 
     logger.debug(
         f"This machine has {addresses.length()} ip addresses: {addresses.to_list()}"

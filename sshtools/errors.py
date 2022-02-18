@@ -3,9 +3,9 @@
 
 from __future__ import annotations  # python -3.9 compatibility
 
-from timtools.log import get_logger
+import timtools.log
 
-logger = get_logger(__name__)
+logger = timtools.log.get_logger(__name__)
 
 
 class ErrorHandler(Exception):

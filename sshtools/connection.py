@@ -4,14 +4,15 @@ import json
 from pathlib import Path
 
 import psutil
-from timtools.log import get_logger
+import timtools.log
 
+import sshtools.errors
 import sshtools.ip
-from sshtools import errors, tools
+import sshtools.tools
 
-logger = get_logger("sshtools.connection")
+logger = timtools.log.get_logger("sshtools.connection")
 
-NETWORK_DIR: Path = tools.CONFIG_DIR / "networks"
+NETWORK_DIR: Path = sshtools.tools.CONFIG_DIR / "networks"
 
 
 class Network:
@@ -27,7 +28,7 @@ class Network:
         self.name = name
 
         if name not in self._get_config_all().keys():
-            raise errors.NetworkNotFound(name)
+            raise sshtools.errors.NetworkNotFound(name)
 
         net_config: dict = self._get_config_all()[name]
         self.is_vpn = net_config.get("vpn", False)

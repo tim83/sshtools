@@ -11,9 +11,9 @@ import sys
 import timtools.bash
 import timtools.log
 
-from sshtools import ip
-from sshtools.device import Device
-from sshtools.errors import ConfigError
+import sshtools.device
+import sshtools.errors
+import sshtools.ip
 
 logger = timtools.log.get_logger(__name__)
 
@@ -23,7 +23,7 @@ class Ssh:
 
     def __init__(
         self,
-        dev: Device,
+        dev: sshtools.device.Device,
         exe: (str, list) = None,
         mosh: bool = False,
         copy_id: bool = False,
@@ -40,7 +40,7 @@ class Ssh:
         else:
             logger.debug("Device: %s", dev.hostname)
 
-        self.device: Device = dev
+        self.device: sshtools.device.Device = dev
         self.hostname: str = socket.gethostname()
         self.username: str = os.environ["USER"]
 
@@ -58,7 +58,7 @@ class Ssh:
         ip_address = self.device.ip_address
         user = self.device.user
         if not self.device.ssh:
-            raise ConfigError(self.device.name)
+            raise sshtools.errors.ConfigError(self.device.name)
 
         if isinstance(exe, list):
             exe = " ".join(exe)
@@ -99,7 +99,7 @@ class Ssh:
         if exe is None:
             self.print_header(ip_address)
 
-    def print_header(self, ip_addr: ip.IPAddress):
+    def print_header(self, ip_addr: sshtools.ip.IPAddress):
         """Prints a header to the terminal"""
         twidth = self.get_terminal_columns()
 
@@ -149,7 +149,7 @@ def run():
 
     timtools.log.set_verbose(args.verbose)
 
-    target = Device(args.target)
+    target = sshtools.device.Device(args.target)
 
     if args.mosh:
         use_mosh = True
