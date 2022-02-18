@@ -1,13 +1,20 @@
 #! /usr/bin/python3
 """Information for packaging the module"""
 
+from pathlib import Path
+
+import toml
 from setuptools import setup
 
-# from distutils.core import setup
+pyproject_path = Path(__file__).parent / "pyproject.toml"
+with open(pyproject_path, "r") as fobj:
+    toml_str = fobj.read()
+
+parsed_toml = toml.loads(toml_str)
 
 setup(
     name="sshtools",
-    version="4.1.0",
+    version=parsed_toml["tool"]["poetry"]["version"],
     packages=["sshtools"],
     url="https://github.com/tim83/sshtools",
     license="",
