@@ -35,7 +35,7 @@ def test_create_ipv6():
 
 
 def test_singleton():
-    """Tests wheter mutliple object with the same IP are singletons"""
+    """Tests whether multiple object with the same IP are singletons"""
     assert ip.IPAddress("localhost") == ip.IPAddress("localhost")
 
 
@@ -74,10 +74,10 @@ def test_local():
         ("10.147.20.130", False, False, False),
     ]
     for ip_str, is_local, is_vpn, is_loopback in test_ips:
-        ip_addr = ip.IPAddress(ip_str)
-        assert ip_addr.is_local(include_vpn=True) == is_local
-        assert ip_addr.is_local(include_vpn=False) == (is_local and not is_vpn)
-        assert ip_addr.is_loopback == is_loopback
+        ip_address = ip.IPAddress(ip_str)
+        assert ip_address.is_local(include_vpn=True) == is_local
+        assert ip_address.is_local(include_vpn=False) == (is_local and not is_vpn)
+        assert ip_address.is_loopback == is_loopback
 
 
 def test_alive():
