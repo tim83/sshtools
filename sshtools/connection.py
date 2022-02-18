@@ -84,15 +84,20 @@ class Network:
     @classmethod
     def get_networks(cls) -> list[Network]:
         """Get the IPs that the networks the current machine has access to"""
-        connected_networks: list[Network] = []
+        networks: list[Network] = []
 
         network_names = cls._get_config_all().keys()
         for network_name in network_names:
             network = Network(network_name)
-            if network is not None and network.is_connected:
-                connected_networks.append(network)
+            if network is not None:
+                networks.append(network)
 
-        return connected_networks
+        return networks
+
+    @classmethod
+    def get_connected_networks(cls) -> list[Network]:
+        """Get the IPs that the networks the current machine has access to"""
+        return list(filter(lambda n: n.is_connected, cls.get_networks()))
 
     def __repr__(self) -> str:
         return f"<sshtools.connection.Network '{self.name}'>"

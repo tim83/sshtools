@@ -49,10 +49,7 @@ def test_create_hostname():
 
 def test_vpn():
     """Tests whether an IP is correctly identified as a VPN"""
-    print(sshtools.connection.Network.get_networks())
-    print(sshtools.ip.IPAddress("192.168.193.20").network)
     assert sshtools.ip.IPAddress("192.168.193.20").is_vpn is True
-    print(sshtools.ip.IPAddress("10.147.20.130").network)
     assert sshtools.ip.IPAddress("10.147.20.130").is_vpn is True
 
     assert sshtools.ip.IPAddress("192.168.20.140").is_vpn is False
