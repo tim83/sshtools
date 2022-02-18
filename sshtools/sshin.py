@@ -69,7 +69,7 @@ class Ssh:
                     else:
                         exe_string = exe
                     cmd += f" -c {exe_string}"
-                Ssh(pf.path[0], exe=cmd)
+                Ssh(pf.path.device_route[0], exe=cmd)
 
     def connect(
         self,

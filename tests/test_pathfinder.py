@@ -28,11 +28,47 @@ def test_is_same_network():
     assert in_same_network is True
 
 
+def test_possible_relays():
+    pf = sshtools.pathfinder.PathFinder(
+        sshtools.device.Device("fujitsu"), sshtools.device.Device("thinkcentre")
+    )
+    for dev_name in ("serverpi", "oracle", "probook"):
+        possible_relay = pf.device_is_a_possible_relay(sshtools.device.Device(dev_name))
+        assert isinstance(possible_relay, bool)
+        assert possible_relay is True
+
+
+def test_path():
+    dev_path = [sshtools.device.Device("oracle"), sshtools.device.Device("thinkcentre")]
+    path = sshtools.pathfinder.Path(dev_path)
+    assert path.device_route == dev_path
+
+
 def test_local_path():
     pf = sshtools.pathfinder.PathFinder(
         sshtools.device.Device("serverpi"), sshtools.device.Device("thinkcentre")
     )
-    pf.find_path()
-    assert isinstance(pf.path, list)
-    assert any(isinstance(node, sshtools.device.Device) for node in pf.path)
-    assert len(pf.path) == 1
+
+    pp = pf.possible_paths
+    assert isinstance(pp, list)
+    assert any(isinstance(path, sshtools.pathfinder.Path) for path in pp)
+
+    print(pp)
+    path = pp[0]
+    assert isinstance(path, sshtools.pathfinder.Path)
+    assert len(path.device_route) == 1
+
+
+def test_sort_paths():
+    pf = sshtools.pathfinder.PathFinder
+    p1 = sshtools.pathfinder.Path(
+        [sshtools.device.Device("serverpi"), sshtools.device.Device("thinkcentre")]
+    )
+    p2 = sshtools.pathfinder.Path(
+        [
+            sshtools.device.Device("serverpi"),
+            sshtools.device.Device("oracle"),
+            sshtools.device.Device("thinkcentre"),
+        ]
+    )
+    assert pf.sort_paths([p2, p1]) == [p1, p2]

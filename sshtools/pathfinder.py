@@ -12,43 +12,23 @@ import sshtools.tools
 logger = timtools.log.get_logger("sshtools.pathfinder")
 
 
-class PathFinder:
-    source: sshtools.device.Device
-    target: sshtools.device.Device
-    path: typing.Optional[list[sshtools.device.Device]]
+class Path:
+    device_route: list[sshtools.device.Device]
 
-    def __init__(
-        self, target: sshtools.device.Device, source: sshtools.device.Device = None
-    ):
-        if source is None:
-            source = sshtools.device.Device.get_self()
+    def __init__(self, devices: list[sshtools.device.Device]):
+        self.device_route = devices
 
-        self.source = source
-        self.target = target
+    def is_reachable(self) -> bool:
+        if not self.device_route[0].is_present():
+            return False
 
-    def find_path(self):
-        self.path = [self.target]
-        if self.target.is_present():
-            return
+        for index in range(1, len(self.device_route)):
+            if not self.device_is_present_for_device(
+                self.device_route[index - 1], self.device_route[index]
+            ):
+                return False
 
-        possible_devices = sshtools.tools.mt_filter(
-            self.device_is_a_possible_relay,
-            sshtools.device.Device.get_devices(),
-        )
-        for device in possible_devices:
-            self.path.insert(0, device)
-            return
-
-        self.path = None
-
-    def device_is_a_possible_relay(self, device: sshtools.device.Device) -> bool:
-        return (
-            not device.is_self()
-            and device.ssh is True
-            and self.in_same_network(device, self.target)
-            and device.is_present()
-            and self.device_is_present_for_device(device, self.target)
-        )
+        return True
 
     @staticmethod
     def device_is_present_for_device(
@@ -59,9 +39,68 @@ class PathFinder:
             exe=f"python3 -m sshtools.getip {target.name} > /dev/null 2>/dev/null",
         )
         logger.critical(
-            f"{target.name} can{'not' if not ssh_check.exe_was_succesfull else ''} be reached through {source}"
+            f"{target.name} can{'not' if not ssh_check.exe_was_succesfull else ''} be reached through "
+            f"{source}"
         )
         return ssh_check.exe_was_succesfull
+
+    def __repr__(self):
+        dev_name_list = [dev.name for dev in self.device_route]
+        return f"<sshtools.pathfinder.Path route={','.join(dev_name_list)}>"
+
+
+class PathFinder:
+    source: sshtools.device.Device
+    target: sshtools.device.Device
+    possible_paths: list[Path]
+    path: typing.Optional[Path]
+
+    def __init__(
+        self, source: sshtools.device.Device, target: sshtools.device.Device = None
+    ):
+        if source is None:
+            source = sshtools.device.Device.get_self()
+
+        self.source = source
+        self.target = target
+
+    @property
+    def possible_paths(self) -> list[Path]:
+        possible_paths = []
+
+        path = [self.target]
+        if self.in_same_network(self.source, self.target):
+            possible_paths.append(Path(path))
+
+        relays = sshtools.tools.mt_filter(
+            self.device_is_a_possible_relay,
+            sshtools.device.Device.get_devices(),
+        )
+
+        for device in relays:
+            possible_paths.append(Path([device] + path))
+
+        return self.sort_paths(possible_paths)
+
+    @staticmethod
+    def sort_paths(paths: list[Path]) -> list[Path]:
+        return sorted(paths, key=lambda p: len(p.device_route))
+
+    def find_path(self):
+        possible_path = self.possible_paths
+        if self.source.is_self():
+            return possible_path[0]
+
+        for path in possible_path:
+            if path.is_reachable():
+                return path
+
+    def device_is_a_possible_relay(self, device: sshtools.device.Device) -> bool:
+        return (
+            not device.is_self()
+            and device.ssh is True
+            and self.in_same_network(device, self.target)
+        )
 
     @classmethod
     def in_same_network(
