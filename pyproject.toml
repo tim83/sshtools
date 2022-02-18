@@ -22,7 +22,7 @@ python = ">=3.8,<4.0"
 argparse = "^1.4.0"
 configparser = "^5.0.2"
 psutil = "^5.8.0"
-timtools = {git = "https://github.com/tim83/timtools"}
+timtools = { git = "https://github.com/tim83/timtools" }
 ipaddress = "^1.0.23"
 tabulate = "^0.8.9"
 
@@ -45,9 +45,7 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.semantic_release]
-version_variable = [
-    "pyproject.toml:version"
-]
+version_variable = "pyproject.toml:version"
 branch = "master"
 upload_to_pypi = false
 upload_to_release = true

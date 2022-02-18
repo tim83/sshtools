@@ -40,7 +40,7 @@ jobs:
       - name: Run tests
         run: poetry run pytest .
   release:
-    needs: code-quality
+    needs: code-test
     runs-on: "ubuntu-latest"
     concurrency: release
     steps:
