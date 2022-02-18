@@ -232,7 +232,9 @@ class Device:
             f"Trying {possible_ips.length()} ips for {self.name}: {possible_ips.to_list()}"
         )
 
-        return possible_ips.get_alive_addresses()
+        alive_ips = possible_ips.get_alive_addresses()
+        logger.info(f"Found {alive_ips.length()} IP addresses: {alive_ips}")
+        return alive_ips
 
     @property
     def ip_address(self) -> sshtools.ip.IPAddress:

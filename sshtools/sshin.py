@@ -14,12 +14,16 @@ import timtools.log
 import sshtools.device
 import sshtools.errors
 import sshtools.ip
+import sshtools.pathfinder
 
 logger = timtools.log.get_logger("sshtools.sshin")
 
 
 class Ssh:
     """Class to ssh into a device"""
+
+    exit_code: int = None
+    exe_was_succesfull: bool = None
 
     def __init__(
         self,
@@ -45,7 +49,27 @@ class Ssh:
         self.username: str = os.environ["USER"]
 
         if connect:
-            self.connect(exe=exe, copy_id=copy_id, mosh=mosh)
+            if self.device.is_present():
+                self.connect(exe=exe, copy_id=copy_id, mosh=mosh)
+            else:
+                logger.warning(
+                    f"{self.device.name} could not be reached, trying to find an alternative path."
+                )
+                pf = sshtools.pathfinder.PathFinder(self.device)
+                pf.find_path()
+                if pf.path is None:
+                    raise sshtools.errors.NotReachableError(self.device.name)
+
+                cmd = f"python3 -m sshtools.sshin {self.device}"
+                if mosh:
+                    cmd += "--mosh"
+                if exe:
+                    if isinstance(exe, list):
+                        exe_string = '"' + '" "'.join(exe) + '"'
+                    else:
+                        exe_string = exe
+                    cmd += f"-c {exe_string}"
+                Ssh(pf.path[0], exe=cmd)
 
     def connect(
         self,
@@ -54,7 +78,6 @@ class Ssh:
         copy_id: bool = False,
         mosh: bool = False,
     ):
-
         ip_address = self.device.ip_address
         user = self.device.user
         if not self.device.ssh:
@@ -88,10 +111,14 @@ class Ssh:
 
             logger.debug(" ".join(cmd))
             cmd_result = timtools.bash.run(
-                cmd, passable_exit_codes=[255, 100, 127], capture_stderr=True
+                cmd, passable_exit_codes=[255, "*"], capture_stderr=True
             )
+            self.exit_code = cmd_result.exit_code
+            if exe:
+                self.exe_was_succesfull = self.exit_code == 0
+
             if __name__ == "__main__":
-                sys.exit(cmd_result.exit_code)
+                sys.exit(self.exit_code)
 
         except ConnectionError:
             pass

@@ -35,7 +35,7 @@ class IPAddress:
             self.__ip_obj = ipaddress.ip_address(ip_address)
         except ValueError:
             self.__ip_obj = None
-        self.version = self._determine_version()
+        self.version = self._determine_ip_version()
 
     def __new__(cls, ip_address: str, *args, **kwargs):
         if ip_address in cls.__instances.keys():
@@ -56,7 +56,7 @@ class IPAddress:
 
         return None
 
-    def _determine_version(self) -> int:
+    def _determine_ip_version(self) -> int:
         """
         Determines the version of the IP address (IPv4 or IPv6)
         :return: The version number of the IP standard
@@ -77,17 +77,13 @@ class IPAddress:
 
         if self.network and self.network.is_vpn is True:
             if self.network.is_public is True:
-                logger.debug("%s is public VPN connection", self.ip_address)
                 return False
-            logger.debug("%s is a VPN connection", self.ip_address)
             return include_vpn
 
         if self.__ip_obj and self.__ip_obj.is_private:
-            logger.debug("%s is private connection", self.ip_address)
             return True
 
         if self.ip_address.endswith(".local") or self.is_loopback():
-            logger.debug("%s is a local hostname", self.ip_address)
             return True
 
         return False
