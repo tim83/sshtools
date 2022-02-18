@@ -15,7 +15,7 @@ import sshtools.device
 import sshtools.errors
 import sshtools.ip
 
-logger = timtools.log.get_logger(__name__)
+logger = timtools.log.get_logger("sshtools.sshin")
 
 
 class Ssh:

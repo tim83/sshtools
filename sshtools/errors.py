@@ -5,7 +5,7 @@ from __future__ import annotations  # python -3.9 compatibility
 
 import timtools.log
 
-logger = timtools.log.get_logger(__name__)
+logger = timtools.log.get_logger("sshtools.errors")
 
 
 class ErrorHandler(Exception):

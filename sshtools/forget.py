@@ -10,7 +10,7 @@ import timtools.log
 
 import sshtools.device
 
-logger = timtools.log.get_logger("ssh-tools.remove-keys")
+logger = timtools.log.get_logger("ssh-tools.forget")
 
 
 def forget_device(target: sshtools.device.Device):

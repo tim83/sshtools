@@ -14,7 +14,7 @@ import timtools.log
 import sshtools.device
 import sshtools.errors
 
-logger = timtools.log.get_logger(__name__)
+logger = timtools.log.get_logger("sshtools.smount")
 
 
 class Mount:

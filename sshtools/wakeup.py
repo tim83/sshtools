@@ -9,7 +9,7 @@ import timtools.log
 
 import sshtools.device
 
-logger = timtools.log.get_logger(__name__)
+logger = timtools.log.get_logger("sshtools.wakeup")
 
 
 def wake(device: sshtools.device.Device):

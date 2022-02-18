@@ -20,7 +20,7 @@ import sshtools.device
 import sshtools.errors
 import sshtools.tools
 
-logger = timtools.log.get_logger(__name__)
+logger = timtools.log.get_logger("sshtools.ssync")
 
 
 class Sync:

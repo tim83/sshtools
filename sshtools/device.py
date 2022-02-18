@@ -20,7 +20,7 @@ import sshtools.ip
 import sshtools.tools
 
 DEVICES_DIR = sshtools.tools.CONFIG_DIR / "devices"
-logger = timtools.log.get_logger(__name__)
+logger = timtools.log.get_logger("sshtools.device")
 
 
 class Device:
