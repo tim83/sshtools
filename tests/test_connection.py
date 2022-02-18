@@ -9,6 +9,16 @@ def test_creation():
     assert net.is_vpn is False
     assert net.is_public is False
 
+    net = connection.Network("zerotier")
+    assert net.name == "zerotier"
+    assert net.is_vpn is True
+    assert net.is_public is False
+
+    net = connection.Network("zerotier-techsupport")
+    assert net.name == "zerotier-techsupport"
+    assert net.is_vpn is True
+    assert net.is_public is True
+
     pub_net = connection.Network("public")
     assert pub_net.name == "public"
     assert pub_net.is_vpn is False
