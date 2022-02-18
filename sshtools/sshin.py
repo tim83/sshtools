@@ -60,15 +60,15 @@ class Ssh:
                 if pf.path is None:
                     raise sshtools.errors.NotReachableError(self.device.name)
 
-                cmd = f"python3 -m sshtools.sshin {self.device}"
+                cmd = f"python3 -m sshtools.sshin {self.device.name}"
                 if mosh:
-                    cmd += "--mosh"
+                    cmd += " --mosh"
                 if exe:
                     if isinstance(exe, list):
                         exe_string = '"' + '" "'.join(exe) + '"'
                     else:
                         exe_string = exe
-                    cmd += f"-c {exe_string}"
+                    cmd += f" -c {exe_string}"
                 Ssh(pf.path[0], exe=cmd)
 
     def connect(
