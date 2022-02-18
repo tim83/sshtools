@@ -54,7 +54,7 @@ class IPAddressList:
         # Loopback
         sorted_ips.update(
             dict.fromkeys(
-                sort_list(filter(lambda ip: ip.is_loopback(), self._ip_addresses))
+                sort_list(filter(lambda ip: ip.is_loopback, self._ip_addresses))
             )
         )
         # mDNS

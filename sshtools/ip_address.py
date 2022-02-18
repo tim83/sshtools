@@ -72,22 +72,24 @@ class IPAddress:
 
         raise ValueError(f"{self.ip_address} is not a valid ip address or hostname.")
 
+    @property
+    def is_vpn(self) -> bool:
+        return self.network is not None and self.network.is_vpn is True
+
     def is_local(self, include_vpn: bool = True) -> bool:
         # https://en.wikipedia.org/wiki/Private_network
-
-        if self.network and self.network.is_vpn is True:
-            if self.network.is_public is True:
-                return False
-            return include_vpn
+        if self.is_vpn:
+            return not self.network.is_public and include_vpn
 
         if self.__ip_obj and self.__ip_obj.is_private:
             return True
 
-        if self.ip_address.endswith(".local") or self.is_loopback():
+        if self.ip_address.endswith(".local") or self.is_loopback:
             return True
 
         return False
 
+    @property
     def is_loopback(self) -> bool:
         return self.ip_address in [
             "localhost",

@@ -4,6 +4,7 @@ import socket
 import pytest
 from timtools import log
 
+import sshtools.ip
 from sshtools import ip
 
 log.set_verbose(True)
@@ -45,6 +46,16 @@ def test_create_hostname():
         assert ipv6.version == 0
 
 
+def test_vpn():
+    """Tests whether an IP is correctly identified as a VPN"""
+    assert sshtools.ip.IPAddress("192.168.193.20").is_vpn is True
+    assert sshtools.ip.IPAddress("10.147.20.130").is_vpn is True
+
+    assert sshtools.ip.IPAddress("192.168.20.140").is_vpn is False
+    assert sshtools.ip.IPAddress("8.8.8.8").is_vpn is False
+    assert sshtools.ip.IPAddress("127.0.0.1").is_vpn is False
+
+
 def test_local():
     """Tests the check whether the IP is local"""
     test_ips = [
@@ -56,12 +67,13 @@ def test_local():
         ("143.169.210.13", False, False, False),
         ("ff80::94b6:ff97:1c37:3f66", False, False, False),
         ("arandomcomputer.local", True, False, False),
+        ("10.147.20.130", False, False, False),
     ]
     for ip_str, is_local, is_vpn, is_loopback in test_ips:
         ip_addr = ip.IPAddress(ip_str)
         assert ip_addr.is_local(include_vpn=True) == is_local
         assert ip_addr.is_local(include_vpn=False) == (is_local and not is_vpn)
-        assert ip_addr.is_loopback() == is_loopback
+        assert ip_addr.is_loopback == is_loopback
 
 
 def test_alive():
