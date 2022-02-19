@@ -1,5 +1,4 @@
 #! /usr/bin/python3
-"""Mounts a device using sftp"""
 
 from __future__ import annotations  # python -3.9 compatibility
 
@@ -59,13 +58,16 @@ class Mount:
                 subprocess.call(["xdg-open", mount_point])
 
     @classmethod
-    def print_header(cls, ip_addr: str):
-        """Prints a header to the terminal"""
+    def print_header(cls, ip_address: str):
+        """
+        Prints a header to the terminal
+        :param ip_address: The IP address to announce in the header
+        """
         os.system("clear")
         try:
             twidth = os.get_terminal_size().columns
 
-            print(f"Connecting to {ip_addr} ...\n")
+            print(f"Connecting to {ip_address} ...\n")
             print("-" * twidth + "\n")
         except OSError:
             pass
@@ -91,7 +93,7 @@ def run():
         "mountpoint",
         help="The location on this machine where the source will be mounted.",
     )
-    parser.add_argument("-v", "--verbose", help="Geef feedback", action="store_true")
+    parser.add_argument("-v", "--verbose", action="store_true")
     parser.add_argument("-r", "--root", help="Mount as root", action="store_true")
     parser.add_argument(
         "-o", "--open", help="Open the mount point after mounting", action="store_true"
