@@ -21,8 +21,8 @@ def wake(device: sshtools.device.Device):
 def run():
     """Main executable for wake-up"""
     parser = argparse.ArgumentParser()
-    parser.add_argument("target", help="Welke computer is de referentie", nargs="?")
-    parser.add_argument("-v", "--verbose", help="Geef feedback", action="store_true")
+    parser.add_argument("target", help="Which device to wake.", nargs="?")
+    parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
     timtools.log.set_verbose(args.verbose)
 
