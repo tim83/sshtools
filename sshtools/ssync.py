@@ -83,7 +83,10 @@ class Sync:
                 timtools.bash.run(cmd)
             except subprocess.CalledProcessError as error:
                 if error.returncode == 255:
-                    raise sshtools.errors.NotReachableError(slave.name) from error
+                    if len(active_slaves) == 1:
+                        raise sshtools.errors.NotReachableError(slave.name) from error
+                    else:
+                        logger.error(f"{slave} could not be reached.")
                 raise error
 
             finally:
