@@ -93,10 +93,19 @@ class Sync:
                 shutil.rmtree(tmp_dir)
 
     def get_cache_dir(self, slave: sshtools.device.Device) -> Path:
+        """
+        Returns the cache directory to be used on the slave machine
+        :param slave: The machine the cache directory will be on
+        :return: The filepath to the cache directory on the slave machine
+        """
         return timtools.locations.get_user_cache_dir(slave.user)
 
-    def backup_parm(self, slave: sshtools.device.Device) -> list:
-        """Returns the rsync paramters pertaining to the backup of files"""
+    def backup_parm(self, slave: sshtools.device.Device) -> list[str]:
+        """
+        Returns the rsync parameters pertaining to the backup of files
+        :param slave: The device to sync to
+        :return: A list of strings containing the rsync backup parameters
+        """
         now = dt.datetime.now()
         random_str = str(uuid.uuid4()).split("-")[0]
         dirname = str(now.strftime("%H%M%S")) + "-" + random_str
@@ -116,8 +125,15 @@ class Sync:
         slave: sshtools.device.Device,
         tmp_dir: Path,
         force_limited: bool = False,
-    ) -> list:
-        """Retruns the rsync parameters for excluding and including files"""
+    ) -> list[str]:
+        """
+        Returns the rsync parameters for excluding and including files
+        :param master: The device to sync from
+        :param slave: The device to sync to
+        :param tmp_dir: The filepath to a temporary directory that is present for the whole sync process
+        :param force_limited: Only sync a limited number of essential files
+        :return: A list of strings that contains the rsync parameters for including and excluding files
+        """
         in2file: Path = tmp_dir / "include_rest.txt"
 
         with open(in2file, "w") as fobj:
@@ -144,8 +160,12 @@ class Sync:
         else:
             return inexdir(sshtools.tools.CONFIG_DIR / "ssync_limited")
 
-    def get_source(self, master) -> list:
-        """Get source parameters of rsync"""
+    def get_source(self, master) -> list[str]:
+        """
+        Get the parameters for rsync identifying the source of the sync
+        :param master: The device to sync from
+        :return: A list of strings containing the sync source
+        """
         source: list
         if master.is_self():
             source = [f"{self.dir}/"]
@@ -153,8 +173,12 @@ class Sync:
             source = [f"{master.user}@{master.ip_address}:{master.home}/"]
         return source
 
-    def get_target(self, slave) -> list:
-        """Get source parameters of rsync"""
+    def get_target(self, slave) -> list[str]:
+        """
+        Get the parameters for rsync identifying the target of the sync
+        :param slave: The device to sync to
+        :return: A list of strings containing the sync target
+        """
         target: list[str]
         if slave.is_self():
             target = [f"{self.dir}"]
@@ -167,19 +191,17 @@ def run():
     """Main executable for ssync"""
     # Arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("master", help="Welke computer is de referentie", nargs="?")
-    parser.add_argument("-v", "--verbose", help="Geef feedback", action="store_true")
-    parser.add_argument("-f", "--from", help="Manuele referentie (heeft --to nodig)")
-    parser.add_argument("-t", "--to", help="Maneel doel (heeft --from nodig)")
+    parser.add_argument("master", help="The device to sync from", nargs="?")
+    parser.add_argument("-v", "--verbose", action="store_true")
+    parser.add_argument("-f", "--from", help="Specify a manual source")
+    parser.add_argument("-t", "--to", help="Specify a manual target")
     parser.add_argument(
         "-l",
         "--limited",
-        help="Synchroniseer het minimum aan bestanden",
+        help="Only sync a limited number of files",
         action="store_true",
     )
-    parser.add_argument(
-        "-d", "--dry-run", help="Voer de sync niet echt uit", action="store_true"
-    )
+    parser.add_argument("-d", "--dry-run", action="store_true")
     args = parser.parse_args()
 
     timtools.log.set_verbose(args.verbose)
