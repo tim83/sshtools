@@ -1,5 +1,4 @@
 #! /usr/bin/python3
-"""Syncs devices over LAN"""
 
 from __future__ import annotations  # python -3.9 compatibility
 
@@ -25,7 +24,7 @@ logger = timtools.log.get_logger("sshtools.ssync")
 
 
 class Sync:
-    """Sync devices"""
+    """Sync devices over the network using RSYNC"""
 
     dir: Path
     username: str
