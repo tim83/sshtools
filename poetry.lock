@@ -940,7 +940,7 @@ widechars = ["wcwidth"]
 
 [[package]]
 name = "timtools"
-version = "1.1.1"
+version = "1.2.0"
 description = ""
 category = "main"
 optional = false
@@ -958,7 +958,7 @@ xdg = "^5.1.1"
 type = "git"
 url = "https://github.com/tim83/timtools"
 reference = "master"
-resolved_reference = "ca3a7f2abe70be83ff2935ec4fba247a32558e94"
+resolved_reference = "f4facfe701b443c0fe131fa05cc4d618712aba6d"
 
 [[package]]
 name = "toml"
