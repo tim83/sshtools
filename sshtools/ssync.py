@@ -86,7 +86,7 @@ class Sync:
                     if len(active_slaves) == 1:
                         raise sshtools.errors.NotReachableError(slave.name) from error
                     else:
-                        logger.error(f"{slave} could not be reached.")
+                        logger.error(f"{slave} has disappeared.")
                 raise error
 
             finally:
