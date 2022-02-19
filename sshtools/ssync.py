@@ -14,6 +14,7 @@ import uuid
 from pathlib import Path
 
 import timtools.bash
+import timtools.locations
 import timtools.log
 
 import sshtools.device
@@ -93,7 +94,7 @@ class Sync:
                 shutil.rmtree(tmp_dir)
 
     def get_cache_dir(self, slave: sshtools.device.Device) -> Path:
-        return slave.home / ".cache"
+        return timtools.locations.get_user_cache_dir(slave.user)
 
     def backup_parm(self, slave: sshtools.device.Device) -> list:
         """Returns the rsync paramters pertaining to the backup of files"""
