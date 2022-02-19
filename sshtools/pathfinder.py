@@ -19,7 +19,7 @@ class Path:
         self.device_route = devices
 
     def is_reachable(self) -> bool:
-        if not self.device_route[0].is_present():
+        if not self.device_route[0].is_sshable():
             return False
 
         for index in range(1, len(self.device_route)):

@@ -49,7 +49,7 @@ class Ssh:
         self.username: str = os.environ["USER"]
 
         if connect:
-            if self.device.is_present():
+            if self.device.is_sshable():
                 self.connect(exe=exe, copy_id=copy_id, mosh=mosh)
             else:
                 logger.warning(
