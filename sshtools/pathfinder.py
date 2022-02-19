@@ -39,10 +39,10 @@ class Path:
             exe=f"python3 -m sshtools.getip {target.name} > /dev/null 2>/dev/null",
         )
         logger.critical(
-            f"{target.name} can{'not' if not ssh_check.exe_was_succesfull else ''} be reached through "
+            f"{target.name} can{'not' if not ssh_check.exe_was_successful else ''} be reached through "
             f"{source}"
         )
-        return ssh_check.exe_was_succesfull
+        return ssh_check.exe_was_successful
 
     def __repr__(self):
         dev_name_list = [dev.name for dev in self.device_route]

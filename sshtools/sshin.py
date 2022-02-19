@@ -1,5 +1,4 @@
 #! /usr/bin/python3
-"""Module to ssh into a device"""
 
 from __future__ import annotations  # python -3.9 compatibility
 
@@ -20,10 +19,10 @@ logger = timtools.log.get_logger("sshtools.sshin")
 
 
 class Ssh:
-    """Class to ssh into a device"""
+    """Connect to a device using SSH"""
 
     exit_code: int = None
-    exe_was_succesfull: bool = None
+    exe_was_successful: bool = None
 
     def __init__(
         self,
@@ -60,15 +59,15 @@ class Ssh:
                 if pf.path is None:
                     raise sshtools.errors.NotReachableError(self.device.name)
 
-                cmd = f"python3 -m sshtools.sshin {self.device.name}"
+                cmd = ["python3", f"-m sshtools.sshin {self.device.name}"]
                 if mosh:
-                    cmd += " --mosh"
+                    cmd.append("--mosh")
                 if exe:
                     if isinstance(exe, list):
                         exe_string = '"' + '" "'.join(exe) + '"'
                     else:
                         exe_string = exe
-                    cmd += f" -c {exe_string}"
+                    cmd.append(f"-c {exe_string}")
                 Ssh(pf.path.device_route[0], exe=cmd)
 
     def connect(
@@ -78,6 +77,13 @@ class Ssh:
         copy_id: bool = False,
         mosh: bool = False,
     ):
+        """
+        Actually connects to the device
+        :param exe: The command to execute on the device (None opens an interactive terminal)
+        :param ssh_port: The port to connect to for SSH
+        :param copy_id: Copy the SSH keys from this machine to the target
+        :param mosh: Use MOSH instead of SSH
+        """
         ip_address = self.device.ip_address
         user = self.device.user
         if not self.device.ssh:
@@ -115,7 +121,7 @@ class Ssh:
             )
             self.exit_code = cmd_result.exit_code
             if exe:
-                self.exe_was_succesfull = self.exit_code == 0
+                self.exe_was_successful = self.exit_code == 0
 
             if __name__ == "__main__":
                 sys.exit(self.exit_code)
@@ -126,11 +132,14 @@ class Ssh:
         if exe is None:
             self.print_header(ip_address)
 
-    def print_header(self, ip_addr: sshtools.ip.IPAddress):
-        """Prints a header to the terminal"""
+    def print_header(self, ip_address: sshtools.ip.IPAddress):
+        """
+        Prints a header to the terminal
+        :param ip_address: The ip address to announce in the header
+        """
         twidth = self.get_terminal_columns()
 
-        print(f"Connecting to {ip_addr} ...\n")
+        print(f"Connecting to {ip_address} ...\n")
         print("-" * twidth + "\n")
 
     @staticmethod
@@ -151,26 +160,24 @@ def run():
     """Main executable for sshin"""
     logger.debug(sys.argv)
     parser = argparse.ArgumentParser()
-    parser.add_argument("target", help="Welke computer is de referentie")
-    parser.add_argument("-c", "--command", help="Uit te voeren commando")
+    parser.add_argument("target", help="The name of the device to connect to.")
+    parser.add_argument("-c", "--command", help="The command to execute on the TARGET.")
     parser.add_argument(
         "-u",
         "--user",
-        help="Login als deze gebruiker, in plaats van de standaard gebruiker",
+        help="Connect to this user on the target device.",
     )
     parser.add_argument(
         "-i",
         "--copy-id",
-        help="Voert ssh-copy-id uit voor de verbinden",
+        help="Copy the SSH keys from this machine to the target.",
         action="store_true",
     )
     parser.add_argument(
-        "-m", "--mosh", help="Gebruik MOSH in plaats van SSH", action="store_true"
+        "-m", "--mosh", help="Use MOSH instead of SSH", action="store_true"
     )
-    parser.add_argument(
-        "-s", "--ssh", help="Gebruik MOSH in plaats van SSH", action="store_true"
-    )
-    parser.add_argument("-v", "--verbose", help="Geef feedback", action="store_true")
+    parser.add_argument("-s", "--ssh", help="Always use SSH.", action="store_true")
+    parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
     logger.debug(args)
 
