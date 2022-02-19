@@ -18,23 +18,25 @@ logger = timtools.log.get_logger("sshtools.smount")
 
 
 class Mount:
-    """Mounts a source directory of a device on mountpoint"""
+    """Mounts a source directory of a device on mount point"""
 
     def __init__(
         self,
         device: sshtools.device.Device,
         src: str,
-        mountpoint: Path,
-        open_mountpoint: bool = False,
+        mount_point: Path,
+        open_mount_point: bool = False,
         be_root: bool = False,
     ):
-        logger.debug("Device: %s ; Source %s ; Mountpoint %s", device, src, mountpoint)
+        logger.debug(
+            "Device: %s ; Source %s ; Mount point %s", device, src, mount_point
+        )
 
         self.hostname = socket.gethostname()
         self.username = os.environ["USER"]
         if not device.ssh:
             raise sshtools.errors.ConfigError(device.name)
-        ip_addr = device.ip_address
+        ip_address = device.ip_address
 
         cmd = [
             "mount",
@@ -42,8 +44,8 @@ class Mount:
             "fuse.sshfs",
             "-o",
             "user,_netdev,reconnect,uid=1000,gid=1000,allow_other",
-            f"{device.user}@{ip_addr}:{src}",
-            f"{mountpoint}",
+            f"{device.user}@{ip_address}:{src}",
+            f"{mount_point}",
         ]
         if be_root:
             cmd.insert(0, "sudo")
@@ -51,10 +53,10 @@ class Mount:
         logger.debug(" ".join(cmd))
         response = subprocess.call(cmd)
         if response != 0:
-            print(f"Responsecode from SSH: {response}")
+            print(f"Response code from SSH: {response}")
         else:
-            if open_mountpoint:
-                subprocess.call(["xdg-open", mountpoint])
+            if open_mount_point:
+                subprocess.call(["xdg-open", mount_point])
 
     @classmethod
     def print_header(cls, ip_addr: str):
@@ -78,28 +80,31 @@ class Mount:
 def run():
     """Main executable class for smount"""
     parser = argparse.ArgumentParser()
-    parser.add_argument("target", help="Welke computer is de referentie")
+    parser.add_argument("target", help="Which device will be mounted.")
     parser.add_argument(
         "source",
-        help="Locatie op taget die gemount moet worden",
+        help="The location on the TARGET that will be mounted.",
         nargs="?",
         default="/home/tim",
     )
-    parser.add_argument("mountpoint", help="Mountpoint")
-    parser.add_argument("-v", "--verbose", help="Geef feedback", action="store_true")
     parser.add_argument(
-        "-r", "--root", help="Koppel de locatie aan als ROOT", action="store_true"
+        "mountpoint",
+        help="The location on this machine where the source will be mounted.",
     )
-    parser.add_argument("-o", "--open", help="Open het mountpoint", action="store_true")
+    parser.add_argument("-v", "--verbose", help="Geef feedback", action="store_true")
+    parser.add_argument("-r", "--root", help="Mount as root", action="store_true")
+    parser.add_argument(
+        "-o", "--open", help="Open the mount point after mounting", action="store_true"
+    )
     args = parser.parse_args()
 
     timtools.log.set_verbose(args.verbose)
 
     target = sshtools.device.Device(args.target)
     source = args.source
-    mountpoint = Path(args.mountpoint)
+    mount_point = Path(args.mountpoint)
 
-    Mount(target, source, mountpoint, open_mountpoint=args.open, be_root=args.root)
+    Mount(target, source, mount_point, open_mount_point=args.open, be_root=args.root)
 
 
 if __name__ == "__main__":
