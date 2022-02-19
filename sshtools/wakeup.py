@@ -1,5 +1,4 @@
 #!  /usr/bin/python3
-"""Module to wake up devices using wake on lan"""
 
 from __future__ import annotations  # python -3.9 compatibility
 
@@ -13,7 +12,10 @@ logger = timtools.log.get_logger("sshtools.wakeup")
 
 
 def wake(device: sshtools.device.Device):
-    """Wake up a device"""
+    """
+    Wake up a device using wake on lan
+    :param device: The device to wake up
+    """
     for iface in device.interfaces:
         iface.wake()
 
