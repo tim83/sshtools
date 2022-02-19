@@ -42,7 +42,7 @@ class Sync:
         self.dir = Path.home()
 
         active_slaves: list[sshtools.device.Device] = sshtools.tools.mt_filter(
-            lambda s: s.is_present() and s.sync is not False, slaves
+            lambda s: s.is_sshable() is not False, slaves
         )
 
         tmp_dir: Path

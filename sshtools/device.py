@@ -9,6 +9,7 @@ import socket
 from pathlib import Path
 from typing import Optional, Union
 
+import timtools.bash
 import timtools.locations
 import timtools.log
 
@@ -275,6 +276,25 @@ class Device:
             sshtools.errors.DeviceNotPresentError,
         ):
             return False
+
+    def is_sshable(self) -> bool:
+        """Checks whether a device is reachable and can receive an SSH-connection"""
+        if self.is_present() and self.ssh:
+            cmd_res = timtools.bash.run(
+                [
+                    "ssh",
+                    "-o BatchMode=yes",
+                    "-o ConnectTimeout=2",
+                    f"-p {self.ssh_port}",
+                    f"{self.user}@{self.ip_address}",
+                    "exit",
+                ],
+                passable_exit_codes=["*"],
+                capture_stderr=True,
+                capture_stdout=True,
+            )
+            return cmd_res.exit_code == 0
+        return False
 
     def get_config_value(self, key: str):
         if self.is_present() and self.ip_address.config is not None:
