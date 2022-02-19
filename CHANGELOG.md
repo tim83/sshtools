@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.2.1 (2022-02-19)
+### Performance
+* **ssync.py:** Reuse cache finder from timtools ([`09fda45`](https://github.com/tim83/sshtools/commit/09fda454f7fb4d7610ccf66de8e0df56e738b52b))
+
 ## v4.2.0 (2022-02-19)
 ### Feature
 * **device.py:** Use the sshable check ([`4e6af59`](https://github.com/tim83/sshtools/commit/4e6af597a84e25988813e930ee325f4c6ccd6bdf))
