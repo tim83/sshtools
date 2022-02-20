@@ -22,7 +22,6 @@ jobs:
       - name: Run flake8
         run: poetry run flake8 .
   code-test:
-    needs: code-quality
     strategy:
       fail-fast: false
       matrix:
@@ -44,7 +43,9 @@ jobs:
       - name: Run tests
         run: poetry run pytest .
   release:
-    needs: code-test
+    needs:
+      - code-test
+      - code-quality
     runs-on: "ubuntu-latest"
     concurrency: release
     steps:
