@@ -2,6 +2,22 @@
 
 <!--next-version-placeholder-->
 
+## v4.3.0 (2022-02-20)
+### Feature
+* **device.py:** Change property-like functions to properties ([`f93e449`](https://github.com/tim83/sshtools/commit/f93e44922fe82ff1b4061b3d26bbf604f0a0446f))
+
+### Fix
+* **device.py:** Disable caching ([`2cc6ef2`](https://github.com/tim83/sshtools/commit/2cc6ef257df09544fcf42096be2b0a65ec94b355))
+* **config:** Non-main limited sync for laptop-oma ([`6234f0b`](https://github.com/tim83/sshtools/commit/6234f0b7ebe1c34dcc2db602403c56052f0c8b94))
+* **config:** Oma -> greta ([`93ff57f`](https://github.com/tim83/sshtools/commit/93ff57f0984fbc4d0ef9e7ef0ff935a8f9dab5ce))
+* **sshin.py:** Clean up user messages and variable names & improve docstrings ([`2651b27`](https://github.com/tim83/sshtools/commit/2651b271e3064bce634cd5ea10d1a0a33032c106))
+* **ssync.py:** Clean up user messages and variable names & improve docstrings ([`ede3ea7`](https://github.com/tim83/sshtools/commit/ede3ea793add46317deb6c37e480756aa8e50937))
+* **smount.py:** Improve docstrings ([`6e42dde`](https://github.com/tim83/sshtools/commit/6e42dde805001fcf5e56421ffb985d5c0263a399))
+* **ssync.py:** Improve docstrings ([`761d196`](https://github.com/tim83/sshtools/commit/761d19686f200222e5ae6c688587f645f7ec8257))
+* **wake.py:** Improve docstrings ([`34f4ddd`](https://github.com/tim83/sshtools/commit/34f4ddd9470e0babc89b9b57d840016b6edca9aa))
+* **wake.py:** Clean up user messages and variable names ([`945c28f`](https://github.com/tim83/sshtools/commit/945c28f92b603d26dcb5a9eeef17a5f56393f07f))
+* **smount.py:** Clean up user messages and variable names ([`fd42275`](https://github.com/tim83/sshtools/commit/fd422758ff7e0606b3a10b2e21b501ac8a6753d0))
+
 ## v4.2.1 (2022-02-19)
 ### Performance
 * **ssync.py:** Reuse cache finder from timtools ([`09fda45`](https://github.com/tim83/sshtools/commit/09fda454f7fb4d7610ccf66de8e0df56e738b52b))
