@@ -9,6 +9,7 @@ import socket
 from pathlib import Path
 from typing import Optional, Union
 
+import cachetools.func
 import timtools.bash
 import timtools.locations
 import timtools.log
@@ -166,7 +167,7 @@ class Device:
 
         :param strict_ip: Only return an actual IP address (no DNS or hostnames allowed)
         """
-        if self.is_self():
+        if self.is_self:
             if strict_ip:
                 return sshtools.ip.IPAddress("127.0.0.1")
             return sshtools.ip.IPAddress("localhost")
@@ -254,11 +255,13 @@ class Device:
         """Checks whether the device is a super device (aka daily driver)"""
         return self.priority == 0
 
+    @property
     def is_self(self) -> bool:
         """Checks if the device is the current machine"""
         hostname_machine = socket.gethostname()
         return self.hostname == hostname_machine or self.hostname == "localhost"
 
+    @property
     def is_local(self, include_vpn: bool = True) -> bool:
         """
         Checks if the device is present on the local LAN
@@ -267,6 +270,7 @@ class Device:
         """
         return self.ip_address.is_local(include_vpn=include_vpn)
 
+    @property
     def is_present(self) -> bool:
         """Checks if the device is reachable"""
         try:
@@ -277,9 +281,11 @@ class Device:
         ):
             return False
 
+    @cachetools.func.ttl_cache(ttl=5)
+    @property
     def is_sshable(self) -> bool:
         """Checks whether a device is reachable and can receive an SSH-connection"""
-        if self.is_present() and self.ssh:
+        if self.is_present and self.ssh:
             cmd_res = timtools.bash.run(
                 [
                     "ssh",
@@ -297,7 +303,7 @@ class Device:
         return False
 
     def get_config_value(self, key: str):
-        if self.is_present() and self.ip_address.config is not None:
+        if self.is_present and self.ip_address.config is not None:
             config = self.ip_address.config
         else:
             config = self.config

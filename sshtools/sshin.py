@@ -48,7 +48,7 @@ class Ssh:
         self.username: str = os.environ["USER"]
 
         if connect:
-            if self.device.is_sshable():
+            if self.device.is_sshable:
                 self.connect(exe=exe, copy_id=copy_id, mosh=mosh)
             else:
                 logger.warning(
@@ -107,7 +107,7 @@ class Ssh:
 
                 response_ci = timtools.bash.run(cmd_ci)
                 logger.info("SSH-COPY-ID exited with code %s", response_ci.exit_code)
-            if mosh and self.device.is_local():
+            if mosh and self.device.is_local:
                 cmd = ["mosh", f"{user}@{ip_address}"]
             else:
                 cmd = ["ssh", "-t", "-p", str(ssh_port), f"{user}@{ip_address}"]

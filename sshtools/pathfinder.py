@@ -19,7 +19,7 @@ class Path:
         self.device_route = devices
 
     def is_reachable(self) -> bool:
-        if not self.device_route[0].is_sshable():
+        if not self.device_route[0].is_sshable:
             return False
 
         for index in range(1, len(self.device_route)):
@@ -88,7 +88,7 @@ class PathFinder:
 
     def find_path(self):
         possible_path = self.possible_paths
-        if self.source.is_self():
+        if self.source.is_self:
             return possible_path[0]
 
         for path in possible_path:
@@ -97,7 +97,7 @@ class PathFinder:
 
     def device_is_a_possible_relay(self, device: sshtools.device.Device) -> bool:
         return (
-            not device.is_self()
+            not device.is_self
             and device.ssh is True
             and self.in_same_network(device, self.target)
         )

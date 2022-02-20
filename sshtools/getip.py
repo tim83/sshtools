@@ -23,7 +23,7 @@ def get_ip_string(
 ) -> str:
     """Return the full address of the user on the device"""
 
-    if not target.is_present():
+    if not target.is_present:
         return "x"
 
     ip_address = target.get_ip(strict_ip=strict_ip)

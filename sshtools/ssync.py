@@ -42,7 +42,7 @@ class Sync:
         self.dir = Path.home()
 
         active_slaves: list[sshtools.device.Device] = sshtools.tools.mt_filter(
-            lambda s: s.is_sshable() is not False, slaves
+            lambda s: s.is_sshable is not False, slaves
         )
 
         tmp_dir: Path
@@ -63,10 +63,10 @@ class Sync:
                 f'--partial-dir={self.get_cache_dir(slave) / "ssync"}',
             ]
 
-            if not slave.is_self():
+            if not slave.is_self:
                 port = slave.ssh_port
                 cmd += ["-e", f"ssh -p {port}"]
-            elif not master.is_self():
+            elif not master.is_self:
                 port = master.ssh_port
                 cmd += ["-e", f"ssh -p {port}"]
 
@@ -167,7 +167,7 @@ class Sync:
         :return: A list of strings containing the sync source
         """
         source: list
-        if master.is_self():
+        if master.is_self:
             source = [f"{self.dir}/"]
         else:
             source = [f"{master.user}@{master.ip_address}:{master.home}/"]
@@ -180,7 +180,7 @@ class Sync:
         :return: A list of strings containing the sync target
         """
         target: list[str]
-        if slave.is_self():
+        if slave.is_self:
             target = [f"{self.dir}"]
         else:
             target = [f"{slave.user}@{slave.ip_address}:{slave.home}/"]
@@ -240,7 +240,7 @@ def run():
     for super_dev in super_devs:
         if (
             super_dev in slave
-            and super_dev.is_present()
+            and super_dev.is_present
             and super_dev.sync is not False
             and (not args.dry_run)
         ):

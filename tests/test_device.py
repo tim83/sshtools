@@ -36,9 +36,10 @@ def test_singleton():
 
 def test_get_ip():
     for self_dev in [device.Device.get_self(), device.Device("localhost")]:
-        assert self_dev.is_self() is True
-        assert self_dev.is_local() is True
+        assert self_dev.is_self is True
+        assert self_dev.is_local is True
         assert self_dev.get_ip() == ip.IPAddress("localhost")
+        assert self_dev.ip_address == ip.IPAddress("localhost")
         assert self_dev.get_ip(strict_ip=True) == ip.IPAddress("127.0.0.1")
 
 
