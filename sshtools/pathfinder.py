@@ -53,10 +53,10 @@ class PathFinder:
     source: sshtools.device.Device
     target: sshtools.device.Device
     possible_paths: list[Path]
-    path: typing.Optional[Path]
+    path: typing.Optional[Path] = None
 
     def __init__(
-        self, source: sshtools.device.Device, target: sshtools.device.Device = None
+        self, target: sshtools.device.Device, source: sshtools.device.Device = None
     ):
         if source is None:
             source = sshtools.device.Device.get_self()
@@ -89,11 +89,13 @@ class PathFinder:
     def find_path(self):
         possible_path = self.possible_paths
         if self.source.is_self:
-            return possible_path[0]
+            self.path = possible_path[0]
+            return
 
         for path in possible_path:
             if path.is_reachable():
-                return path
+                self.path = path
+                return
 
     def device_is_a_possible_relay(self, device: sshtools.device.Device) -> bool:
         return (

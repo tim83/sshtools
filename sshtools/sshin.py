@@ -31,6 +31,7 @@ class Ssh:
         mosh: bool = False,
         copy_id: bool = False,
         connect: bool = True,
+        user: str = None,
     ):
         if connect:
             logger.debug(
@@ -44,11 +45,14 @@ class Ssh:
             logger.debug("Device: %s", dev.hostname)
 
         self.device: sshtools.device.Device = dev
+        if user is not None:
+            self.device.config.user = user
+
         self.hostname: str = socket.gethostname()
         self.username: str = os.environ["USER"]
 
         if connect:
-            if self.device.is_sshable:
+            if self.device.is_present and self.device.ssh:
                 self.connect(exe=exe, copy_id=copy_id, mosh=mosh)
             else:
                 logger.warning(
@@ -191,7 +195,7 @@ def run():
         use_mosh = False
     else:
         use_mosh = target.config.mosh
-    Ssh(target, exe=args.command, mosh=use_mosh, copy_id=args.copy_id)
+    Ssh(target, exe=args.command, mosh=use_mosh, copy_id=args.copy_id, user=args.user)
 
 
 if __name__ == "__main__":

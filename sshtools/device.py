@@ -9,7 +9,6 @@ import socket
 from pathlib import Path
 from typing import Optional, Union
 
-import cachetools.func
 import timtools.bash
 import timtools.locations
 import timtools.log
@@ -281,7 +280,6 @@ class Device:
         ):
             return False
 
-    @cachetools.func.ttl_cache(ttl=5)
     @property
     def is_sshable(self) -> bool:
         """Checks whether a device is reachable and can receive an SSH-connection"""
