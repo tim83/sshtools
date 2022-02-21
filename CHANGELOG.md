@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.3.1 (2022-02-21)
+### Fix
+* **pathfinder.py:** Fix selecting target as relay ([`dec6b3e`](https://github.com/tim83/sshtools/commit/dec6b3ec4e87a57380afb7e73691def1f404dc9a))
+
 ## v4.3.0 (2022-02-20)
 ### Feature
 * **device.py:** Change property-like functions to properties ([`f93e449`](https://github.com/tim83/sshtools/commit/f93e44922fe82ff1b4061b3d26bbf604f0a0446f))
