@@ -88,10 +88,6 @@ class PathFinder:
 
     def find_path(self):
         possible_path = self.possible_paths
-        if self.source.is_self:
-            self.path = possible_path[0]
-            return
-
         for path in possible_path:
             if path.is_reachable():
                 self.path = path
@@ -100,6 +96,7 @@ class PathFinder:
     def device_is_a_possible_relay(self, device: sshtools.device.Device) -> bool:
         return (
             not device.is_self
+            and device != self.target
             and device.ssh is True
             and self.in_same_network(device, self.target)
         )
