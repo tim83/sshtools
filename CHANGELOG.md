@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.5.0 (2022-02-24)
+### Feature
+* **device.py:** Allow creating a device based on the hostname instead of the name ([`260fc84`](https://github.com/tim83/sshtools/commit/260fc84efc32596c7d035d3d57cb3da2c04910a3))
+
 ## v4.4.0 (2022-02-24)
 ### Feature
 * **device.py:** Add a method fo checking if a device can be a relay ([`ef6e76c`](https://github.com/tim83/sshtools/commit/ef6e76ce77ff292c078b3140f882ab5b3da88578))
