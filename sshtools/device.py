@@ -18,6 +18,7 @@ import sshtools.connection
 import sshtools.errors
 import sshtools.interface
 import sshtools.ip
+import sshtools.pathfinder
 import sshtools.tools
 
 DEVICES_DIR = sshtools.tools.CONFIG_DIR / "devices"
@@ -307,6 +308,9 @@ class Device:
             config = self.config
 
         return getattr(config, key)
+
+    def can_connect_to_device(self, target: "Device") -> bool:
+        return sshtools.pathfinder.Path.device_is_present_for_device(self, target)
 
     @property
     def sync(self) -> Union[str, bool]:
