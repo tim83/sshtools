@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.3.2 (2022-02-24)
+### Performance
+* **device.py:** Improve logging by providing a __str__ method for device ([`8220070`](https://github.com/tim83/sshtools/commit/8220070790d78a73bca84b6dd71280e4b8cc76da))
+
 ## v4.3.1 (2022-02-21)
 ### Fix
 * **pathfinder.py:** Fix selecting target as relay ([`dec6b3e`](https://github.com/tim83/sshtools/commit/dec6b3ec4e87a57380afb7e73691def1f404dc9a))
