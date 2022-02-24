@@ -68,14 +68,21 @@ class Device:
         return Device(name)
 
     def __init__(self, name: str):
-        self.name = name
         self.last_ip_address = None
         self.last_ip_address_update = None
 
-        if name not in self._get_config_all().keys() and name != "localhost":
-            raise sshtools.errors.DeviceNotFoundError(name)
-
         config = self._get_config_all().get(name, {})
+        if len(config) == 0:
+            for key_name, value_config in self._get_config_all().items():
+                if value_config.get("hostname", None) == name:
+                    name = key_name
+                    config = value_config
+                    break
+            else:
+                if name not in self._get_config_all().keys() and name != "localhost":
+                    raise sshtools.errors.DeviceNotFoundError(name)
+
+        self.name = name
         self.hostname = config.get("hostname", name)
         self.ip_id = config.get("ip_id")
 
@@ -141,6 +148,17 @@ class Device:
         if name in cls.__instances.keys():
             return cls.__instances[name]
 
+        if name not in cls._get_config_all().keys():
+            hostname_matches = list(
+                filter(
+                    lambda d: hasattr(d, "hostname") and d.hostname == name,
+                    cls.__instances.values(),
+                )
+            )
+            if len(hostname_matches) == 1:
+                print(hostname_matches[0].hostname, name)
+                return hostname_matches[0]
+
         instance = super(Device, cls).__new__(cls)
         cls.__instances[name] = instance
         return instance
@@ -149,7 +167,7 @@ class Device:
     def get_self() -> Device:
         hostname = socket.gethostname()
         try:
-            return Device(hostname.rstrip("-tim"))
+            return Device(hostname)
         except sshtools.errors.DeviceNotFoundError:
             return Device("localhost")
 

@@ -21,6 +21,16 @@ def test_creation():
         device.Device("doesnotexist")
 
 
+def test_get_devices():
+    dev_list = device.Device.get_devices()
+    assert isinstance(dev_list, list)
+    assert all(isinstance(dev, device.Device) for dev in dev_list)
+
+
+def test_name_or_hostname():
+    assert device.Device("laptop") == device.Device("laptop-tim")
+
+
 def test_main_device():
     m_implied_dev = device.Device("laptop")
     nm_specified_dev = device.Device("testvm")
@@ -37,6 +47,7 @@ def test_singleton():
 
 def test_get_ip():
     for self_dev in [device.Device.get_self(), device.Device("localhost")]:
+        print(f"Evaluating {self_dev}")
         assert self_dev.is_self is True
         assert self_dev.is_local is True
         assert self_dev.get_ip() == ip.IPAddress("localhost")
