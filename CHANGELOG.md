@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v4.4.0 (2022-02-24)
+### Feature
+* **device.py:** Add a method fo checking if a device can be a relay ([`ef6e76c`](https://github.com/tim83/sshtools/commit/ef6e76ce77ff292c078b3140f882ab5b3da88578))
+
+### Fix
+* **pathfinder.py:** Don't use the hostname for connecting to a relay to prevent Device-Not-Found errors ([`91bb62c`](https://github.com/tim83/sshtools/commit/91bb62c17a5490c5d242889f16fdafc73ba25ec8))
+
 ## v4.3.2 (2022-02-24)
 ### Performance
 * **device.py:** Improve logging by providing a __str__ method for device ([`8220070`](https://github.com/tim83/sshtools/commit/8220070790d78a73bca84b6dd71280e4b8cc76da))
