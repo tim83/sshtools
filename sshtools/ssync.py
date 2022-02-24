@@ -47,8 +47,7 @@ class Sync:
 
         tmp_dir: Path
         for slave in sorted(active_slaves, key=lambda d: d.priority):
-            print()
-            print(master.name + " -> " + slave.name)
+            print(f"\n{master} -> {slave}")
             tmp_dir = Path(tempfile.mkdtemp())
 
             cmd = ["rsync"]
@@ -245,7 +244,7 @@ def run():
             and (not args.dry_run)
         ):
             answer = input(
-                f"Ben je zeker dat je naar {super_dev.name} wilt synchroniseren? (y/N) "
+                f"Ben je zeker dat je naar {super_dev} wilt synchroniseren? (y/N) "
             )
             if answer.lower() not in ["y", "j"]:
                 return

@@ -15,6 +15,7 @@ def test_creation():
     assert isinstance(dev.reachable_ip_addresses, ip.IPAddressList)
     assert isinstance(dev.is_super, bool)
     assert isinstance(dev.is_main_device, bool)
+    assert str(dev) == f"{dev}" == dev.hostname
 
     with pytest.raises(errors.DeviceNotFoundError):
         device.Device("doesnotexist")

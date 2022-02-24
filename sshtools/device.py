@@ -116,7 +116,7 @@ class Device:
                 )
             else:
                 raise ValueError(
-                    f"No IP address configured for {self.name} in network {config_network}"
+                    f"No IP address configured for {self} in network {config_network}"
                 )
 
             ip_address.config = sshtools.ip.IPConnectionConfig(
@@ -172,13 +172,13 @@ class Device:
             return sshtools.ip.IPAddress("localhost")
 
         if self.reachable_ip_addresses.length() == 0:
-            logger.info(f"Found no reachable ips for {self.name}")
+            logger.info(f"Found no reachable ips for {self}")
             raise sshtools.errors.DeviceNotPresentError(self.name)
 
         alive_ips = self.get_active_ips(strict_ip=strict_ip)
         if alive_ips.length() > 0:
             ip_address = alive_ips.get_first()
-            logger.info(f"Found ip {ip_address} for {self.name}")
+            logger.info(f"Found ip {ip_address} for {self}")
             self.last_ip_address = ip_address
             self.last_ip_address_update = dt.datetime.now()
             return ip_address
@@ -230,7 +230,7 @@ class Device:
             possible_ips = self.get_possible_ips()
 
         logger.info(
-            f"Trying {possible_ips.length()} ips for {self.name}: {possible_ips.to_list()}"
+            f"Trying {possible_ips.length()} ips for {self}: {possible_ips.to_list()}"
         )
 
         alive_ips = possible_ips.get_alive_addresses()
@@ -338,3 +338,6 @@ class Device:
 
     def __repr__(self):
         return "<Device({name})>".format(name=self.hostname or self.name)
+
+    def __str__(self):
+        return self.hostname or self.name

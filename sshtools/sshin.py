@@ -56,14 +56,14 @@ class Ssh:
                 self.connect(exe=exe, copy_id=copy_id, mosh=mosh)
             else:
                 logger.warning(
-                    f"{self.device.name} could not be reached, trying to find an alternative path."
+                    f"{self.device} could not be reached, trying to find an alternative path."
                 )
                 pf = sshtools.pathfinder.PathFinder(self.device)
                 pf.find_path()
                 if pf.path is None:
                     raise sshtools.errors.NotReachableError(self.device.name)
 
-                cmd = ["python3", f"-m sshtools.sshin {self.device.name}"]
+                cmd = ["python3", f"-m sshtools.sshin {self.device}"]
                 if mosh:
                     cmd.append("--mosh")
                 if exe:
