@@ -36,7 +36,7 @@ class Path:
     ) -> bool:
         ssh_check = sshtools.sshin.Ssh(
             source,
-            exe=f"python3 -m sshtools.getip {target} > /dev/null 2>/dev/null",
+            exe=f"python3 -m sshtools.getip {target.name} > /dev/null 2>/dev/null",
         )
         logger.critical(
             f"{target} can{'not' if not ssh_check.exe_was_successful else ''} be reached through {source}"
