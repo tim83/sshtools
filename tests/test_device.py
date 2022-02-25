@@ -28,7 +28,13 @@ def test_get_devices():
 
 
 def test_name_or_hostname():
+    assert device.Device.get_name_from_hostname("laptop") == "laptop"
+    assert device.Device.get_name_from_hostname("laptop-tim") == "laptop"
     assert device.Device("laptop") == device.Device("laptop-tim")
+
+    assert device.Device("laptop-greta") != device.Device("localhost")
+
+    assert device.Device.get_name_from_hostname("doesnotexist") is None
 
 
 def test_main_device():

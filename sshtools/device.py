@@ -6,6 +6,7 @@ from __future__ import annotations  # python -3.9 compatibility
 import datetime as dt
 import json
 import socket
+import typing
 from pathlib import Path
 from typing import Optional, Union
 
@@ -67,20 +68,23 @@ class Device:
 
         return Device(name)
 
+    @classmethod
+    def get_name_from_hostname(cls, hostname: str) -> typing.Optional[str]:
+        if hostname in cls._get_config_all().keys():
+            return hostname
+
+        for name, config in cls._get_config_all().items():
+            if config.get("hostname", None) == hostname:
+                return name
+
     def __init__(self, name: str):
         self.last_ip_address = None
         self.last_ip_address_update = None
 
+        name = self.get_name_from_hostname(name) or name
         config = self._get_config_all().get(name, {})
-        if len(config) == 0:
-            for key_name, value_config in self._get_config_all().items():
-                if value_config.get("hostname", None) == name:
-                    name = key_name
-                    config = value_config
-                    break
-            else:
-                if name not in self._get_config_all().keys() and name != "localhost":
-                    raise sshtools.errors.DeviceNotFoundError(name)
+        if name not in self._get_config_all().keys() and name != "localhost":
+            raise sshtools.errors.DeviceNotFoundError(name)
 
         self.name = name
         self.hostname = config.get("hostname", name)
@@ -145,19 +149,9 @@ class Device:
             self.mdns = None
 
     def __new__(cls, name: str, *args, **kwargs):
+        name = cls.get_name_from_hostname(name)
         if name in cls.__instances.keys():
             return cls.__instances[name]
-
-        if name not in cls._get_config_all().keys():
-            hostname_matches = list(
-                filter(
-                    lambda d: hasattr(d, "hostname") and d.hostname == name,
-                    cls.__instances.values(),
-                )
-            )
-            if len(hostname_matches) == 1:
-                print(hostname_matches[0].hostname, name)
-                return hostname_matches[0]
 
         instance = super(Device, cls).__new__(cls)
         cls.__instances[name] = instance
