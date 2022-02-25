@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.5.1 (2022-02-25)
+### Fix
+* **device.py:** Allow creating a device based on the hostname instead of the name ([`8681ed0`](https://github.com/tim83/sshtools/commit/8681ed00ce5d9d13243900bfe62367f91e7233bc))
+
 ## v4.5.0 (2022-02-24)
 ### Feature
 * **device.py:** Allow creating a device based on the hostname instead of the name ([`260fc84`](https://github.com/tim83/sshtools/commit/260fc84efc32596c7d035d3d57cb3da2c04910a3))
