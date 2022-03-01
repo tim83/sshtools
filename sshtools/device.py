@@ -274,13 +274,11 @@ class Device:
         return self.hostname == hostname_machine or self.hostname == "localhost"
 
     @property
-    def is_local(self, include_vpn: bool = True) -> bool:
+    def is_local(self) -> bool:
         """
-        Checks if the device is present on the local LAN
-
-        :param include_vpn: Does a VPN (e.g. zerotier) count as part of the LAN?
+        Checks if the device is present on the local LAN (VPN is not regarded as local)
         """
-        return self.ip_address.is_local(include_vpn=include_vpn)
+        return self.ip_address.is_local(include_vpn=False)
 
     @property
     def is_present(self) -> bool:
