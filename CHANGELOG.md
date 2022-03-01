@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.5.2 (2022-03-01)
+### Fix
+* **device.py:** Specify that .is_local does not include VPNs ([`7dad382`](https://github.com/tim83/sshtools/commit/7dad382f01b463ad71f18875f3155c763c876356))
+
 ## v4.5.1 (2022-02-25)
 ### Fix
 * **device.py:** Allow creating a device based on the hostname instead of the name ([`8681ed0`](https://github.com/tim83/sshtools/commit/8681ed00ce5d9d13243900bfe62367f91e7233bc))
