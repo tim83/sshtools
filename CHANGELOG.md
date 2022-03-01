@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.5.3 (2022-03-01)
+### Fix
+* **__init__.py:** Fix timtools import ([`e591038`](https://github.com/tim83/sshtools/commit/e591038d986aa12036438bac4e0cd03c9f09bfd5))
+
 ## v4.5.2 (2022-03-01)
 ### Fix
 * **device.py:** Specify that .is_local does not include VPNs ([`7dad382`](https://github.com/tim83/sshtools/commit/7dad382f01b463ad71f18875f3155c763c876356))
