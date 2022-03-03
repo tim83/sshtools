@@ -8,7 +8,6 @@ import os
 import shutil
 import socket
 import subprocess
-import tempfile
 import typing
 import uuid
 from pathlib import Path
@@ -31,52 +30,41 @@ class Sync:
     username: str
     hostname: str
 
+    master: sshtools.device.Device
+    slaves: list[sshtools.device.Device]
+    dry_run: bool
+    force_limited: bool
+
     def __init__(
         self,
         master: sshtools.device.Device,
         slaves: list[sshtools.device.Device],
         dry_run: bool = False,
         force_limited: bool = False,
+        connect: bool = True,
     ):
         self.hostname = socket.gethostname()
         self.username = os.environ["USER"]
         self.dir = Path.home()
 
+        self.master = master
+        self.slaves = slaves
+        self.dry_run = dry_run
+        self.force_limited = force_limited
+
+        if connect is True:
+            self.connect()
+
+    def connect(self):
         active_slaves: list[sshtools.device.Device] = sshtools.tools.mt_filter(
-            lambda s: s.is_sshable is not False, slaves
+            lambda s: s.is_sshable is not False, self.slaves
         )
 
         tmp_dir: Path
         for slave in sorted(active_slaves, key=lambda d: d.priority):
-            print(f"\n{master} -> {slave}")
-            tmp_dir = Path(tempfile.mkdtemp())
-
-            cmd = ["rsync"]
-            cmd += [
-                "--archive",
-                "--verbose",
-                "--human-readable",
-                "-P",
-                "--force",
-                "--delete",
-                "--compress",
-                f'--partial-dir={self.get_cache_dir(slave) / "ssync"}',
-            ]
-
-            if not slave.is_self:
-                port = slave.ssh_port
-                cmd += ["-e", f"ssh -p {port}"]
-            elif not master.is_self:
-                port = master.ssh_port
-                cmd += ["-e", f"ssh -p {port}"]
-
-            if dry_run:
-                cmd += ["--dry-run"]
-
-            cmd += self.backup_parm(slave)
-            cmd += self.inex_parm(master, slave, tmp_dir, force_limited=force_limited)
-            cmd += self.get_source(master)
-            cmd += self.get_target(slave)
+            print(f"\n{self.master} -> {slave}")
+            tmp_dir = sshtools.tools.get_tmp_dir()
+            cmd = self.get_cmd(slave, tmp_dir)
 
             logger.debug(" ".join(cmd))
             try:
@@ -91,6 +79,37 @@ class Sync:
 
             finally:
                 shutil.rmtree(tmp_dir)
+
+    def get_cmd(self, slave: sshtools.device.Device, tmp_dir: Path) -> [str]:
+        cmd = ["rsync"]
+        cmd += [
+            "--archive",
+            "--verbose",
+            "--human-readable",
+            "-P",
+            "--force",
+            "--delete",
+            "--compress",
+            f'--partial-dir={self.get_cache_dir(slave) / "ssync"}',
+        ]
+
+        if not slave.is_self:
+            port = slave.ssh_port
+            cmd += ["-e", f"ssh -p {port}"]
+        elif not self.master.is_self:
+            port = self.master.ssh_port
+            cmd += ["-e", f"ssh -p {port}"]
+
+        if self.dry_run:
+            cmd += ["--dry-run"]
+
+        cmd += self.backup_parm(slave)
+        cmd += self.inex_parm(
+            self.master, slave, tmp_dir, force_limited=self.force_limited
+        )
+        cmd += self.get_source(self.master)
+        cmd += self.get_target(slave)
+        return cmd
 
     def get_cache_dir(self, slave: sshtools.device.Device) -> Path:
         """

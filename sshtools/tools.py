@@ -1,5 +1,6 @@
 from __future__ import annotations  # python -3.9 compatibility
 
+import tempfile
 from pathlib import Path
 from typing import Callable, Iterable
 
@@ -21,6 +22,10 @@ else:
     CONFIG_DIR = src_config_dir
 
 IP_CACHE_TIMEOUT: int = 5
+
+
+def get_tmp_dir() -> Path:
+    return Path(tempfile.mkdtemp())
 
 
 def mt_filter(func: Callable, collection: Iterable, max_workers=20) -> list:
