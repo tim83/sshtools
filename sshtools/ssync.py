@@ -9,6 +9,7 @@ import shutil
 import socket
 import subprocess
 import tempfile
+import typing
 import uuid
 from pathlib import Path
 
@@ -186,6 +187,39 @@ class Sync:
         return target
 
 
+def get_relevant_devices(
+    master_arg: typing.Optional[str],
+    from_arg: typing.Optional[str],
+    to_arg: typing.Optional[str],
+) -> (sshtools.device.Device, list[sshtools.device.Device]):
+    if from_arg and to_arg:
+        # Define both SLAVE and MASTER
+        master = sshtools.device.Device(from_arg)
+        slaves = [sshtools.device.Device(to_arg)]
+    elif from_arg and not to_arg:
+        # Define only MASTER
+        master = sshtools.device.Device(from_arg.replace(" ", ""))
+        slaves = [sshtools.device.Device.get_self()]
+    elif not from_arg and to_arg:
+        # Define only SLAVE
+        master = sshtools.device.Device.get_self()
+        slaves = [sshtools.device.Device(to_arg.replace(" ", ""))]
+    else:
+        if master_arg:
+            master = sshtools.device.Device(master_arg)
+        else:
+            master = sshtools.device.Device.get_self()
+        slaves = sshtools.tools.mt_filter(
+            lambda d: d != master and d.is_main_device and d.sync is not False,
+            sshtools.device.Device.get_devices(),
+        )
+
+    if master in slaves:
+        raise argparse.ArgumentError(master_arg, "Master kan geen slaves zijn")
+
+    return master, slaves
+
+
 def run():
     """Main executable for ssync"""
     # Arguments
@@ -206,31 +240,8 @@ def run():
     timtools.log.set_verbose(args.verbose)
 
     master: sshtools.device.Device
-    slave: list[sshtools.device.Device]
-    if getattr(args, "from") and args.to:
-        # Define both SLAVE and MASTER
-        master = sshtools.device.Device(getattr(args, "from").replace(" ", ""))
-        slave = [sshtools.device.Device(args.to.replace(" ", ""))]
-    elif getattr(args, "from") and not args.to:
-        # Define only MASTER
-        master = sshtools.device.Device(getattr(args, "from").replace(" ", ""))
-        slave = [sshtools.device.Device.get_self()]
-    elif not getattr(args, "from") and args.to:
-        # Define only SLAVE
-        master = sshtools.device.Device.get_self()
-        slave = [sshtools.device.Device(args.to.replace(" ", ""))]
-    else:
-        if args.master:
-            master = sshtools.device.Device(args.master)
-        else:
-            master = sshtools.device.Device.get_self()
-        slave = sshtools.tools.mt_filter(
-            lambda d: d != master and d.is_main_device and d.sync is not False,
-            sshtools.device.Device.get_devices(),
-        )
-
-    if master in slave:
-        raise argparse.ArgumentError(args.master, "Master kan geen slave zijn")
+    slaves: list[sshtools.device.Device]
+    master, slaves = get_relevant_devices(args.master, getattr(args, "from"), args.to)
 
     super_devs: list[sshtools.device.Device] = sshtools.tools.mt_filter(
         lambda d: d.is_super, sshtools.device.Device.get_devices()
@@ -238,7 +249,7 @@ def run():
     super_dev: sshtools.device.Device
     for super_dev in super_devs:
         if (
-            super_dev in slave
+            super_dev in slaves
             and super_dev.is_present
             and super_dev.sync is not False
             and (not args.dry_run)
@@ -249,7 +260,7 @@ def run():
             if answer.lower() not in ["y", "j"]:
                 return
 
-    Sync(master, slave, dry_run=args.dry_run, force_limited=args.limited)
+    Sync(master, slaves, dry_run=args.dry_run, force_limited=args.limited)
 
 
 if __name__ == "__main__":
