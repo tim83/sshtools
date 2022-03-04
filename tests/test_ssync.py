@@ -33,7 +33,7 @@ def test_relevant_devices():
 
 def test_cmd():
     ssync = sshtools.ssync.Sync(
-        sshtools.device.Device("laptop"),
+        sshtools.device.Device.get_self(),
         [sshtools.device.Device("oracle")],
         dry_run=True,
         connect=False,
