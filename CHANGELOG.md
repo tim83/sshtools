@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.5.4 (2022-03-16)
+### Performance
+* **pathfinder.py:** Use multiprocessing for checking alive paths ([`befa103`](https://github.com/tim83/sshtools/commit/befa1037188e2db5dbf8a780dd72cbcf84137e19))
+
 ## v4.5.3 (2022-03-01)
 ### Fix
 * **__init__.py:** Fix timtools import ([`e591038`](https://github.com/tim83/sshtools/commit/e591038d986aa12036438bac4e0cd03c9f09bfd5))
