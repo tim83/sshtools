@@ -30,6 +30,10 @@ class Path:
 
         return True
 
+    @property
+    def length(self) -> int:
+        return len(self.device_route)
+
     @staticmethod
     def device_is_present_for_device(
         source: sshtools.device.Device, target: sshtools.device.Device
@@ -83,14 +87,20 @@ class PathFinder:
 
     @staticmethod
     def sort_paths(paths: list[Path]) -> list[Path]:
-        return sorted(paths, key=lambda p: len(p.device_route))
+        return sorted(paths, key=lambda p: p.length)
 
-    def find_path(self):
-        possible_path = self.possible_paths
-        for path in possible_path:
-            if path.is_reachable():
-                self.path = path
-                return
+    def find_path(self) -> typing.Optional[Path]:
+        """
+        Returns the shorted alive path
+        :return: Path or None
+        """
+        alive_paths = sshtools.tools.mt_filter(
+            lambda p: p.is_reachable(), self.possible_paths
+        )
+        if len(alive_paths) == 0:
+            return None
+
+        return self.sort_paths(alive_paths)[0]
 
     def device_is_a_possible_relay(self, device: sshtools.device.Device) -> bool:
         return (
