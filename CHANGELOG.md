@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v4.6.0 (2022-03-17)
+### Feature
+* **device.py:** Return the hostname instead of localhost for self device ([`a426faa`](https://github.com/tim83/sshtools/commit/a426faa57234ef8f5c7d6d261a9b00a998d6ec5a))
+
+### Fix
+* **pathfinder.py:** Fix not storing the correct path ([`cca39ff`](https://github.com/tim83/sshtools/commit/cca39ff7787086995082f5094c8641356cd42b12))
+
 ## v4.5.4 (2022-03-16)
 ### Performance
 * **pathfinder.py:** Use multiprocessing for checking alive paths ([`befa103`](https://github.com/tim83/sshtools/commit/befa1037188e2db5dbf8a780dd72cbcf84137e19))
