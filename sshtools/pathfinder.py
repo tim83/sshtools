@@ -49,7 +49,7 @@ class Path:
 
     def __repr__(self):
         dev_name_list = [dev.name for dev in self.device_route]
-        return f"<sshtools.pathfinder.Path route={','.join(dev_name_list)}>"
+        return f"<sshtools.pathfinder.Path route={'->'.join(dev_name_list)}>"
 
 
 class PathFinder:
@@ -97,10 +97,9 @@ class PathFinder:
         alive_paths = sshtools.tools.mt_filter(
             lambda p: p.is_reachable(), self.possible_paths
         )
-        if len(alive_paths) == 0:
-            return None
-
-        return self.sort_paths(alive_paths)[0]
+        if len(alive_paths) > 0:
+            self.path = self.sort_paths(alive_paths)[0]
+            return self.path
 
     def device_is_a_possible_relay(self, device: sshtools.device.Device) -> bool:
         return (

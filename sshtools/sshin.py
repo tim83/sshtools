@@ -60,6 +60,7 @@ class Ssh:
                 )
                 pf = sshtools.pathfinder.PathFinder(self.device)
                 pf.find_path()
+                print(pf.path)
                 if pf.path is None:
                     raise sshtools.errors.NotReachableError(self.device.name)
 
