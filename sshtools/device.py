@@ -169,7 +169,7 @@ class Device:  # pylint:disable=too-many-instance-attributes
 
     def __new__(cls, name: str, *_, **__):
         name = DeviceConfig.get_name_from_hostname(name)
-        if name in cls.__instances.keys():
+        if name in cls.__instances:
             return cls.__instances[name]
 
         instance = super(Device, cls).__new__(cls)
@@ -296,7 +296,7 @@ class Device:  # pylint:disable=too-many-instance-attributes
     def is_self(self) -> bool:
         """Checks if the device is the current machine"""
         hostname_machine = socket.gethostname()
-        return self.hostname == hostname_machine or self.hostname == "localhost"
+        return self.hostname in (hostname_machine, "localhost")
 
     @property
     def is_local(self) -> bool:
@@ -384,7 +384,7 @@ class Device:  # pylint:disable=too-many-instance-attributes
         return self._get_config_value("priority")
 
     def __repr__(self):
-        return "<Device({name})>".format(name=self.hostname or self.name)
+        return f"<Device({self.hostname or self.name})>"
 
     def __str__(self):
         return self.hostname or self.name

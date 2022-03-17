@@ -30,7 +30,7 @@ class Network:
     def __init__(self, name: str):
         self.name = name
 
-        if name not in self._get_config_all().keys():
+        if name not in self._get_config_all():
             raise sshtools.errors.NetworkNotFound(name)
 
         net_config: dict = self._get_config_all()[name]
@@ -40,7 +40,7 @@ class Network:
         self.interface = net_config.get("interface", None)
 
     def __new__(cls, name: str, *_, **__):
-        if name in cls.__instances.keys():
+        if name in cls.__instances:
             return cls.__instances[name]
 
         instance = super(Network, cls).__new__(cls)
@@ -54,7 +54,7 @@ class Network:
         with combined property and classmethod decorators
         TODO: use @property when python >=3.9 can be ensured
         """
-        if cls.__config_all == {}:
+        if not cls.__config_all:
             cls.__config_all = {}
             for net_list_file in NETWORK_DIR.iterdir():
                 net_list_config = json.load(net_list_file.open("r"))

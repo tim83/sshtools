@@ -137,7 +137,7 @@ class Sync:
             / str(now.day)
             / dirname
         )
-        return ["--backup", "--backup-dir={dir}".format(dir=backup_dir)]
+        return ["--backup", f"--backup-dir={backup_dir}"]
 
     def inex_parm(
         self,
@@ -156,7 +156,7 @@ class Sync:
         """
         in2file: Path = tmp_dir / "include_rest.txt"
 
-        with open(in2file, "w") as fobj:
+        with open(in2file, "w", encoding="utf-8") as fobj:
             rules: list[str] = [
                 f"{d}/**\n" for d in os.listdir(self.dir) if not d.startswith(".")
             ]

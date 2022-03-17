@@ -39,7 +39,7 @@ class IPAddress:
         self.version = self._determine_ip_version()
 
     def __new__(cls, ip_address: str, *_, **__):
-        if ip_address in cls.__instances.keys():
+        if ip_address in cls.__instances:
             return cls.__instances[ip_address]
 
         instance = super(IPAddress, cls).__new__(cls)
