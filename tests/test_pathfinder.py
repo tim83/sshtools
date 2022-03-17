@@ -86,3 +86,11 @@ def test_pathfinder():
     pf2 = sshtools.pathfinder.PathFinder(target, source=source)
     assert pf2.target == target
     assert pf2.source == source
+
+
+def test_find_path():
+    target = sshtools.device.Device("oracle")
+    pf = sshtools.pathfinder.PathFinder(target)
+    path = pf.find_path()
+    assert path == pf.path
+    assert isinstance(path, sshtools.pathfinder.Path)
