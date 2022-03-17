@@ -93,4 +93,4 @@ def test_find_path():
     pf = sshtools.pathfinder.PathFinder(target)
     path = pf.find_path()
     assert path == pf.path
-    assert isinstance(path, sshtools.pathfinder.Path)
+    assert isinstance(path, sshtools.pathfinder.Path) or path is None
