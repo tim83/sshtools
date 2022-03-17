@@ -56,8 +56,8 @@ def test_get_ip():
         print(f"Evaluating {self_dev}")
         assert self_dev.is_self is True
         assert self_dev.is_local is True
-        assert self_dev.get_ip() == ip.IPAddress("localhost")
-        assert self_dev.ip_address == ip.IPAddress("localhost")
+        assert self_dev.get_ip() == ip.IPAddress(self_dev.hostname)
+        assert self_dev.ip_address == ip.IPAddress(self_dev.hostname)
         assert self_dev.get_ip(strict_ip=True) == ip.IPAddress("127.0.0.1")
 
 

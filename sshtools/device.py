@@ -182,7 +182,7 @@ class Device:
         if self.is_self:
             if strict_ip:
                 return sshtools.ip.IPAddress("127.0.0.1")
-            return sshtools.ip.IPAddress("localhost")
+            return sshtools.ip.IPAddress(self.hostname)
 
         if self.reachable_ip_addresses.length() == 0:
             logger.info(f"Found no reachable ips for {self}")
