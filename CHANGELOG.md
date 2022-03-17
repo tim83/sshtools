@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.7.0 (2022-03-17)
+### Feature
+* Use pylint ([`a779769`](https://github.com/tim83/sshtools/commit/a77976961936b5e76a4372e6bae084dd0a0b73bd))
+
 ## v4.6.0 (2022-03-17)
 ### Feature
 * **device.py:** Return the hostname instead of localhost for self device ([`a426faa`](https://github.com/tim83/sshtools/commit/a426faa57234ef8f5c7d6d261a9b00a998d6ec5a))
