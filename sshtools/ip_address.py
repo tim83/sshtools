@@ -13,7 +13,7 @@ import timtools.log
 
 import sshtools.connection
 import sshtools.device
-from sshtools import tools
+import sshtools.tools
 from sshtools.config import IPConnectionConfig
 
 logger = timtools.log.get_logger("sshtools.ip_address")
@@ -103,7 +103,7 @@ class IPAddress:
             socket.gethostname(),
         ]
 
-    @cachetools.func.ttl_cache(ttl=tools.IP_CACHE_TIMEOUT)
+    @cachetools.func.ttl_cache(ttl=sshtools.tools.IP_CACHE_TIMEOUT)
     def is_alive(self) -> bool:
         """Is the ip address alive?"""
         if self.config and not self.config.check_online:
@@ -122,7 +122,7 @@ class IPAddress:
                 capture_stdout=True,
                 capture_stderr=True,
                 passable_exit_codes=[0, 2],
-                timeout=0.7,
+                timeout=sshtools.tools.IP_PING_TIMEOUT,
             )
         except subprocess.TimeoutExpired:
             return False

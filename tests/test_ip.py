@@ -6,6 +6,7 @@ from timtools import log
 
 import sshtools.connection
 import sshtools.ip
+import sshtools.tools
 from sshtools import ip
 
 log.set_verbose(True)
@@ -143,15 +144,21 @@ def test_sort_ips():
 
 
 def test_list_alive():
-    start_time = dt.datetime.now()
     alive_ips = [ip.IPAddress("127.0.0.1"), ip.IPAddress("localhost")]
     ip_list = ip.IPAddressList(alive_ips + [ip.IPAddress("doesnotexists.local")])
+
+    start_time = dt.datetime.now()
     alive_list = ip_list.get_alive_addresses()
     end_time = dt.datetime.now()
+
     alive_list.sort_ips()
     assert alive_list._ip_addresses == alive_ips
+
     process_time = end_time - start_time
-    assert process_time.total_seconds() < 5
+    assert (
+        process_time.total_seconds()
+        < (ip_list.length * sshtools.tools.IP_PING_TIMEOUT) + 1
+    )
 
 
 def test_list_length():
