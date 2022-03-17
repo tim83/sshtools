@@ -89,7 +89,7 @@ def test_pathfinder():
 
 
 def test_find_path():
-    target = sshtools.device.Device("oracle")
+    target = sshtools.device.Device.get_self()
     pf = sshtools.pathfinder.PathFinder(target)
     path = pf.find_path()
     assert path == pf.path
