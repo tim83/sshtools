@@ -21,6 +21,8 @@ jobs:
         run: poetry run isort . --check-only --profile black
       - name: Run flake8
         run: poetry run flake8 .
+      - name: Run pylint
+        run: poetry run pylint sshtools
   code-test:
     strategy:
       fail-fast: false

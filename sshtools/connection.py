@@ -1,3 +1,4 @@
+"""Module for handling networks"""
 from __future__ import annotations  # python -3.9 compatibility
 
 import json
@@ -16,8 +17,10 @@ NETWORK_DIR: Path = sshtools.tools.CONFIG_DIR / "networks"
 
 
 class Network:
+    """A network"""
+
     __instances: dict[str, Network] = {}
-    __config_all: dict[str, dict] = None
+    __config_all: dict[str, dict] = {}
     name: str
     is_vpn: bool
     is_public: bool
@@ -36,7 +39,7 @@ class Network:
         self.ip_start = net_config.get("ip_start", None)
         self.interface = net_config.get("interface", None)
 
-    def __new__(cls, name: str, *args, **kwargs):
+    def __new__(cls, name: str, *_, **__):
         if name in cls.__instances.keys():
             return cls.__instances[name]
 
@@ -47,10 +50,11 @@ class Network:
     @classmethod
     def _get_config_all(cls) -> dict:
         """
-        Use getter to fix problems with python <3.9 with combined property and classmethod decorators
+        Use getter to fix problems with python <3.9
+        with combined property and classmethod decorators
         TODO: use @property when python >=3.9 can be ensured
         """
-        if cls.__config_all is None:
+        if cls.__config_all == {}:
             cls.__config_all = {}
             for net_list_file in NETWORK_DIR.iterdir():
                 net_list_config = json.load(net_list_file.open("r"))
@@ -60,6 +64,7 @@ class Network:
 
     @property
     def is_connected(self) -> bool:
+        """Is this device connected to this device?"""
         ip_list: sshtools.ip.IPAddressList = sshtools.ip.get_current_ips()
         if self.name == "public":
             return True
@@ -76,6 +81,7 @@ class Network:
         return False
 
     def has_ip_address(self, ip_address: sshtools.ip.IPAddress) -> bool:
+        """Is an ip address part of this network"""
         if isinstance(self.ip_start, str):
             return str(ip_address).startswith(self.ip_start)
 

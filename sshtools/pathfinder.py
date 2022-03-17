@@ -1,3 +1,4 @@
+"""Module for finding a relay path to a device"""
 from __future__ import annotations  # python -3.9 compatibility
 
 import typing
@@ -13,12 +14,15 @@ logger = timtools.log.get_logger("sshtools.pathfinder")
 
 
 class Path:
+    """A path to a device"""
+
     device_route: list[sshtools.device.Device]
 
     def __init__(self, devices: list[sshtools.device.Device]):
         self.device_route = devices
 
     def is_reachable(self) -> bool:
+        """Are all devices in the path SSHable?"""
         if not self.device_route[0].is_sshable:
             return False
 
@@ -32,18 +36,23 @@ class Path:
 
     @property
     def length(self) -> int:
+        """How many devices are needed to complete the path?"""
         return len(self.device_route)
 
     @staticmethod
     def device_is_present_for_device(
         source: sshtools.device.Device, target: sshtools.device.Device
     ) -> bool:
+        """Can devices reach each other?"""
         ssh_check = sshtools.sshin.Ssh(
             source,
             exe=f"python3 -m sshtools.getip {target} > /dev/null 2>/dev/null",
         )
         logger.critical(
-            f"{target} can{'not' if not ssh_check.exe_was_successful else ''} be reached through {source}"
+            "%s can%s be reached through %s",
+            target,
+            "not" if not ssh_check.exe_was_successful else "",
+            source,
         )
         return ssh_check.exe_was_successful
 
@@ -53,9 +62,10 @@ class Path:
 
 
 class PathFinder:
+    """Class for selecting a path between devices"""
+
     source: sshtools.device.Device
     target: sshtools.device.Device
-    possible_paths: list[Path]
     path: typing.Optional[Path] = None
 
     def __init__(
@@ -69,6 +79,7 @@ class PathFinder:
 
     @property
     def possible_paths(self) -> list[Path]:
+        """Determine all possible paths between devices"""
         possible_paths = []
 
         path = [self.target]
@@ -80,7 +91,7 @@ class PathFinder:
 
         relays = sshtools.tools.mt_filter(
             self.device_is_a_possible_relay,
-            sshtools.device.Device.get_devices(),
+            sshtools.device.DeviceConfig.get_devices(),
         )
 
         for device in relays:
@@ -90,6 +101,7 @@ class PathFinder:
 
     @staticmethod
     def sort_paths(paths: list[Path]) -> list[Path]:
+        """Sort the paths by their length (sortest path first)"""
         return sorted(paths, key=lambda p: p.length)
 
     def find_path(self) -> typing.Optional[Path]:
@@ -107,6 +119,7 @@ class PathFinder:
         return None
 
     def device_is_a_possible_relay(self, device: sshtools.device.Device) -> bool:
+        """Is a device a possible relay?"""
         return (
             not device.is_self
             and device != self.target
@@ -118,6 +131,7 @@ class PathFinder:
     def in_same_network(
         cls, device1: sshtools.device.Device, device2: sshtools.device.Device
     ) -> bool:
+        """Are devices in the same network?"""
         networks1 = cls.get_device_networks(device1)
         networks2 = cls.get_device_networks(device2)
         return any(
@@ -128,5 +142,6 @@ class PathFinder:
     def get_device_networks(
         device: sshtools.device.Device,
     ) -> list[sshtools.connection.Network]:
+        """Get the list of networks a device can connect to"""
         ip_list = device.ip_address_list_all
         return [ip_address.network for ip_address in ip_list]

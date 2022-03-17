@@ -1,5 +1,5 @@
 #! /usr/bin/python3
-
+"""Module for connecting to a device using SSH or MOSH"""
 from __future__ import annotations  # python -3.9 compatibility
 
 import argparse
@@ -24,25 +24,21 @@ class Ssh:
     exit_code: int = None
     exe_was_successful: bool = None
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         dev: sshtools.device.Device,
         exe: (str, list) = None,
         mosh: bool = False,
         copy_id: bool = False,
-        connect: bool = True,
         user: str = None,
     ):
-        if connect:
-            logger.debug(
-                "Device: %s ; Executable: %s ; Mosh: %s ; Copy ID: %s",
-                dev.hostname,
-                exe,
-                mosh,
-                copy_id,
-            )
-        else:
-            logger.debug("Device: %s", dev.hostname)
+        logger.debug(
+            "Device: %s ; Executable: %s ; Mosh: %s ; Copy ID: %s",
+            dev.hostname,
+            exe,
+            mosh,
+            copy_id,
+        )
 
         self.device: sshtools.device.Device = dev
         if user is not None:
@@ -51,29 +47,33 @@ class Ssh:
         self.hostname: str = socket.gethostname()
         self.username: str = os.environ["USER"]
 
-        if connect:
-            if self.device.is_present and self.device.ssh:
-                self.connect(exe=exe, copy_id=copy_id, mosh=mosh)
-            else:
-                logger.warning(
-                    f"{self.device} could not be reached, trying to find an alternative path."
-                )
-                pf = sshtools.pathfinder.PathFinder(self.device)
-                pf.find_path()
-                print(pf.path)
-                if pf.path is None:
-                    raise sshtools.errors.NotReachableError(self.device.name)
+        if self.device.is_present and self.device.ssh:
+            self.connect(exe=exe, copy_id=copy_id, mosh=mosh)
+        else:
+            self.relay_connect(exe=exe, mosh=mosh)
 
-                cmd = ["python3", f"-m sshtools.sshin {self.device}"]
-                if mosh:
-                    cmd.append("--mosh")
-                if exe:
-                    if isinstance(exe, list):
-                        exe_string = '"' + '" "'.join(exe) + '"'
-                    else:
-                        exe_string = exe
-                    cmd.append(f"-c {exe_string}")
-                Ssh(pf.path.device_route[0], exe=cmd)
+    def relay_connect(self, mosh: bool = False, exe: (str, list) = None):
+        """Connect to the device using a relay"""
+        logger.warning(
+            "%s could not be reached, trying to find an alternative path.",
+            self.device,
+        )
+        pathfinder = sshtools.pathfinder.PathFinder(self.device)
+        pathfinder.find_path()
+        if pathfinder.path is None:
+            raise sshtools.errors.NotReachableError(self.device.name)
+
+        cmd = ["python3", f"-m sshtools.sshin {self.device}"]
+        if mosh:
+            cmd.append("--mosh")
+
+        if exe:
+            if isinstance(exe, list):
+                exe_string = '"' + '" "'.join(exe) + '"'
+            else:
+                exe_string = exe
+            cmd.append(f"-c {exe_string}")
+        Ssh(pathfinder.path.device_route[0], exe=cmd)
 
     def connect(
         self,
@@ -99,8 +99,6 @@ class Ssh:
 
         if ssh_port is None:
             ssh_port = str(self.device.ssh_port)
-        else:
-            ssh_port = ssh_port
 
         if exe is None:
             self.print_header(ip_address)

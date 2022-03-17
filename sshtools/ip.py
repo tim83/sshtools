@@ -1,3 +1,4 @@
+"""Module for handling collections of IP address"""
 from __future__ import annotations
 
 import socket
@@ -18,6 +19,8 @@ IPAddress = sshtools.ip_address.IPAddress
 
 
 class IPAddressList:
+    """A collection of IPAddress"""
+
     _ip_addresses: list[IPAddress]
 
     def __init__(self, ip_addresses: list[IPAddress] = None):
@@ -27,18 +30,30 @@ class IPAddressList:
             self._ip_addresses = []
 
     def add(self, ip_address: IPAddress):
-        if type(ip_address) == IPAddress:
+        """
+        Add an ip address to the collection
+        :param ip_address: The IPAddress to add
+        """
+        if isinstance(ip_address, IPAddress):
             self._ip_addresses.append(ip_address)
         else:
             raise ValueError("Only IPAddress objects can be added to a IPAddressList")
 
     def add_list(self, ip_addresses: Union[list[IPAddress], "IPAddressList"]):
-        if all(type(ip) == IPAddress for ip in ip_addresses):
+        """
+        Add a list of ip address to the collection
+        :param ip_addresses: A list of IPAddress or a IPAddressList object to add
+        """
+        if all(isinstance(ip, IPAddress) for ip in ip_addresses):
             self._ip_addresses += ip_addresses
         else:
             raise ValueError("Only IPAddress objects can be added to a IPAddressList")
 
     def get_alive_addresses(self) -> "IPAddressList":
+        """
+        Determine which ip addresses from the collection are reachable
+        :return: A IPAddressList of reachable ip addresses
+        """
         alive_ips_list = sshtools.tools.mt_filter(
             lambda i: i.is_alive(), self._ip_addresses
         )
@@ -46,10 +61,13 @@ class IPAddressList:
         return alive_ips
 
     def sort_ips(self):
+        """
+        Sort the ip addresses based on the order of precedence for connecting
+        """
         sorted_ips = {}
 
         def sort_list(ip_list):
-            return sorted(ip_list, key=lambda ip: str(ip))
+            return sorted(ip_list, key=str)
 
         # Loopback
         sorted_ips.update(
@@ -87,14 +105,19 @@ class IPAddressList:
         sorted_ips.update(dict.fromkeys(sort_list(self._ip_addresses)))
         self._ip_addresses: list[str] = list(sorted_ips.keys())
 
-    def get_first(self) -> IPAddress:
+    @property
+    def first(self) -> IPAddress:
+        """Returns the first ip address in the collection after sorting"""
         self.sort_ips()
         return self._ip_addresses[0]
 
+    @property
     def length(self) -> int:
+        """Returns the length of the collection"""
         return len(self._ip_addresses)
 
     def to_list(self) -> list[IPAddress]:
+        """Returns a list object of the collections"""
         return self._ip_addresses
 
     def __iter__(self):
@@ -102,7 +125,7 @@ class IPAddressList:
         return IPAddressListIterator(self)
 
 
-class IPAddressListIterator:
+class IPAddressListIterator:  # pylint: disable=too-few-public-methods
     """Iterator class for IPAddressLists"""
 
     def __init__(self, ip_address_list: IPAddressList):
@@ -112,8 +135,8 @@ class IPAddressListIterator:
 
     def __next__(self):
         """Returns the next value from the object's lists"""
-        if self._index < len(self._ip_address_list._ip_addresses):
-            result = self._ip_address_list._ip_addresses[self._index]
+        if self._index < self._ip_address_list.length:
+            result = self._ip_address_list.to_list()[self._index]
             self._index += 1
             return result
 
@@ -138,11 +161,13 @@ def get_current_ips() -> IPAddressList:
             addresses.add_list(ip_address_list)
         except StopIteration:
             pass
-    if addresses.length() == 0:
+    if addresses.length == 0:
         raise sshtools.errors.NetworkError()
 
     logger.debug(
-        f"This machine has {addresses.length()} ip addresses: {addresses.to_list()}"
+        "This machine has %d ip addresses: %s",
+        addresses.length,
+        str(addresses.to_list()),
     )
 
     return addresses

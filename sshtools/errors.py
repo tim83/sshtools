@@ -13,21 +13,12 @@ class ErrorHandler(Exception):
 
     logger = None
 
-    def __init__(self, message):
-        # if self.logger:
-        #     self.logger.critical(message)
-        # else:
-        #     temp_log = get_logger(__name__)
-        #     temp_log.critical(message)
-
-        super().__init__(message)
-
 
 class NotEmptyError(ErrorHandler):
-    """Error to be raised when a mountpoint is not an empty directory"""
+    """Error to be raised when a mount point is not an empty directory"""
 
-    def __init__(self, mountpoint):
-        super().__init__(f"Mountpoint {mountpoint} is not empty.")
+    def __init__(self, mount_point):
+        super().__init__(f"Mount point {mount_point} is not empty.")
 
 
 class NotReachableError(ErrorHandler):

@@ -30,11 +30,12 @@ def get_ip_string(
     if ssh_string:
         user = target.user
         return f"{user}@{ip_address}"
-    else:
-        return str(ip_address)
+
+    return str(ip_address)
 
 
 def run():
+    """Run getip"""
     # Arguments
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -66,12 +67,14 @@ def run():
     targets: list[sshtools.device.Device]
     if len(args.target) == 0:
         targets = list(
-            filter(lambda dev: dev.is_main_device, sshtools.device.Device.get_devices())
+            filter(
+                lambda dev: dev.is_main_device,
+                sshtools.device.DeviceConfig.get_devices(),
+            )
         )
     else:
         targets = [sshtools.device.Device(name) for name in args.target]
 
-    target: sshtools.device.Device
     output: list[list[str]] = []
 
     def device_add_row(device: sshtools.device.Device):
@@ -93,7 +96,7 @@ def run():
 
     if args.write_log is True:
         return
-    elif len(output) == 1:
+    if len(output) == 1:
         output_str = output[0][1]
         if output_str == "x":
             raise sshtools.errors.DeviceNotPresentError(targets[0].name)

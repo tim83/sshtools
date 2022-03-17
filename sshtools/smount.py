@@ -1,5 +1,5 @@
 #! /usr/bin/python3
-
+"""Module for mounting a location on a remote device using SFTP"""
 from __future__ import annotations  # python -3.9 compatibility
 
 import argparse
@@ -19,7 +19,7 @@ logger = timtools.log.get_logger("sshtools.smount")
 class Mount:
     """Mounts a source directory of a device on mount point"""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         device: sshtools.device.Device,
         src: str,

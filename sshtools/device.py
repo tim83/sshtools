@@ -6,7 +6,6 @@ from __future__ import annotations  # python -3.9 compatibility
 import datetime as dt
 import json
 import socket
-import typing
 from pathlib import Path
 from typing import Optional, Union
 
@@ -26,12 +25,68 @@ DEVICES_DIR = sshtools.tools.CONFIG_DIR / "devices"
 logger = timtools.log.get_logger("sshtools.device")
 
 
-class Device:
-    """A physical device"""
+class DeviceConfig:
+    """The config for the devices"""
 
     __config_all: dict = None
+
+    @classmethod
+    def _get_config_all(cls) -> dict[str, dict]:
+        """
+        Use getter to fix problems with python <3.9
+        with combined property and classmethod decorators
+        TODO: use @property when python >=3.9 can be ensured
+        """
+        if cls.__config_all is None:
+            cls.__config_all = {
+                dev.stem: json.load(dev.open("r")) for dev in DEVICES_DIR.iterdir()
+            }
+        return cls.__config_all
+
+    @classmethod
+    def get_config(cls, name) -> dict:
+        """
+        Return the config of a device
+        :param name: The name of the device
+        :return: The dictionary containing the config
+        """
+        config = cls._get_config_all().get(name, {})
+        if name not in cls._get_config_all().keys() and name != "localhost":
+            raise sshtools.errors.DeviceNotFoundError(name)
+        return config
+
+    @classmethod
+    def get_devices(cls) -> list[Device]:
+        """Return all devices"""
+        config: dict = cls._get_config_all()
+        device_names: list[str] = list(config.keys())
+        return [Device(name) for name in device_names]
+
+    @classmethod
+    def get_device(cls, name: str):
+        """Return the device with a given name"""
+        return Device(cls.get_name_from_hostname(name))
+
+    @classmethod
+    def get_name_from_hostname(cls, hostname: str) -> str:
+        """
+        Returns the name corresponding to a given hostname.
+        If no name is found, the hostname is returned
+        """
+        if hostname in cls._get_config_all().keys():
+            return hostname
+
+        for name, config in cls._get_config_all().items():
+            if config.get("hostname", None) == hostname:
+                return name
+        return hostname
+
+
+class Device:  # pylint:disable=too-many-instance-attributes
+    """A physical device"""
+
     __instances: dict[str, "Device"] = {}
-    # Config
+
     hostname: str
     mdns: Optional[str]
     ip_id: int
@@ -43,48 +98,12 @@ class Device:
     last_ip_address: Optional[sshtools.ip.IPAddress]
     last_ip_address_update: Optional[dt.datetime]
 
-    @classmethod
-    def _get_config_all(cls) -> dict[str, dict]:
-        """
-        Use getter to fix problems with python <3.9 with combined property and classmethod decorators
-        TODO: use @property when python >=3.9 can be ensured
-        """
-        if cls.__config_all is None:
-            cls.__config_all = {
-                dev.stem: json.load(dev.open("r")) for dev in DEVICES_DIR.iterdir()
-            }
-        return cls.__config_all
-
-    @classmethod
-    def get_devices(cls) -> list[Device]:
-        config: dict = cls._get_config_all()
-        device_names: list[str] = list(config.keys())
-        return [Device(name) for name in device_names]
-
-    @staticmethod
-    def get_device(name: str):
-        if name in Device.__instances.keys():
-            return Device.__instances.get(name)
-
-        return Device(name)
-
-    @classmethod
-    def get_name_from_hostname(cls, hostname: str) -> typing.Optional[str]:
-        if hostname in cls._get_config_all().keys():
-            return hostname
-
-        for name, config in cls._get_config_all().items():
-            if config.get("hostname", None) == hostname:
-                return name
-
     def __init__(self, name: str):
         self.last_ip_address = None
         self.last_ip_address_update = None
 
-        name = self.get_name_from_hostname(name) or name
-        config = self._get_config_all().get(name, {})
-        if name not in self._get_config_all().keys() and name != "localhost":
-            raise sshtools.errors.DeviceNotFoundError(name)
+        name = DeviceConfig.get_name_from_hostname(name)
+        config = DeviceConfig.get_config(name)
 
         self.name = name
         self.hostname = config.get("hostname", name)
@@ -148,8 +167,8 @@ class Device:
         else:
             self.mdns = None
 
-    def __new__(cls, name: str, *args, **kwargs):
-        name = cls.get_name_from_hostname(name)
+    def __new__(cls, name: str, *_, **__):
+        name = DeviceConfig.get_name_from_hostname(name)
         if name in cls.__instances.keys():
             return cls.__instances[name]
 
@@ -159,6 +178,7 @@ class Device:
 
     @staticmethod
     def get_self() -> Device:
+        """Return the device object of this machine"""
         hostname = socket.gethostname()
         try:
             return Device(hostname)
@@ -167,6 +187,7 @@ class Device:
 
     @property
     def reachable_ip_addresses(self) -> sshtools.ip.IPAddressList:
+        """Returns the reachable ip addresses"""
         reachable_ips = sshtools.ip.IPAddressList()
         for ip_address in self.ip_address_list_all:
             if ip_address.config.network.is_connected:
@@ -176,7 +197,6 @@ class Device:
     def get_ip(self, strict_ip: bool = False) -> sshtools.ip.IPAddress:
         """
         Returns the IP to used for the device
-
         :param strict_ip: Only return an actual IP address (no DNS or hostnames allowed)
         """
         if self.is_self:
@@ -184,14 +204,14 @@ class Device:
                 return sshtools.ip.IPAddress("127.0.0.1")
             return sshtools.ip.IPAddress(self.hostname)
 
-        if self.reachable_ip_addresses.length() == 0:
-            logger.info(f"Found no reachable ips for {self}")
+        if self.reachable_ip_addresses.length == 0:
+            logger.info("Found no reachable ips for %s", self)
             raise sshtools.errors.DeviceNotPresentError(self.name)
 
         alive_ips = self.get_active_ips(strict_ip=strict_ip)
-        if alive_ips.length() > 0:
-            ip_address = alive_ips.get_first()
-            logger.info(f"Found ip {ip_address} for {self}")
+        if alive_ips.length > 0:
+            ip_address = alive_ips.first
+            logger.info("Found ip %s for %s", ip_address, self)
             self.last_ip_address = ip_address
             self.last_ip_address_update = dt.datetime.now()
             return ip_address
@@ -243,15 +263,19 @@ class Device:
             possible_ips = self.get_possible_ips()
 
         logger.info(
-            f"Trying {possible_ips.length()} ips for {self}: {possible_ips.to_list()}"
+            "Trying %d ips for %s: %s",
+            possible_ips.length,
+            self,
+            possible_ips.to_list(),
         )
 
         alive_ips = possible_ips.get_alive_addresses()
-        logger.info(f"Found {alive_ips.length()} IP addresses: {alive_ips}")
+        logger.info("Found %d IP addresses: %s", alive_ips.length, alive_ips)
         return alive_ips
 
     @property
     def ip_address(self) -> sshtools.ip.IPAddress:
+        """The ip address of this machine"""
         if self.last_ip_address is not None and self.last_ip_address_update is not None:
             td_update: dt.timedelta = dt.datetime.now() - self.last_ip_address_update
             if td_update.total_seconds() < sshtools.tools.IP_CACHE_TIMEOUT:
@@ -260,6 +284,7 @@ class Device:
 
     @property
     def home(self) -> Path:
+        """The home directory of this device"""
         return timtools.locations.get_user_home(self.user)
 
     @property
@@ -311,7 +336,8 @@ class Device:
             return cmd_res.exit_code == 0
         return False
 
-    def get_config_value(self, key: str):
+    def _get_config_value(self, key: str):
+        """Get the applicable value for a certain configuration key"""
         if self.is_present and self.ip_address.config is not None:
             config = self.ip_address.config
         else:
@@ -320,35 +346,42 @@ class Device:
         return getattr(config, key)
 
     def can_connect_to_device(self, target: "Device") -> bool:
+        """Can this device connect to the target device"""
         return sshtools.pathfinder.Path.device_is_present_for_device(self, target)
 
     @property
     def sync(self) -> Union[str, bool]:
+        """Can the device be used for sync?"""
         if self.config.sync is False:
             # If sync is disabled on the device level, don't bother finding the IP
             return self.config.sync
 
-        return self.get_config_value("sync")
+        return self._get_config_value("sync")
 
     @property
     def user(self) -> str:
-        return self.get_config_value("user")
+        """What is the user to connect to on this device?"""
+        return self._get_config_value("user")
 
     @property
     def ssh(self) -> bool:
-        return self.get_config_value("ssh")
+        """Can SSH be used on this device?"""
+        return self._get_config_value("ssh")
 
     @property
     def mosh(self) -> bool:
-        return self.get_config_value("mosh")
+        """Can MOSH be used on this device?"""
+        return self._get_config_value("mosh")
 
     @property
     def ssh_port(self) -> bool:
-        return self.get_config_value("ssh_port")
+        """What port should be used for SSH?"""
+        return self._get_config_value("ssh_port")
 
     @property
     def priority(self) -> int:
-        return self.get_config_value("priority")
+        """What is the priority of this device?"""
+        return self._get_config_value("priority")
 
     def __repr__(self):
         return "<Device({name})>".format(name=self.hostname or self.name)

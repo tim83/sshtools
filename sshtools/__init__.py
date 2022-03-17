@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+"""Package for connecting to and interacting with devices over the network"""
 from __future__ import annotations
 
 import platform
@@ -6,4 +6,4 @@ import platform
 import timtools.log
 
 logger = timtools.log.get_logger(__name__)
-logger.debug(f"Python version: {platform.python_version()}")
+logger.debug("Python version: %s", platform.python_version())

@@ -1,5 +1,5 @@
 #! /usr/bin/python3
-
+"""Module for syncing between devices"""
 from __future__ import annotations  # python -3.9 compatibility
 
 import argparse
@@ -41,7 +41,6 @@ class Sync:
         slaves: list[sshtools.device.Device],
         dry_run: bool = False,
         force_limited: bool = False,
-        connect: bool = True,
     ):
         self.hostname = socket.gethostname()
         self.username = os.environ["USER"]
@@ -52,10 +51,6 @@ class Sync:
         self.dry_run = dry_run
         self.force_limited = force_limited
 
-        if connect is True:
-            self.connect()
-
-    def connect(self):
         active_slaves: list[sshtools.device.Device] = sshtools.tools.mt_filter(
             lambda s: s.is_sshable is not False, self.slaves
         )
@@ -73,14 +68,19 @@ class Sync:
                 if error.returncode == 255:
                     if len(active_slaves) == 1:
                         raise sshtools.errors.NotReachableError(slave.name) from error
-                    else:
-                        logger.error(f"{slave} has disappeared.")
+                    logger.error("%s has disappeared.", slave)
                 raise error
 
             finally:
                 shutil.rmtree(tmp_dir)
 
-    def get_cmd(self, slave: sshtools.device.Device, tmp_dir: Path) -> [str]:
+    def get_cmd(self, slave: sshtools.device.Device, tmp_dir: Path) -> list[str]:
+        """
+        Returns the command for syncing to a certain device
+        :param slave: The device to sync to
+        :param tmp_dir: A temporary directory that exists
+        :return: A list of strings
+        """
         cmd = ["rsync"]
         cmd += [
             "--archive",
@@ -111,7 +111,8 @@ class Sync:
         cmd += self.get_target(slave)
         return cmd
 
-    def get_cache_dir(self, slave: sshtools.device.Device) -> Path:
+    @staticmethod
+    def get_cache_dir(slave: sshtools.device.Device) -> Path:
         """
         Returns the cache directory to be used on the slave machine
         :param slave: The machine the cache directory will be on
@@ -126,7 +127,7 @@ class Sync:
         :return: A list of strings containing the rsync backup parameters
         """
         now = dt.datetime.now()
-        random_str = str(uuid.uuid4()).split("-")[0]
+        random_str = str(uuid.uuid4()).split("-", maxsplit=1)[0]
         dirname = str(now.strftime("%H%M%S")) + "-" + random_str
         backup_dir = (
             self.get_cache_dir(slave)
@@ -149,9 +150,9 @@ class Sync:
         Returns the rsync parameters for excluding and including files
         :param master: The device to sync from
         :param slave: The device to sync to
-        :param tmp_dir: The filepath to a temporary directory that is present for the whole sync process
+        :param tmp_dir: The path to a temporary directory
         :param force_limited: Only sync a limited number of essential files
-        :return: A list of strings that contains the rsync parameters for including and excluding files
+        :return: A list of strings that contains the rsync parameters for selecting files
         """
         in2file: Path = tmp_dir / "include_rest.txt"
 
@@ -176,8 +177,7 @@ class Sync:
 
         if all(dev.sync is True for dev in (slave, master)) and not force_limited:
             return inexdir(sshtools.tools.CONFIG_DIR / "ssync")
-        else:
-            return inexdir(sshtools.tools.CONFIG_DIR / "ssync_limited")
+        return inexdir(sshtools.tools.CONFIG_DIR / "ssync_limited")
 
     def get_source(self, master) -> list[str]:
         """
@@ -211,6 +211,13 @@ def get_relevant_devices(
     from_arg: typing.Optional[str],
     to_arg: typing.Optional[str],
 ) -> (sshtools.device.Device, list[sshtools.device.Device]):
+    """
+    Determine the devices that are involved in the transaction
+    :param master_arg: The device that is to be used as the master (or none)
+    :param from_arg: The device that is selected in the from field (or none)
+    :param to_arg: The device that is selected in the to field (or none)
+    :return: The master device and the list of slave devices
+    """
     if from_arg and to_arg:
         # Define both SLAVE and MASTER
         master = sshtools.device.Device(from_arg)
@@ -230,7 +237,7 @@ def get_relevant_devices(
             master = sshtools.device.Device.get_self()
         slaves = sshtools.tools.mt_filter(
             lambda d: d != master and d.is_main_device and d.sync is not False,
-            sshtools.device.Device.get_devices(),
+            sshtools.device.DeviceConfig.get_devices(),
         )
 
     if master in slaves:
@@ -263,7 +270,7 @@ def run():
     master, slaves = get_relevant_devices(args.master, getattr(args, "from"), args.to)
 
     super_devs: list[sshtools.device.Device] = sshtools.tools.mt_filter(
-        lambda d: d.is_super, sshtools.device.Device.get_devices()
+        lambda d: d.is_super, sshtools.device.DeviceConfig.get_devices()
     )
     super_dev: sshtools.device.Device
     for super_dev in super_devs:

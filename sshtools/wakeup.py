@@ -1,5 +1,5 @@
 #!  /usr/bin/python3
-
+"""Use wake on lan to activate a device"""
 from __future__ import annotations  # python -3.9 compatibility
 
 import argparse

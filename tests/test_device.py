@@ -22,19 +22,19 @@ def test_creation():
 
 
 def test_get_devices():
-    dev_list = device.Device.get_devices()
+    dev_list = device.DeviceConfig.get_devices()
     assert isinstance(dev_list, list)
     assert all(isinstance(dev, device.Device) for dev in dev_list)
 
 
 def test_name_or_hostname():
-    assert device.Device.get_name_from_hostname("laptop") == "laptop"
-    assert device.Device.get_name_from_hostname("laptop-tim") == "laptop"
+    assert device.DeviceConfig.get_name_from_hostname("laptop") == "laptop"
+    assert device.DeviceConfig.get_name_from_hostname("laptop-tim") == "laptop"
     assert device.Device("laptop") == device.Device("laptop-tim")
 
     assert device.Device("laptop-greta") != device.Device("localhost")
 
-    assert device.Device.get_name_from_hostname("doesnotexist") is None
+    assert device.DeviceConfig.get_name_from_hostname("doesnotexist") == "doesnotexist"
 
 
 def test_main_device():
@@ -48,7 +48,7 @@ def test_main_device():
 
 def test_singleton():
     assert device.Device("laptop") == device.Device("laptop")
-    assert device.Device("laptop") == device.Device.get_device("laptop")
+    assert device.Device("laptop") == device.DeviceConfig.get_device("laptop")
 
 
 def test_get_ip():
@@ -62,8 +62,8 @@ def test_get_ip():
 
 
 def test_device_class():
-    assert isinstance(device.Device._get_config_all(), dict)
-    devices = device.Device.get_devices()
+    assert isinstance(device.DeviceConfig._get_config_all(), dict)
+    devices = device.DeviceConfig.get_devices()
     assert isinstance(devices, list)
     assert all(isinstance(dev, device.Device) for dev in devices)
 

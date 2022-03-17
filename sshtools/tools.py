@@ -1,3 +1,4 @@
+"""Tools for use in the sshtools package"""
 from __future__ import annotations  # python -3.9 compatibility
 
 import tempfile
@@ -25,6 +26,10 @@ IP_CACHE_TIMEOUT: int = 5
 
 
 def get_tmp_dir() -> Path:
+    """
+    Creates a temporary directory
+    :return A Path for the temporary directory
+    """
     return Path(tempfile.mkdtemp())
 
 

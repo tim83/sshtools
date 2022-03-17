@@ -139,7 +139,7 @@ def test_sort_ips():
         pub_ip,
         dns_ip,
     ]
-    assert ip_list.get_first() == loop_ip
+    assert ip_list.first == loop_ip
 
 
 def test_list_alive():
@@ -162,7 +162,7 @@ def test_list_length():
             ip.IPAddress("doesnotexists.local"),
         ]
     )
-    assert ip_list.length() == 3
+    assert ip_list.length == 3
 
 
 def test_list_to_list():

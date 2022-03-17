@@ -1,3 +1,4 @@
+"""Module for handling ip addresses"""
 from __future__ import annotations  # python -3.9 compatibility
 
 import ipaddress
@@ -28,7 +29,7 @@ class IPAddress:
     __instances: dict[str, "IPAddress"] = {}
 
     def __init__(self, ip_address: str):
-        if type(ip_address) != str:
+        if not isinstance(ip_address, str):
             raise ValueError("IP address must by a string.")
         self.ip_address = ip_address
         try:
@@ -37,7 +38,7 @@ class IPAddress:
             self.__ip_obj = None
         self.version = self._determine_ip_version()
 
-    def __new__(cls, ip_address: str, *args, **kwargs):
+    def __new__(cls, ip_address: str, *_, **__):
         if ip_address in cls.__instances.keys():
             return cls.__instances[ip_address]
 
@@ -47,6 +48,7 @@ class IPAddress:
 
     @property
     def network(self) -> typing.Optional[sshtools.connection.Network]:
+        """The network to which the ip address belongs"""
         if self.config and self.config.network:
             return self.config.network
 
@@ -74,9 +76,11 @@ class IPAddress:
 
     @property
     def is_vpn(self) -> bool:
+        """Is the ip address a VPN?"""
         return self.network is not None and self.network.is_vpn is True
 
     def is_local(self, include_vpn: bool = True) -> bool:
+        """Is the ip address part a local one?"""
         # https://en.wikipedia.org/wiki/Private_network
         if self.is_vpn:
             return not self.network.is_public and include_vpn
@@ -91,6 +95,7 @@ class IPAddress:
 
     @property
     def is_loopback(self) -> bool:
+        """Is the ip address a loopback address?"""
         return self.ip_address in [
             "localhost",
             "127.0.0.1",
@@ -100,6 +105,7 @@ class IPAddress:
 
     @cachetools.func.ttl_cache(ttl=tools.IP_CACHE_TIMEOUT)
     def is_alive(self) -> bool:
+        """Is the ip address alive?"""
         if self.config and not self.config.check_online:
             return True
 

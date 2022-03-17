@@ -14,17 +14,24 @@ logger = timtools.log.get_logger("ssh-tools.forget")
 
 
 def forget_device(target: sshtools.device.Device):
+    """
+    Remove all entries for a device in .ssh/known_hosts
+    :param target: The device whose entries need to be removed
+    """
     ips = target.get_possible_ips(
         include_dns=True, include_ips=True, include_hostname=True
     )
     ips.add_list(target.ip_address_list_all)
-    for ip in ips:
+    for ip_address in ips:
         timtools.bash.run(
-            ["ssh-keygen", "-R", str(ip)], capture_stderr=True, capture_stdout=True
+            ["ssh-keygen", "-R", str(ip_address)],
+            capture_stderr=True,
+            capture_stdout=True,
         )
 
 
 def run():
+    """Run ssh-forget"""
     # Arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("target", help="De machine om te vergeten", nargs="*")
@@ -34,7 +41,7 @@ def run():
     timtools.log.set_verbose(args.verbose)
 
     for target in args.target:
-        forget_device(sshtools.device.Device.get_device(target))
+        forget_device(sshtools.device.DeviceConfig.get_device(target))
 
 
 if __name__ == "__main__":
