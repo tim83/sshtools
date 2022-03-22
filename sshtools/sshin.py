@@ -28,7 +28,7 @@ class Ssh:
         self,
         dev: sshtools.device.Device,
         exe: (str, list) = None,
-        mosh: bool = False,
+        mosh: bool = None,
         copy_id: bool = False,
         user: str = None,
     ):
@@ -52,7 +52,7 @@ class Ssh:
         else:
             self.relay_connect(exe=exe, mosh=mosh)
 
-    def relay_connect(self, mosh: bool = False, exe: (str, list) = None):
+    def relay_connect(self, mosh: bool = None, exe: (str, list) = None):
         """Connect to the device using a relay"""
         logger.warning(
             "%s could not be reached, trying to find an alternative path.",
@@ -64,8 +64,10 @@ class Ssh:
             raise sshtools.errors.NotReachableError(self.device.name)
 
         cmd = ["python3", f"-m sshtools.sshin {self.device}"]
-        if mosh:
+        if mosh is True:
             cmd.append("--mosh")
+        elif mosh is False:
+            cmd.append("--ssh")
 
         if exe:
             if isinstance(exe, list):
@@ -80,7 +82,7 @@ class Ssh:
         exe: (str, list) = None,
         ssh_port: str = None,
         copy_id: bool = False,
-        mosh: bool = False,
+        mosh: bool = None,
     ):
         """
         Actually connects to the device
@@ -110,7 +112,7 @@ class Ssh:
 
                 response_ci = timtools.bash.run(cmd_ci)
                 logger.info("SSH-COPY-ID exited with code %s", response_ci.exit_code)
-            if mosh and self.device.is_local:
+            if mosh is True or (mosh is None and self.device.mosh):
                 cmd = ["mosh", f"{user}@{ip_address}"]
             else:
                 cmd = ["ssh", "-t", "-p", str(ssh_port), f"{user}@{ip_address}"]
@@ -193,7 +195,7 @@ def run():
     elif args.ssh:
         use_mosh = False
     else:
-        use_mosh = target.config.mosh
+        use_mosh = None
     Ssh(target, exe=args.command, mosh=use_mosh, copy_id=args.copy_id, user=args.user)
 
 
