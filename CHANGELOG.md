@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.7.1 (2022-03-22)
+### Fix
+* **sshin.py:** Improve mosh selection ([`8231f8a`](https://github.com/tim83/sshtools/commit/8231f8ad9ad70d161025f9b299a3bb88fb4e557f))
+
 ## v4.7.0 (2022-03-17)
 ### Feature
 * Use pylint ([`a779769`](https://github.com/tim83/sshtools/commit/a77976961936b5e76a4372e6bae084dd0a0b73bd))
