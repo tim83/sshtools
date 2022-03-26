@@ -30,7 +30,8 @@ def test_is_same_network():
 
 def test_possible_relays():
     pf = sshtools.pathfinder.PathFinder(
-        sshtools.device.Device("thinkcentre"), source=sshtools.device.Device("fujitsu")
+        sshtools.device.Device("thinkcentre"),
+        source=sshtools.device.Device("coolermaster"),
     )
     for dev_name in ("serverpi", "oracle", "probook"):
         possible_relay = pf.device_is_a_possible_relay(sshtools.device.Device(dev_name))
