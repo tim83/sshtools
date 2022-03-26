@@ -28,9 +28,11 @@ repos:
         name: pylint
         entry: pylint
         language: system
+        pass_filenames: false
         types: [ python ]
         args:
           [
+            "sshtools",
             "-rn", # Only display messages
             "-sn", # Don't display the score
           ]
