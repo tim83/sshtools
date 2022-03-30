@@ -56,11 +56,14 @@ class DeviceConfig:
         return config
 
     @classmethod
-    def get_devices(cls) -> list[Device]:
+    def get_devices(cls, filter_main: bool = False) -> list[Device]:
         """Return all devices"""
         config: dict = cls._get_config_all()
         device_names: list[str] = list(config.keys())
-        return [Device(name) for name in device_names]
+        devices = [Device(name) for name in device_names]
+        if filter_main:
+            devices = list(filter(lambda d: d.is_main_device, devices))
+        return devices
 
     @classmethod
     def get_device(cls, name: str):

@@ -60,18 +60,19 @@ def run():
         help="Maak een logentry bij de target",
         action="store_true",
     )
+    parser.add_argument(
+        "-j",
+        "--json",
+        help="Geef de output als een json",
+        action="store_true",
+    )
     args = parser.parse_args()
 
     timtools.log.set_verbose(args.verbose)
 
     targets: list[sshtools.device.Device]
     if len(args.target) == 0:
-        targets = list(
-            filter(
-                lambda dev: dev.is_main_device,
-                sshtools.device.DeviceConfig.get_devices(),
-            )
-        )
+        targets = sshtools.device.DeviceConfig.get_devices(filter_main=True)
     else:
         targets = [sshtools.device.Device(name) for name in args.target]
 
@@ -96,6 +97,18 @@ def run():
 
     if args.write_log is True:
         return
+
+    if args.json is True:
+
+        def x_to_none(value: str):
+            return None if value == "x" else value
+
+        output_json: dict[str, str] = {
+            device: x_to_none(ip_address) for device, ip_address in output
+        }
+        print(output_json)
+        return
+
     if len(output) == 1:
         output_str = output[0][1]
         if output_str == "x":
