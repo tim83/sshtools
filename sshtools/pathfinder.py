@@ -47,6 +47,7 @@ class Path:
         ssh_check = sshtools.sshin.Ssh(
             source,
             exe=f"python3 -m sshtools.getip {target} > /dev/null 2>/dev/null",
+            mosh=False,
         )
         logger.critical(
             "%s can%s be reached through %s",

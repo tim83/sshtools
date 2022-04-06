@@ -64,6 +64,8 @@ class Ssh:
             raise sshtools.errors.NotReachableError(self.device.name)
 
         cmd = ["python3", f"-m sshtools.sshin {self.device}"]
+        print(cmd)
+        print(mosh)
         if mosh is True:
             cmd.append("--mosh")
         elif mosh is False:
@@ -75,7 +77,7 @@ class Ssh:
             else:
                 exe_string = exe
             cmd.append(f"-c {exe_string}")
-        Ssh(pathfinder.path.device_route[0], exe=cmd)
+        Ssh(pathfinder.path.device_route[0], exe=cmd, mosh=mosh)
 
     def connect(
         self,
