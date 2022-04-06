@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.8.1 (2022-04-06)
+### Fix
+* **sshin.py:** Don't use mosh when it is not wanted ([`82ee471`](https://github.com/tim83/sshtools/commit/82ee471118569d2229745ef705d34cccd87a4252))
+
 ## v4.8.0 (2022-04-05)
 ### Feature
 * **getip.py:** Allow JSON output ([`d3e398a`](https://github.com/tim83/sshtools/commit/d3e398a6b6d2103a40cdc8603c4a45d2f39d9b68))
