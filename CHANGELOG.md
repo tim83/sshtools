@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.8.0 (2022-04-05)
+### Feature
+* **getip.py:** Allow JSON output ([`d3e398a`](https://github.com/tim83/sshtools/commit/d3e398a6b6d2103a40cdc8603c4a45d2f39d9b68))
+
 ## v4.7.1 (2022-03-22)
 ### Fix
 * **sshin.py:** Improve mosh selection ([`8231f8a`](https://github.com/tim83/sshtools/commit/8231f8ad9ad70d161025f9b299a3bb88fb4e557f))
