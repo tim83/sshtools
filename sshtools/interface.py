@@ -1,7 +1,6 @@
 """Module for managing network interfaces"""
 from __future__ import annotations  # python -3.9 compatibility
 
-import subprocess
 from typing import TYPE_CHECKING
 
 import timtools.bash
@@ -37,7 +36,10 @@ class Interface:  # pylint: disable=too-few-public-methods
 
     def wake(self):
         """Send a magic packet to this interface using wake on lan"""
-        try:
+        wol_present_check = timtools.bash.run(
+            ["which", "wol"], passable_exit_codes=[0, 1]
+        )
+        if wol_present_check.exit_code == 0:
             timtools.bash.run(["wol", self.mac])
-        except subprocess.CalledProcessError:
+        else:
             timtools.bash.run(["sudo", "wakeonlan", self.mac])
