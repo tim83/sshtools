@@ -56,13 +56,21 @@ class DeviceConfig:
         return config
 
     @classmethod
-    def get_devices(cls, filter_main: bool = False) -> list[Device]:
-        """Return all devices"""
+    def get_devices(
+        cls, filter_main: bool = False, filter_super: bool = False
+    ) -> list[Device]:
+        """
+        Return devices in the configuration. Multiple filters can be applied at the same time for an AND operation.
+        :param filter_main: Returns only devices that are marked as "main devices"
+        :param filter_super: Returns only devices that are marked as "super devices"
+        """
         config: dict = cls._get_config_all()
         device_names: list[str] = list(config.keys())
         devices = [Device(name) for name in device_names]
         if filter_main:
             devices = list(filter(lambda d: d.is_main_device, devices))
+        if filter_super:
+            devices = list(filter(lambda d: d.is_super, devices))
         return devices
 
     @classmethod
@@ -273,7 +281,12 @@ class Device:  # pylint:disable=too-many-instance-attributes
         )
 
         alive_ips = possible_ips.get_alive_addresses()
-        logger.info("Found %d alive IP addresses: %s", alive_ips.length, alive_ips)
+        logger.info(
+            "Found %d alive IP addresses for %s: %s",
+            alive_ips.length,
+            self,
+            alive_ips.list,
+        )
         return alive_ips
 
     @property
@@ -292,8 +305,11 @@ class Device:  # pylint:disable=too-many-instance-attributes
 
     @property
     def is_super(self) -> bool:
-        """Checks whether the device is a super device (aka daily driver)"""
-        return self.priority == 0
+        """
+        Checks whether the device is a super device (aka daily driver)
+        This check only takes into account the setting for the device, not for any of its IPs
+        """
+        return self.config.priority == 0
 
     @property
     def is_self(self) -> bool:

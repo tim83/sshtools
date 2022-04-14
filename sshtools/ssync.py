@@ -52,12 +52,19 @@ class Sync:
         self.force_limited = force_limited
 
         active_slaves: list[sshtools.device.Device] = sshtools.tools.mt_filter(
-            lambda s: s.is_sshable is not False, self.slaves
+            lambda s: s.is_reachable is True, self.slaves
         )
 
         tmp_dir: Path
         for slave in sorted(active_slaves, key=lambda d: d.priority):
             print(f"\n{self.master} -> {slave}")
+            if not slave.is_sshable:
+                logger.error(
+                    "Could not establish a SSH connection to %s (IP: %s)",
+                    slave,
+                    slave.ip_address,
+                )
+
             tmp_dir = sshtools.tools.get_tmp_dir()
             cmd = self.get_cmd(slave, tmp_dir)
 
@@ -268,9 +275,8 @@ def run():
     master: sshtools.device.Device
     slaves: list[sshtools.device.Device]
     master, slaves = get_relevant_devices(args.master, getattr(args, "from"), args.to)
-
-    super_devs: list[sshtools.device.Device] = sshtools.tools.mt_filter(
-        lambda d: d.is_super, sshtools.device.DeviceConfig.get_devices()
+    super_devs: list[sshtools.device.Device] = sshtools.device.DeviceConfig.get_devices(
+        filter_super=True
     )
     super_dev: sshtools.device.Device
     for super_dev in super_devs:
@@ -285,7 +291,6 @@ def run():
             )
             if answer.lower() not in ["y", "j"]:
                 return
-
     Sync(master, slaves, dry_run=args.dry_run, force_limited=args.limited)
 
 
