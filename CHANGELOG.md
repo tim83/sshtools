@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.9.2 (2022-04-14)
+### Fix
+* **ssync.py:** Use correct method for checking presence. ([`0e49215`](https://github.com/tim83/sshtools/commit/0e49215a283668b229920006b79186decce6883e))
+
 ## v4.9.1 (2022-04-14)
 ### Fix
 * **ssync.py:** Improve logging ([`6b957a0`](https://github.com/tim83/sshtools/commit/6b957a0524681bf39efe9ea6fcc9286b08acee28))
