@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.9.0 (2022-04-06)
+### Feature
+* **interface.py:** Add check for wol vs wakeonlan executable ([`49285a7`](https://github.com/tim83/sshtools/commit/49285a756f76cbc4385e67caceeca51b5c66ca23))
+
 ## v4.8.1 (2022-04-06)
 ### Fix
 * **sshin.py:** Don't use mosh when it is not wanted ([`82ee471`](https://github.com/tim83/sshtools/commit/82ee471118569d2229745ef705d34cccd87a4252))
