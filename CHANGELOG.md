@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.9.1 (2022-04-14)
+### Fix
+* **ssync.py:** Improve logging ([`6b957a0`](https://github.com/tim83/sshtools/commit/6b957a0524681bf39efe9ea6fcc9286b08acee28))
+
 ## v4.9.0 (2022-04-06)
 ### Feature
 * **interface.py:** Add check for wol vs wakeonlan executable ([`49285a7`](https://github.com/tim83/sshtools/commit/49285a756f76cbc4385e67caceeca51b5c66ca23))
