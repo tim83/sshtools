@@ -181,4 +181,4 @@ def test_list_to_list():
     ip_list = ip.IPAddressList(ips)
     extra_ip = ip.IPAddress("example.com")
     ip_list.add(extra_ip)
-    assert ip_list.to_list() == ips + [extra_ip]
+    assert ip_list.list == ips + [extra_ip]

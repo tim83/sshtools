@@ -116,7 +116,8 @@ class IPAddressList:
         """Returns the length of the collection"""
         return len(self._ip_addresses)
 
-    def to_list(self) -> list[IPAddress]:
+    @property
+    def list(self) -> list[IPAddress]:
         """Returns a list object of the collections"""
         return self._ip_addresses
 
@@ -136,7 +137,7 @@ class IPAddressListIterator:  # pylint: disable=too-few-public-methods
     def __next__(self):
         """Returns the next value from the object's lists"""
         if self._index < self._ip_address_list.length:
-            result = self._ip_address_list.to_list()[self._index]
+            result = self._ip_address_list.list[self._index]
             self._index += 1
             return result
 
@@ -167,7 +168,7 @@ def get_current_ips() -> IPAddressList:
     logger.debug(
         "This machine has %d ip addresses: %s",
         addresses.length,
-        str(addresses.to_list()),
+        str(addresses.list),
     )
 
     return addresses

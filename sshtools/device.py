@@ -214,7 +214,7 @@ class Device:  # pylint:disable=too-many-instance-attributes
         alive_ips = self.get_active_ips(strict_ip=strict_ip)
         if alive_ips.length > 0:
             ip_address = alive_ips.first
-            logger.info("Found ip %s for %s", ip_address, self)
+            logger.info("Selected %s for %s", ip_address, self)
             self.last_ip_address = ip_address
             self.last_ip_address_update = dt.datetime.now()
             return ip_address
@@ -269,11 +269,11 @@ class Device:  # pylint:disable=too-many-instance-attributes
             "Trying %d ips for %s: %s",
             possible_ips.length,
             self,
-            possible_ips.to_list(),
+            possible_ips.list,
         )
 
         alive_ips = possible_ips.get_alive_addresses()
-        logger.info("Found %d IP addresses: %s", alive_ips.length, alive_ips)
+        logger.info("Found %d alive IP addresses: %s", alive_ips.length, alive_ips)
         return alive_ips
 
     @property
