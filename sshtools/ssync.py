@@ -52,7 +52,7 @@ class Sync:
         self.force_limited = force_limited
 
         active_slaves: list[sshtools.device.Device] = sshtools.tools.mt_filter(
-            lambda s: s.is_reachable is True, self.slaves
+            lambda s: s.is_present is True, self.slaves
         )
 
         tmp_dir: Path
