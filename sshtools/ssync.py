@@ -64,6 +64,7 @@ class Sync:
                     slave,
                     slave.ip_address,
                 )
+                continue
 
             tmp_dir = sshtools.tools.get_tmp_dir()
             cmd = self.get_cmd(slave, tmp_dir)
