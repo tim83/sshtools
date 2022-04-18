@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.9.3 (2022-04-18)
+### Fix
+* **ssync.py:** Actually stop sync for non-online device ([`17b9561`](https://github.com/tim83/sshtools/commit/17b9561a61979b1d7015aea06d4c93a2651a5fa7))
+
 ## v4.9.2 (2022-04-14)
 ### Fix
 * **ssync.py:** Use correct method for checking presence. ([`0e49215`](https://github.com/tim83/sshtools/commit/0e49215a283668b229920006b79186decce6883e))
