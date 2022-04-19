@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.9.4 (2022-04-19)
+### Fix
+* **sshin.py:** Remove unnescesairy prints ([`443a3a4`](https://github.com/tim83/sshtools/commit/443a3a4501fa5b9f3893cf338f76925a7ec9afaf))
+
 ## v4.9.3 (2022-04-18)
 ### Fix
 * **ssync.py:** Actually stop sync for non-online device ([`17b9561`](https://github.com/tim83/sshtools/commit/17b9561a61979b1d7015aea06d4c93a2651a5fa7))
