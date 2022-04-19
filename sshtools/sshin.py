@@ -64,8 +64,6 @@ class Ssh:
             raise sshtools.errors.NotReachableError(self.device.name)
 
         cmd = ["python3", f"-m sshtools.sshin {self.device}"]
-        print(cmd)
-        print(mosh)
         if mosh is True:
             cmd.append("--mosh")
         elif mosh is False:
