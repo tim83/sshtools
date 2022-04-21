@@ -106,7 +106,7 @@ class IPAddress:
     @cachetools.func.ttl_cache(ttl=sshtools.tools.IP_CACHE_TIMEOUT)
     def is_alive(self) -> bool:
         """Is the ip address alive?"""
-        if self.config_value("check_online") is True:
+        if self.config_value("check_online") is False:
             return True
 
         ping_cmd = [

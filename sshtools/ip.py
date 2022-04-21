@@ -70,7 +70,7 @@ class IPAddressList:
 
         def is_ip_alive(ip_address: IPAddress) -> bool:
             if only_sshable:
-                return ip_address.is_sshable()
+                return ip_address.is_alive() and ip_address.is_sshable()
             return ip_address.is_alive()
 
         alive_ips_list = sshtools.tools.mt_filter(is_ip_alive, self._ip_addresses)
