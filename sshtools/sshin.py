@@ -54,7 +54,7 @@ class Ssh:
 
     def relay_connect(self, mosh: bool = None, exe: (str, list) = None):
         """Connect to the device using a relay"""
-        logger.warning(
+        logger.info(
             "%s could not be reached, trying to find an alternative path.",
             self.device,
         )

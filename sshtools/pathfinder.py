@@ -49,7 +49,7 @@ class Path:
             exe=f"python3 -m sshtools.getip {target} > /dev/null 2>/dev/null",
             mosh=False,
         )
-        logger.critical(
+        logger.info(
             "%s can%s be reached through %s",
             target,
             "not" if not ssh_check.exe_was_successful else "",
