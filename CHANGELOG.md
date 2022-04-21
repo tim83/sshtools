@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v4.10.0 (2022-04-21)
+### Feature
+* **sshin.py:** Limit logging ([`61094bd`](https://github.com/tim83/sshtools/commit/61094bd0c4f280e5d9b6d5cf12903d064670e0f2))
+* **ip.py:** Allow filtering based on sshability instead of just pingability ([`a5423e0`](https://github.com/tim83/sshtools/commit/a5423e0e3ca162986ec36b1db13036290a034662))
+
+### Fix
+* **test_ip.py:** Disable ip check thanks to github ([`03ae4e3`](https://github.com/tim83/sshtools/commit/03ae4e3cbaa072a7d3064e9df430977202ed1287))
+* **test_ip.py:** Change test IP ([`78a238f`](https://github.com/tim83/sshtools/commit/78a238f8177e805994dcf42bd03ce6ef8084eca3))
+* **test_ip.py:** Fix typo ([`1832c31`](https://github.com/tim83/sshtools/commit/1832c319b17e9438269fd5a3126adb0634c4f6e5))
+
 ## v4.9.4 (2022-04-19)
 ### Fix
 * **sshin.py:** Remove unnescesairy prints ([`443a3a4`](https://github.com/tim83/sshtools/commit/443a3a4501fa5b9f3893cf338f76925a7ec9afaf))
