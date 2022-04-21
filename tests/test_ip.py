@@ -86,7 +86,7 @@ def test_alive():
 
 def test_sshable():
     """Tests whether an IP is sshable"""
-    non_ssh_ip = ip.IPAddress("8.8.8.8")
+    non_ssh_ip = ip.IPAddress("1.1.1.1")
     assert non_ssh_ip.is_alive()
     assert not non_ssh_ip.is_sshable()
 
