@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.10.1 (2022-04-21)
+### Fix
+* **ip.py:** Fix check_online config check ([`523c064`](https://github.com/tim83/sshtools/commit/523c0644ce6d4cbcf9cc3ea06e5ba60ae9f6238b))
+
 ## v4.10.0 (2022-04-21)
 ### Feature
 * **sshin.py:** Limit logging ([`61094bd`](https://github.com/tim83/sshtools/commit/61094bd0c4f280e5d9b6d5cf12903d064670e0f2))
