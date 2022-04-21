@@ -106,7 +106,7 @@ class IPAddress:
     @cachetools.func.ttl_cache(ttl=sshtools.tools.IP_CACHE_TIMEOUT)
     def is_alive(self) -> bool:
         """Is the ip address alive?"""
-        if self.config and not self.config.check_online:
+        if self.config_value("check_online") is True:
             return True
 
         ping_cmd = [
@@ -129,8 +129,35 @@ class IPAddress:
 
         return ping_result.exit_code == 0
 
+    @cachetools.func.ttl_cache(ttl=sshtools.tools.IP_CACHE_TIMEOUT)
+    def is_sshable(self) -> bool:
+        """Can an SSH connection be established to the IP?"""
+        if not self.is_alive and self.config_value("ssh") is False:
+            return False
+
+        cmd_res = timtools.bash.run(
+            [
+                "ssh",
+                "-o BatchMode=yes",
+                "-o ConnectTimeout=2",
+                f"-p {self.config_value('ssh_port')}",
+                f"{self.config_value('user')}@{self.ip_address}",
+                "exit",
+            ],
+            passable_exit_codes=["*"],
+            capture_stderr=True,
+            capture_stdout=True,
+        )
+        return cmd_res.exit_code == 0
+
     def __repr__(self):
         return f"<sshtools.ip.IPAddress {self.ip_address}>"
 
     def __str__(self):
         return self.ip_address
+
+    def config_value(self, key: str):
+        """Get the applicable value for a certain configuration key"""
+        if self.config is not None:
+            return getattr(self.config, key)
+        return None

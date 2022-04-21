@@ -205,10 +205,14 @@ class Device:  # pylint:disable=too-many-instance-attributes
                 reachable_ips.add(ip_address)
         return reachable_ips
 
-    def get_ip(self, strict_ip: bool = False) -> sshtools.ip.IPAddress:
+    def get_ip(
+        self, strict_ip: bool = False, only_sshable: bool = False
+    ) -> sshtools.ip.IPAddress:
         """
         Returns the IP to used for the device
+
         :param strict_ip: Only return an actual IP address (no DNS or hostnames allowed)
+        :param only_sshable: Only return IPs that can be connected to using SSH
         """
         if self.is_self:
             if strict_ip:
@@ -219,7 +223,7 @@ class Device:  # pylint:disable=too-many-instance-attributes
             logger.info("Found no reachable ips for %s", self)
             raise sshtools.errors.DeviceNotPresentError(self.name)
 
-        alive_ips = self.get_active_ips(strict_ip=strict_ip)
+        alive_ips = self.get_active_ips(strict_ip=strict_ip, only_sshable=only_sshable)
         if alive_ips.length > 0:
             ip_address = alive_ips.first
             logger.info("Selected %s for %s", ip_address, self)
@@ -259,11 +263,14 @@ class Device:  # pylint:disable=too-many-instance-attributes
 
         return possible_ips
 
-    def get_active_ips(self, strict_ip: bool = False) -> sshtools.ip.IPAddressList:
+    def get_active_ips(
+        self, strict_ip: bool = False, only_sshable: bool = False
+    ) -> sshtools.ip.IPAddressList:
         """
         Returns the list of all active ips
 
         :param strict_ip: Only return an actual IP address (no DNS or hostnames allowed)
+        :param only_sshable: Filter IPs on whether they can be connected to using SSH
         """
         possible_ips: sshtools.ip.IPAddressList
         if strict_ip:
@@ -280,7 +287,7 @@ class Device:  # pylint:disable=too-many-instance-attributes
             possible_ips.list,
         )
 
-        alive_ips = possible_ips.get_alive_addresses()
+        alive_ips = possible_ips.get_alive_addresses(only_sshable=only_sshable)
         logger.info(
             "Found %d alive IP addresses for %s: %s",
             alive_ips.length,
@@ -338,22 +345,10 @@ class Device:  # pylint:disable=too-many-instance-attributes
     @property
     def is_sshable(self) -> bool:
         """Checks whether a device is reachable and can receive an SSH-connection"""
-        if self.is_present and self.ssh:
-            cmd_res = timtools.bash.run(
-                [
-                    "ssh",
-                    "-o BatchMode=yes",
-                    "-o ConnectTimeout=2",
-                    f"-p {self.ssh_port}",
-                    f"{self.user}@{self.ip_address}",
-                    "exit",
-                ],
-                passable_exit_codes=["*"],
-                capture_stderr=True,
-                capture_stdout=True,
-            )
-            return cmd_res.exit_code == 0
-        return False
+        if not (self.is_present and self.ssh):
+            return False
+
+        return self.get_ip(only_sshable=True) is not None
 
     def _get_config_value(self, key: str):
         """Get the applicable value for a certain configuration key"""

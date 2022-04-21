@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import socket
+import typing
 from typing import Union
 
 import psutil
 import timtools.log
+import timtools.multithreading
 from cachetools.func import ttl_cache
 
 import sshtools.errors
@@ -18,16 +20,24 @@ IPConnectionConfig = sshtools.ip_address.IPConnectionConfig
 IPAddress = sshtools.ip_address.IPAddress
 
 
+def hash_ip_list(ip_list: list[IPAddress]) -> int:
+    """Return a unique hash for a list of IPAddresses"""
+    ip_str_list: list[str] = [str(ip_address) for ip_address in ip_list]
+    return hash(",".join(ip_str_list))
+
+
 class IPAddressList:
     """A collection of IPAddress"""
 
     _ip_addresses: list[IPAddress]
+    _last_sort_hash: int
 
     def __init__(self, ip_addresses: list[IPAddress] = None):
         if ip_addresses is not None:
             self._ip_addresses = ip_addresses.copy()
         else:
             self._ip_addresses = []
+        self._last_sort_hash = 0
 
     def add(self, ip_address: IPAddress):
         """
@@ -49,14 +59,21 @@ class IPAddressList:
         else:
             raise ValueError("Only IPAddress objects can be added to a IPAddressList")
 
-    def get_alive_addresses(self) -> "IPAddressList":
+    def get_alive_addresses(self, only_sshable: bool = False) -> "IPAddressList":
         """
         Determine which ip addresses from the collection are reachable
+
+        :param only_sshable: Only return IPs that can be connected to using SSH
+
         :return: A IPAddressList of reachable ip addresses
         """
-        alive_ips_list = sshtools.tools.mt_filter(
-            lambda i: i.is_alive(), self._ip_addresses
-        )
+
+        def is_ip_alive(ip_address: IPAddress) -> bool:
+            if only_sshable:
+                return ip_address.is_sshable()
+            return ip_address.is_alive()
+
+        alive_ips_list = sshtools.tools.mt_filter(is_ip_alive, self._ip_addresses)
         alive_ips: IPAddressList = IPAddressList(alive_ips_list)
         return alive_ips
 
@@ -64,10 +81,26 @@ class IPAddressList:
         """
         Sort the ip addresses based on the order of precedence for connecting
         """
+        if self._is_sorted:
+            return
+
         sorted_ips = {}
 
-        def sort_list(ip_list):
-            return sorted(ip_list, key=str)
+        # Lookup ssh-ability for all IPAddresses simultaneously to improve performance
+        timtools.multithreading.mt_map(lambda i: i.is_sshable, self._ip_addresses)
+
+        def sort_list(ip_list: typing.Iterable[IPAddress]) -> list[IPAddress]:
+            ip_list = list(ip_list)
+            check_sshable = len(ip_list) > 1
+
+            def sort_key(ip_address: IPAddress) -> str:
+                key = ""
+                if check_sshable:
+                    key += "0" if ip_address.is_sshable() else "1"
+                key += str(ip_address)
+                return key
+
+            return sorted(ip_list, key=sort_key)
 
         # Loopback
         sorted_ips.update(
@@ -103,7 +136,14 @@ class IPAddressList:
         )
         # Rest
         sorted_ips.update(dict.fromkeys(sort_list(self._ip_addresses)))
-        self._ip_addresses: list[str] = list(sorted_ips.keys())
+        self._ip_addresses = list(sorted_ips.keys())
+        self._last_sort_hash = hash_ip_list(self._ip_addresses)
+
+    @property
+    def _is_sorted(self):
+        """Checks if the order and/or composition of the ip list has been changed since the last sort"""
+        list_hash = hash_ip_list(self._ip_addresses)
+        return list_hash == self._last_sort_hash
 
     @property
     def first(self) -> IPAddress:

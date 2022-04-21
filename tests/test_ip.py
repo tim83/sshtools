@@ -84,6 +84,13 @@ def test_alive():
     assert not ip.IPAddress("doesnotexists").is_alive()
 
 
+def test_ssable():
+    """Tests whether an IP is sshable"""
+    non_ssh_ip = ip.IPAddress("8.8.8.8")
+    assert non_ssh_ip.is_alive()
+    assert not non_ssh_ip.is_sshable()
+
+
 def test_str_conversion():
     """Tests that convert an instance to a string returns the ip address"""
     assert str(ip.IPAddress("localhost")) == "localhost"
@@ -129,6 +136,7 @@ def test_sort_ips():
     ip_list = ip.IPAddressList(
         [dns_ip, mdns_ip, lan_ip, loc_ip, ztts_ip, zt_ip, pub_ip, loop_ip]
     )
+    assert ip_list._is_sorted is False
     ip_list.sort_ips()
     assert ip_list._ip_addresses == [
         loop_ip,
@@ -140,6 +148,7 @@ def test_sort_ips():
         pub_ip,
         dns_ip,
     ]
+    assert ip_list._is_sorted is True
     assert ip_list.first == loop_ip
 
 
