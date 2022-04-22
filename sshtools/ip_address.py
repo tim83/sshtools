@@ -150,6 +150,28 @@ class IPAddress:
         )
         return cmd_res.exit_code == 0
 
+    @cachetools.func.ttl_cache(ttl=sshtools.tools.IP_CACHE_TIMEOUT)
+    def is_moshable(self) -> bool:
+        """Can an SSH connection be established to the IP?"""
+        if not self.is_alive and self.config_value("mosh") is False:
+            return False
+        try:
+            cmd_res = timtools.bash.run(
+                [
+                    "mosh",
+                    f"{self.config_value('user')}@{self.ip_address}",
+                    "exit",
+                ],
+                passable_exit_codes=["*"],
+                capture_stderr=True,
+                capture_stdout=True,
+                timeout=2,
+            )
+        except subprocess.TimeoutExpired:
+            return False
+
+        return cmd_res.exit_code == 0
+
     def __repr__(self):
         return f"<sshtools.ip.IPAddress {self.ip_address}>"
 

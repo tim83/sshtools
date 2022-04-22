@@ -206,13 +206,18 @@ class Device:  # pylint:disable=too-many-instance-attributes
         return reachable_ips
 
     def get_ip(
-        self, strict_ip: bool = False, only_sshable: bool = False
+        self,
+        strict_ip: bool = False,
+        only_sshable: bool = False,
+        only_moshable: bool = False,
     ) -> sshtools.ip.IPAddress:
         """
-        Returns the IP to used for the device
+        Returns the IP to used for the device.
+        Multiple filters (only_*) will act as an AND operation.
 
         :param strict_ip: Only return an actual IP address (no DNS or hostnames allowed)
         :param only_sshable: Only return IPs that can be connected to using SSH
+        :param only_moshable: Only return IPs that can be connected to using MOSH
         """
         if self.is_self:
             if strict_ip:
@@ -223,7 +228,9 @@ class Device:  # pylint:disable=too-many-instance-attributes
             logger.info("Found no reachable ips for %s", self)
             raise sshtools.errors.DeviceNotPresentError(self.name)
 
-        alive_ips = self.get_active_ips(strict_ip=strict_ip, only_sshable=only_sshable)
+        alive_ips = self.get_active_ips(
+            strict_ip=strict_ip, only_sshable=only_sshable, only_moshable=only_moshable
+        )
         if alive_ips.length > 0:
             ip_address = alive_ips.first
             logger.info("Selected %s for %s", ip_address, self)
@@ -264,13 +271,18 @@ class Device:  # pylint:disable=too-many-instance-attributes
         return possible_ips
 
     def get_active_ips(
-        self, strict_ip: bool = False, only_sshable: bool = False
+        self,
+        strict_ip: bool = False,
+        only_sshable: bool = False,
+        only_moshable: bool = False,
     ) -> sshtools.ip.IPAddressList:
         """
-        Returns the list of all active ips
+        Returns the list of all active ips.
+        Multiple filters (only_*) will act as an AND operation.
 
         :param strict_ip: Only return an actual IP address (no DNS or hostnames allowed)
         :param only_sshable: Filter IPs on whether they can be connected to using SSH
+        :param only_moshable: Filter IPs on whether they can be connected to using mosh
         """
         possible_ips: sshtools.ip.IPAddressList
         if strict_ip:
@@ -287,7 +299,9 @@ class Device:  # pylint:disable=too-many-instance-attributes
             possible_ips.list,
         )
 
-        alive_ips = possible_ips.get_alive_addresses(only_sshable=only_sshable)
+        alive_ips = possible_ips.get_alive_addresses(
+            only_sshable=only_sshable, only_moshable=only_moshable
+        )
         logger.info(
             "Found %d alive IP addresses for %s: %s",
             alive_ips.length,

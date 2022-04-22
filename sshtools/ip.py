@@ -59,19 +59,26 @@ class IPAddressList:
         else:
             raise ValueError("Only IPAddress objects can be added to a IPAddressList")
 
-    def get_alive_addresses(self, only_sshable: bool = False) -> "IPAddressList":
+    def get_alive_addresses(
+        self, only_sshable: bool = False, only_moshable: bool = True
+    ) -> "IPAddressList":
         """
-        Determine which ip addresses from the collection are reachable
+        Determine which ip addresses from the collection are reachable.
+        Multiple filters (only_*) will act as an AND operation.
 
         :param only_sshable: Only return IPs that can be connected to using SSH
+        :param only_moshable: Filter IPs on whether they can be connected to using mosh
 
         :return: A IPAddressList of reachable ip addresses
         """
 
         def is_ip_alive(ip_address: IPAddress) -> bool:
+            out = ip_address.is_alive()
             if only_sshable:
-                return ip_address.is_alive() and ip_address.is_sshable()
-            return ip_address.is_alive()
+                out = out and ip_address.is_sshable()
+            if only_moshable:
+                out = out and ip_address.is_moshable()
+            return out
 
         alive_ips_list = sshtools.tools.mt_filter(is_ip_alive, self._ip_addresses)
         alive_ips: IPAddressList = IPAddressList(alive_ips_list)
@@ -92,9 +99,12 @@ class IPAddressList:
         def sort_list(ip_list: typing.Iterable[IPAddress]) -> list[IPAddress]:
             ip_list = list(ip_list)
             check_sshable = len(ip_list) > 1
+            check_moshable = check_sshable
 
             def sort_key(ip_address: IPAddress) -> str:
                 key = ""
+                if check_moshable:
+                    key += "0" if ip_address.is_moshable() else "1"
                 if check_sshable:
                     key += "0" if ip_address.is_sshable() else "1"
                 key += str(ip_address)
