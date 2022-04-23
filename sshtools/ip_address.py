@@ -129,21 +129,34 @@ class IPAddress:
 
         return ping_result.exit_code == 0
 
+    @property
+    def ssh_string(self) -> str:
+        """Returns the SSH string for this IP ([USER]@[IP])"""
+        user: str = self.config_value("user")
+        if user is None:
+            return self.ip_address
+        return f"{user}@{self.ip_address}"
+
     @cachetools.func.ttl_cache(ttl=sshtools.tools.IP_CACHE_TIMEOUT)
     def is_sshable(self) -> bool:
         """Can an SSH connection be established to the IP?"""
-        if not self.is_alive and self.config_value("ssh") is False:
+        if not self.is_alive() or self.config_value("ssh") is False:
             return False
 
+        ssh_cmd: list[str] = [
+            "ssh",
+            "-o BatchMode=yes",
+            "-o ConnectTimeout=2",
+        ]
+        if self.config_value("ssh_port") is not None:
+            ssh_cmd += [f"-p {self.config_value('ssh_port')}"]
+        ssh_cmd += [
+            self.ssh_string,
+            "exit",
+        ]
+
         cmd_res = timtools.bash.run(
-            [
-                "ssh",
-                "-o BatchMode=yes",
-                "-o ConnectTimeout=2",
-                f"-p {self.config_value('ssh_port')}",
-                f"{self.config_value('user')}@{self.ip_address}",
-                "exit",
-            ],
+            ssh_cmd,
             passable_exit_codes=["*"],
             capture_stderr=True,
             capture_stdout=True,
@@ -153,7 +166,7 @@ class IPAddress:
     @cachetools.func.ttl_cache(ttl=sshtools.tools.IP_CACHE_TIMEOUT)
     def is_moshable(self) -> bool:
         """Can an SSH connection be established to the IP?"""
-        if not self.is_alive and self.config_value("mosh") is False:
+        if not self.is_sshable() or self.config_value("mosh") is False:
             return False
 
         mosh_is_installed_check = timtools.bash.run(
@@ -169,8 +182,7 @@ class IPAddress:
             cmd_res = timtools.bash.run(
                 [
                     "mosh",
-                    "--ssh='-o BatchMode=yes -o ConnectionTimeout=2'"
-                    f"{self.config_value('user')}@{self.ip_address}",
+                    self.ssh_string,
                     "exit",
                 ],
                 passable_exit_codes=["*"],
