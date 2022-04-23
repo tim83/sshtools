@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v4.11.0 (2022-04-23)
+### Feature
+* **ip.py:** Allow filtering based on mosh-ability ([`4aab7d9`](https://github.com/tim83/sshtools/commit/4aab7d901ffba2ea34707c795a44d8949d0d75aa))
+
+### Fix
+* **ip_address.py:** Use batchmode for MOSH ([`3790379`](https://github.com/tim83/sshtools/commit/37903796e2aa9778e4ba469d64233f5d0924ffbc))
+* **ip.py:** Don't filter moshable by default ([`81f5956`](https://github.com/tim83/sshtools/commit/81f59561787234868d4d36a7353070ae964ac3d2))
+* **ip.py:** Take into account whether mosh is installed ([`a37729b`](https://github.com/tim83/sshtools/commit/a37729b76c627b13054ed37a20ad6672b6552577))
+
 ## v4.10.1 (2022-04-21)
 ### Fix
 * **ip.py:** Fix check_online config check ([`523c064`](https://github.com/tim83/sshtools/commit/523c0644ce6d4cbcf9cc3ea06e5ba60ae9f6238b))
