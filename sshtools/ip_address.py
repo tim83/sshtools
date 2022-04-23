@@ -169,6 +169,7 @@ class IPAddress:
             cmd_res = timtools.bash.run(
                 [
                     "mosh",
+                    "--ssh='-o BatchMode=yes -o ConnectionTimeout=2'"
                     f"{self.config_value('user')}@{self.ip_address}",
                     "exit",
                 ],
