@@ -155,6 +155,16 @@ class IPAddress:
         """Can an SSH connection be established to the IP?"""
         if not self.is_alive and self.config_value("mosh") is False:
             return False
+
+        mosh_is_installed_check = timtools.bash.run(
+            ["which", "mosh"],
+            capture_stdout=True,
+            capture_stderr=True,
+            passable_exit_codes=["*"],
+        )
+        if mosh_is_installed_check.exit_code != 0:
+            return False
+
         try:
             cmd_res = timtools.bash.run(
                 [
