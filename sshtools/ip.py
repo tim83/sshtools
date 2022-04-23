@@ -80,6 +80,9 @@ class IPAddressList:
                 out = out and ip_address.is_moshable()
             return out
 
+        # Lookup ssh/mosh-ability for all IPAddresses simultaneously to improve performance
+        timtools.multithreading.mt_map(lambda i: i.cache_online, self._ip_addresses)
+
         alive_ips_list = sshtools.tools.mt_filter(is_ip_alive, self._ip_addresses)
         alive_ips: IPAddressList = IPAddressList(alive_ips_list)
         return alive_ips
@@ -93,20 +96,20 @@ class IPAddressList:
 
         sorted_ips = {}
 
-        # Lookup ssh-ability for all IPAddresses simultaneously to improve performance
-        timtools.multithreading.mt_map(lambda i: i.is_sshable, self._ip_addresses)
+        # Lookup ssh/mosh-ability for all IPAddresses simultaneously to improve performance
+        timtools.multithreading.mt_map(lambda i: i.cache_online, self._ip_addresses)
 
         def sort_list(ip_list: typing.Iterable[IPAddress]) -> list[IPAddress]:
             ip_list = list(ip_list)
-            check_sshable = len(ip_list) > 1
+            check_sshable = False
             check_moshable = check_sshable
 
             def sort_key(ip_address: IPAddress) -> str:
                 key = ""
                 if check_moshable:
-                    key += "0" if ip_address.is_moshable() else "1"
+                    key += "1" if ip_address.is_moshable() else "0"
                 if check_sshable:
-                    key += "0" if ip_address.is_sshable() else "1"
+                    key += "1" if ip_address.is_sshable() else "0"
                 key += str(ip_address)
                 return key
 

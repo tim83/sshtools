@@ -10,6 +10,7 @@ import typing
 import cachetools.func
 import timtools.bash
 import timtools.log
+import timtools.multithreading
 
 import sshtools.connection
 import sshtools.device
@@ -102,6 +103,16 @@ class IPAddress:
             "::1",
             socket.gethostname(),
         ]
+
+    def cache_online(self):
+        """Call all online/ssh/mosh checks to cache the result"""
+
+        def exec_string_method(method_string: str):
+            getattr(self, method_string)()
+
+        timtools.multithreading.mt_map(
+            exec_string_method, ["alive", "sshable", "moshable"]
+        )
 
     @cachetools.func.ttl_cache(ttl=sshtools.tools.IP_CACHE_TIMEOUT)
     def is_alive(self) -> bool:
