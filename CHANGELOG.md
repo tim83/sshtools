@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.11.1 (2022-04-23)
+### Fix
+* **ip_address.py:** Fix sshable and moshable checks ([`98f11d8`](https://github.com/tim83/sshtools/commit/98f11d82071e169b124a5d7addb52c45de4c5d5b))
+
 ## v4.11.0 (2022-04-23)
 ### Feature
 * **ip.py:** Allow filtering based on mosh-ability ([`4aab7d9`](https://github.com/tim83/sshtools/commit/4aab7d901ffba2ea34707c795a44d8949d0d75aa))
