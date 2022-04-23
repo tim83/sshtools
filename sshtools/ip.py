@@ -60,7 +60,7 @@ class IPAddressList:
             raise ValueError("Only IPAddress objects can be added to a IPAddressList")
 
     def get_alive_addresses(
-        self, only_sshable: bool = False, only_moshable: bool = True
+        self, only_sshable: bool = False, only_moshable: bool = False
     ) -> "IPAddressList":
         """
         Determine which ip addresses from the collection are reachable.
