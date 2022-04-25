@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.12.0 (2022-04-25)
+### Feature
+* **forget.py:** Re-add device after deletion ([`3e95af0`](https://github.com/tim83/sshtools/commit/3e95af02085c9cdb37f4289d47bcd0a5db0185c5))
+
 ## v4.11.1 (2022-04-23)
 ### Fix
 * **ip_address.py:** Fix sshable and moshable checks ([`98f11d8`](https://github.com/tim83/sshtools/commit/98f11d82071e169b124a5d7addb52c45de4c5d5b))
