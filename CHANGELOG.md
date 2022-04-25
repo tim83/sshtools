@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.13.0 (2022-04-25)
+### Feature
+* **sshin.py:** Check if a device is moshable before moshing ([`19d72e5`](https://github.com/tim83/sshtools/commit/19d72e521100b86c7440e26e1cc1e16632d3ffae))
+
 ## v4.12.0 (2022-04-25)
 ### Feature
 * **forget.py:** Re-add device after deletion ([`3e95af0`](https://github.com/tim83/sshtools/commit/3e95af02085c9cdb37f4289d47bcd0a5db0185c5))
