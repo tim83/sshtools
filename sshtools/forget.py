@@ -6,6 +6,7 @@ from __future__ import annotations  # python -3.9 compatibility
 import argparse
 
 import timtools.bash
+import timtools.locations
 import timtools.log
 
 import sshtools.device
@@ -28,11 +29,16 @@ def forget_device(target: sshtools.device.Device):
             capture_stderr=True,
             capture_stdout=True,
         )
+        host_id: str = timtools.bash.get_output(
+            ["ssh-keyscan", str(ip_address)], passable_exit_codes=["*"]
+        )
+        known_host_file = timtools.locations.get_user_home() / ".ssh/known_hosts"
+        with open(known_host_file, "a", encoding="utf-8") as kh_file:
+            kh_file.write(host_id)
 
 
 def run():
     """Run ssh-forget"""
-    # Arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("target", help="De machine om te vergeten", nargs="*")
     parser.add_argument("-v", "--verbose", help="Geef feedback", action="store_true")
