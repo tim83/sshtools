@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.13.1 (2022-06-01)
+### Fix
+* **sshin.py:** Fix relay command execution ([`10aaf1f`](https://github.com/tim83/sshtools/commit/10aaf1fe166f1384b14188ba0a7b8777343868d5))
+
 ## v4.13.0 (2022-04-25)
 ### Feature
 * **sshin.py:** Check if a device is moshable before moshing ([`19d72e5`](https://github.com/tim83/sshtools/commit/19d72e521100b86c7440e26e1cc1e16632d3ffae))
