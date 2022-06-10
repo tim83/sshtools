@@ -224,10 +224,6 @@ class Device:  # pylint:disable=too-many-instance-attributes
                 return sshtools.ip.IPAddress("127.0.0.1")
             return sshtools.ip.IPAddress(self.hostname)
 
-        if self.reachable_ip_addresses.length == 0:
-            logger.info("Found no reachable ips for %s", self)
-            raise sshtools.errors.DeviceNotPresentError(self.name)
-
         alive_ips = self.get_active_ips(
             strict_ip=strict_ip, only_sshable=only_sshable, only_moshable=only_moshable
         )
@@ -349,7 +345,7 @@ class Device:  # pylint:disable=too-many-instance-attributes
     def is_present(self) -> bool:
         """Checks if the device is reachable"""
         try:
-            return self.ip_address.is_alive()
+            return self.ip_address.is_alive
         except (
             sshtools.errors.NotReachableError,
             sshtools.errors.DeviceNotPresentError,

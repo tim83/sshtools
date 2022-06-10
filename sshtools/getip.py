@@ -5,8 +5,6 @@ from __future__ import annotations  # python -3.9 compatibility
 
 import argparse
 import concurrent.futures
-import datetime as dt
-import os
 
 import timtools.log
 from tabulate import tabulate
@@ -72,12 +70,6 @@ def run():
         action="store_true",
     )
     parser.add_argument(
-        "-w",
-        "--write-log",
-        help="Maak een logentry bij de target",
-        action="store_true",
-    )
-    parser.add_argument(
         "-j",
         "--json",
         help="Geef de output als een json",
@@ -105,21 +97,8 @@ def run():
         )
         output.append([device.name, ip_string])
 
-        if args.write_log is True:
-            sshtools.sshin.Ssh(
-                dev=device,
-                exe=[
-                    "echo",
-                    f"{os.uname().nodename} accessed this device on {dt.datetime.now()}",
-                    ">> /tmp/sshtools_access.txt",
-                ],
-            )
-
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         executor.map(device_add_row, targets)
-
-    if args.write_log is True:
-        return
 
     if args.json is True:
 
@@ -132,7 +111,9 @@ def run():
         print(output_json)
         return
 
-    if len(output) == 1:
+    if len(output) == 0:
+        print(output)
+    elif len(output) == 1:
         output_str = output[0][1]
         if output_str == "x":
             raise sshtools.errors.DeviceNotPresentError(targets[0].name)

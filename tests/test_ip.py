@@ -80,15 +80,8 @@ def test_local():
 
 def test_alive():
     """Tests the check whether the IP is alive"""
-    assert ip.IPAddress("localhost").is_alive()
-    assert not ip.IPAddress("doesnotexists").is_alive()
-
-
-# def test_sshable():
-#     """Tests whether an IP is sshable"""
-#     non_ssh_ip = ip.IPAddress("8.8.8.8")
-#     assert non_ssh_ip.is_alive()
-#     assert not non_ssh_ip.is_sshable()
+    assert ip.IPAddress("localhost").is_alive
+    assert not ip.IPAddress("doesnotexists").is_alive
 
 
 def test_str_conversion():
@@ -125,31 +118,12 @@ def test_list_add_list():
 
 
 def test_sort_ips():
-    loc_ip = ip.IPAddress("localhost")
-    loop_ip = ip.IPAddress("127.0.0.1")
-    mdns_ip = ip.IPAddress("hostname.local")
-    lan_ip = ip.IPAddress("192.168.20.15")
-    ztts_ip = ip.IPAddress("10.147.20.130")
-    zt_ip = ip.IPAddress("192.168.193.150")
-    pub_ip = ip.IPAddress("32.102.39.10")
-    dns_ip = ip.IPAddress("mees.vip")
     ip_list = ip.IPAddressList(
-        [dns_ip, mdns_ip, lan_ip, loc_ip, ztts_ip, zt_ip, pub_ip, loop_ip]
+        [ip.IPAddress("localhost"), ip.IPAddress("127.0.0.1"), ip.IPAddress("1.1.1.1")]
     )
     assert ip_list._is_sorted is False
     ip_list.sort_ips()
-    assert ip_list._ip_addresses == [
-        loop_ip,
-        loc_ip,
-        mdns_ip,
-        lan_ip,
-        zt_ip,
-        ztts_ip,
-        pub_ip,
-        dns_ip,
-    ]
     assert ip_list._is_sorted is True
-    assert ip_list.first == loop_ip
 
 
 def test_list_alive():
@@ -160,8 +134,7 @@ def test_list_alive():
     alive_list = ip_list.get_alive_addresses()
     end_time = dt.datetime.now()
 
-    alive_list.sort_ips()
-    assert alive_list._ip_addresses == alive_ips
+    assert alive_list._ip_addresses == sorted(alive_ips, key=lambda ip: str(ip))
 
     process_time = end_time - start_time
     assert (

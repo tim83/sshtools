@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import socket
-import typing
 from typing import Union
 
 import psutil
@@ -73,7 +72,7 @@ class IPAddressList:
         """
 
         def is_ip_alive(ip_address: IPAddress) -> bool:
-            out = ip_address.is_alive()
+            out = ip_address.is_alive
             if only_sshable:
                 out = out and ip_address.is_sshable()
             if only_moshable:
@@ -99,56 +98,9 @@ class IPAddressList:
         # Lookup ssh/mosh-ability for all IPAddresses simultaneously to improve performance
         timtools.multithreading.mt_map(lambda i: i.cache_online, self._ip_addresses)
 
-        def sort_list(ip_list: typing.Iterable[IPAddress]) -> list[IPAddress]:
-            ip_list = list(ip_list)
-            check_sshable = False
-            check_moshable = check_sshable
-
-            def sort_key(ip_address: IPAddress) -> str:
-                key = ""
-                if check_moshable:
-                    key += "1" if ip_address.is_moshable() else "0"
-                if check_sshable:
-                    key += "1" if ip_address.is_sshable() else "0"
-                key += str(ip_address)
-                return key
-
-            return sorted(ip_list, key=sort_key)
-
-        # Loopback
         sorted_ips.update(
-            dict.fromkeys(
-                sort_list(filter(lambda ip: ip.is_loopback, self._ip_addresses))
-            )
+            dict.fromkeys(sorted(self._ip_addresses, key=lambda ip: ip.latency))
         )
-        # mDNS
-        sorted_ips.update(
-            dict.fromkeys(
-                sort_list(
-                    filter(lambda ip: str(ip).endswith(".local"), self._ip_addresses)
-                )
-            )
-        )
-        # Local IPs
-        sorted_ips.update(
-            dict.fromkeys(
-                sort_list(
-                    filter(
-                        lambda ip: ip.is_local(include_vpn=False), self._ip_addresses
-                    )
-                )
-            )
-        )
-        # Zerotier IPs
-        sorted_ips.update(
-            dict.fromkeys(
-                sort_list(
-                    filter(lambda ip: ip.is_local(include_vpn=True), self._ip_addresses)
-                )
-            )
-        )
-        # Rest
-        sorted_ips.update(dict.fromkeys(sort_list(self._ip_addresses)))
         self._ip_addresses = list(sorted_ips.keys())
         self._last_sort_hash = hash_ip_list(self._ip_addresses)
 

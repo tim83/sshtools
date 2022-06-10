@@ -1,6 +1,7 @@
 """Module for handling ip addresses"""
 from __future__ import annotations  # python -3.9 compatibility
 
+import dataclasses
 import ipaddress
 import re
 import socket
@@ -18,6 +19,14 @@ import sshtools.tools
 from sshtools.config import IPConnectionConfig
 
 logger = timtools.log.get_logger("sshtools.ip_address")
+
+
+@dataclasses.dataclass
+class PingResult:
+    """Class to store the result of a ping operation"""
+
+    alive: bool
+    latency: float
 
 
 class IPAddress:
@@ -111,14 +120,14 @@ class IPAddress:
             getattr(self, method_string)()
 
         timtools.multithreading.mt_map(
-            exec_string_method, ["alive", "sshable", "moshable"]
+            exec_string_method, ["ping", "sshable", "moshable"]
         )
 
     @cachetools.func.ttl_cache(ttl=sshtools.tools.IP_CACHE_TIMEOUT)
-    def is_alive(self) -> bool:
+    def ping(self) -> PingResult:
         """Is the ip address alive?"""
         if self.config_value("check_online") is False:
-            return True
+            return PingResult(True, -1)
 
         ping_cmd = [
             "ping",
@@ -135,10 +144,29 @@ class IPAddress:
                 passable_exit_codes=[0, 2],
                 timeout=sshtools.tools.IP_PING_TIMEOUT,
             )
+            is_alive = ping_result.exit_code == 0
+            if is_alive:
+                ping_time = float(
+                    ping_result.output.rsplit("\n", maxsplit=1)[-1]
+                    .split(" = ")[1]
+                    .split("/")[1]
+                )
+            else:
+                ping_time = float("inf")
         except subprocess.TimeoutExpired:
-            return False
+            return PingResult(False, float("inf"))
 
-        return ping_result.exit_code == 0
+        return PingResult(is_alive, ping_time)
+
+    @property
+    def is_alive(self) -> bool:
+        """Returns whether this IP address is alive"""
+        return self.ping().alive
+
+    @property
+    def latency(self) -> float:
+        """Returns the latency of the IP address"""
+        return self.ping().latency
 
     @property
     def ssh_string(self) -> str:
@@ -151,7 +179,7 @@ class IPAddress:
     @cachetools.func.ttl_cache(ttl=sshtools.tools.IP_CACHE_TIMEOUT)
     def is_sshable(self) -> bool:
         """Can an SSH connection be established to the IP?"""
-        if not self.is_alive() or self.config_value("ssh") is False:
+        if not self.is_alive or self.config_value("ssh") is False:
             return False
 
         ssh_cmd: list[str] = [
