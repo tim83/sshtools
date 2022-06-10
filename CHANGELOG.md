@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.14.0 (2022-06-10)
+### Feature
+* **ip.py:** Use latency to sort IPs instead of hardcoding ([`1c5bba9`](https://github.com/tim83/sshtools/commit/1c5bba93bf7aadbedd825fe6466d04d37c3db2e3))
+
 ## v4.13.1 (2022-06-01)
 ### Fix
 * **sshin.py:** Fix relay command execution ([`10aaf1f`](https://github.com/tim83/sshtools/commit/10aaf1fe166f1384b14188ba0a7b8777343868d5))
