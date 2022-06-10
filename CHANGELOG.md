@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.15.0 (2022-06-10)
+### Feature
+* **ip.py:** Give hostnames a headstart ([`3f37550`](https://github.com/tim83/sshtools/commit/3f37550f3da7e25c3ca442d518b3d34b2a6ff15d))
+
 ## v4.14.0 (2022-06-10)
 ### Feature
 * **ip.py:** Use latency to sort IPs instead of hardcoding ([`1c5bba9`](https://github.com/tim83/sshtools/commit/1c5bba93bf7aadbedd825fe6466d04d37c3db2e3))
