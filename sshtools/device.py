@@ -247,11 +247,11 @@ class Device:  # pylint:disable=too-many-instance-attributes
         possible_ips: sshtools.ip.IPAddressList = sshtools.ip.IPAddressList()
 
         def clean_ip_group(
-            ip_group: Optional[list[str]],
+            ip_group: Optional[list[str]], *args, **kwargs
         ) -> list[sshtools.ip.IPAddress]:
             if ip_group is not None:
                 return [
-                    sshtools.ip.IPAddress(ipaddr)
+                    sshtools.ip.IPAddress(ipaddr, *args, **kwargs)
                     for ipaddr in ip_group
                     if ipaddr is not None and ipaddr not in [""]
                 ]
@@ -262,7 +262,7 @@ class Device:  # pylint:disable=too-many-instance-attributes
         if include_dns:
             possible_ips.add_list(clean_ip_group([self.mdns]))
         if include_hostname:
-            possible_ips.add_list(clean_ip_group([self.hostname]))
+            possible_ips.add_list(clean_ip_group([self.hostname], hostname=True))
 
         return possible_ips
 

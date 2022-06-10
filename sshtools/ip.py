@@ -99,7 +99,12 @@ class IPAddressList:
         timtools.multithreading.mt_map(lambda i: i.cache_online, self._ip_addresses)
 
         sorted_ips.update(
-            dict.fromkeys(sorted(self._ip_addresses, key=lambda ip: ip.latency))
+            dict.fromkeys(
+                sorted(
+                    self._ip_addresses,
+                    key=lambda ip: ip.latency - 7 if ip.is_hostname else ip.latency,
+                )
+            )
         )
         self._ip_addresses = list(sorted_ips.keys())
         self._last_sort_hash = hash_ip_list(self._ip_addresses)

@@ -34,11 +34,12 @@ class IPAddress:
 
     ip_address: str
     version: int
+    is_hostname: bool
     config: IPConnectionConfig = None
     __ip_obj: ipaddress.ip_address
     __instances: dict[str, "IPAddress"] = {}
 
-    def __init__(self, ip_address: str):
+    def __init__(self, ip_address: str, hostname: bool = False):
         if not isinstance(ip_address, str):
             raise ValueError("IP address must by a string.")
         self.ip_address = ip_address
@@ -47,6 +48,7 @@ class IPAddress:
         except ValueError:
             self.__ip_obj = None
         self.version = self._determine_ip_version()
+        self.is_hostname = hostname
 
     def __new__(cls, ip_address: str, *_, **__):
         if ip_address in cls.__instances:
