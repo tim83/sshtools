@@ -52,19 +52,12 @@ class Sync:
         self.force_limited = force_limited
 
         active_slaves: list[sshtools.device.Device] = sshtools.tools.mt_filter(
-            lambda s: s.is_present is True, self.slaves
+            lambda s: s.is_sshable is True, self.slaves
         )
 
         tmp_dir: Path
         for slave in sorted(active_slaves, key=lambda d: d.priority):
             print(f"\n{self.master} -> {slave}")
-            if not slave.is_sshable:
-                logger.error(
-                    "Could not establish a SSH connection to %s (IP: %s)",
-                    slave,
-                    slave.ip_address,
-                )
-                continue
 
             tmp_dir = sshtools.tools.get_tmp_dir()
             cmd = self.get_cmd(slave, tmp_dir)
