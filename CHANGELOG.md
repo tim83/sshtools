@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.20.0 (2022-06-12)
+### Feature
+* Remove moshable functions and checks ([`dab1766`](https://github.com/tim83/sshtools/commit/dab1766185a66eb2c96c6d852319fd30bbbaa889))
+
 ## v4.19.1 (2022-06-12)
 ### Fix
 * **sshin.py:** Actually call the moshable check ([`b8de6f5`](https://github.com/tim83/sshtools/commit/b8de6f5687ee9c3e2a35f479125be210739dba27))
