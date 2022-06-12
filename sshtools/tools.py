@@ -25,7 +25,7 @@ else:
 
 IP_CACHE_TIMEOUT: int = 5
 IP_PING_TIMEOUT: float = 0.7
-IP_SSH_TIMEOUT: float = 2 * IP_PING_TIMEOUT
+IP_SSH_TIMEOUT: float = 3
 
 
 def get_tmp_dir() -> Path:
