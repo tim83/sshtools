@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v4.17.0 (2022-06-12)
+### Feature
+* **ssinfo.py:** Implement a function to lookup data about devices ([`2d3a259`](https://github.com/tim83/sshtools/commit/2d3a2598ca35a891e96e408f434eb58eeb4731a5))
+
+### Fix
+* **device.py:** Look for the tailscale magic dns ([`430cd3b`](https://github.com/tim83/sshtools/commit/430cd3b1c9e5c70e21afcfd59f536fae3033972f))
+
 ## v4.16.0 (2022-06-12)
 ### Feature
 * **device.py:** Check tailscale magic dns ([`b895a31`](https://github.com/tim83/sshtools/commit/b895a31d23c75e5a506146c78b5504d6a8de82be))
