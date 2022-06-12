@@ -89,9 +89,9 @@ def run():
         output.append([device.name, ip_string])
 
     if len(targets) == 1:
-        output = []
-        device_add_row(output, targets[0])
-        output_str = output[0][1]
+        rows = []
+        device_add_row(rows, targets[0])
+        output_str = rows[0][1]
         if output_str == "x":
             raise sshtools.errors.DeviceNotPresentError(targets[0].name)
         print(output_str)
