@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.15.1 (2022-06-11)
+### Fix
+* **ssync.py:** Only sync to sshable devices ([`f2c2740`](https://github.com/tim83/sshtools/commit/f2c2740afa0cafeea2caf570fd1776b1b5bc674e))
+
 ## v4.15.0 (2022-06-10)
 ### Feature
 * **ip.py:** Give hostnames a headstart ([`3f37550`](https://github.com/tim83/sshtools/commit/3f37550f3da7e25c3ca442d518b3d34b2a6ff15d))
