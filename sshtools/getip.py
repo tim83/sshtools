@@ -68,6 +68,12 @@ def run():
         help="Gebruik alleen IP adressen en geen DNS of hostnamen",
         action="store_true",
     )
+    parser.add_argument(
+        "-j",
+        "--json",
+        help="Print de output in json",
+        action="store_true",
+    )
     args = parser.parse_args()
 
     timtools.log.set_verbose(args.verbose)
@@ -78,7 +84,7 @@ def run():
     else:
         targets = [sshtools.device.Device(name) for name in args.target]
 
-    def device_add_row(output: list[list[str]], device: sshtools.device.Device):
+    def device_add_row(rows: list[list[str]], device: sshtools.device.Device):
         ip_string = get_ip_string(
             device,
             ssh_string=args.ssh_string,
@@ -86,12 +92,23 @@ def run():
             only_sshable=args.ssh,
             only_moshable=args.mosh,
         )
-        output.append([device.name, ip_string])
+        rows.append([device.name, ip_string])
+
+    if args.json is True:
+        output = []
+        sshtools.tools.mt_map(lambda r: device_add_row(output, r), targets)
+        print(
+            {
+                device: (ip_address if ip_address != "x" else None)
+                for device, ip_address in output
+            }
+        )
+        return
 
     if len(targets) == 1:
-        rows = []
-        device_add_row(rows, targets[0])
-        output_str = rows[0][1]
+        output = []
+        device_add_row(output, targets[0])
+        output_str = output[0][1]
         if output_str == "x":
             raise sshtools.errors.DeviceNotPresentError(targets[0].name)
         print(output_str)
@@ -107,4 +124,7 @@ def run():
 
 
 if __name__ == "__main__":
+    import sys
+
     run()
+    sys.stdout.flush()
