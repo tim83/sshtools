@@ -260,7 +260,14 @@ class Device:  # pylint:disable=too-many-instance-attributes
         if include_ips:
             possible_ips.add_list(self.reachable_ip_addresses)
         if include_dns:
-            possible_ips.add_list(clean_ip_group([self.mdns]))
+            possible_ips.add_list(
+                clean_ip_group(
+                    [
+                        self.mdns
+                        + f"{self.hostname}.tim-mees83.gmail.com.beta.tailscale.net"  # Tailscale
+                    ]
+                )
+            )
         if include_hostname:
             possible_ips.add_list(clean_ip_group([self.hostname], hostname=True))
 
