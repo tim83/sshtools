@@ -219,7 +219,6 @@ class IPAddress:
             capture_stdout=True,
             capture_stderr=True,
             passable_exit_codes=["*"],
-            timeout=sshtools.tools.IP_SSH_TIMEOUT,
         )
         if mosh_is_installed_check.exit_code != 0:
             return False
@@ -234,7 +233,7 @@ class IPAddress:
                 passable_exit_codes=["*"],
                 capture_stderr=True,
                 capture_stdout=True,
-                timeout=2,
+                timeout=sshtools.tools.IP_SSH_TIMEOUT,
             )
         except subprocess.TimeoutExpired:
             return False
