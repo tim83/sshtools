@@ -21,7 +21,6 @@ def print_ips(device: sshtools.device.Device):
             ip_address.is_alive,
             ip_address.latency,
             ip_address.is_sshable(),
-            ip_address.is_moshable(),
         ]
         output.append(row)
 
@@ -29,7 +28,7 @@ def print_ips(device: sshtools.device.Device):
         ip_add_row,
         device.get_possible_ips(),
         sorting_key=lambda r: r[2],
-        headers=["IP Address", "Reachable", "Latency (ms)", "SSHable?", "MOSHable"],
+        headers=["IP Address", "Reachable", "Latency (ms)", "SSHable?"],
     )
     print(table)
 
