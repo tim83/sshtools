@@ -16,6 +16,7 @@ sshin = "sshtools.sshin:run"
 ssync = "sshtools.ssync:run"
 wake-up = "sshtools.wakeup:run"
 ssh-forget = "sshtools.forget:run"
+ssinfo = "sshtools.ssinfo:run"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0"
