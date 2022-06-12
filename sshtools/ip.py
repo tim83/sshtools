@@ -102,7 +102,9 @@ class IPAddressList:
             dict.fromkeys(
                 sorted(
                     self._ip_addresses,
-                    key=lambda ip: ip.latency - 7 if ip.is_hostname else ip.latency,
+                    key=lambda ip: ip.latency
+                    if any(char.isdigit() for char in str(ip))
+                    else (ip.latency - 7 if ".local" in str(ip) else ip.latency - 5),
                 )
             )
         )
