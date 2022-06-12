@@ -263,8 +263,8 @@ class Device:  # pylint:disable=too-many-instance-attributes
             possible_ips.add_list(
                 clean_ip_group(
                     [
-                        self.mdns
-                        + f"{self.hostname}.tim-mees83.gmail.com.beta.tailscale.net"  # Tailscale
+                        self.mdns,
+                        f"{self.hostname}.tim-mees83.gmail.com.beta.tailscale.net",  # Tailscale
                     ]
                 )
             )

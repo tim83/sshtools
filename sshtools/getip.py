@@ -1,17 +1,16 @@
 #! /usr/bin/python3
-"""Module to obtain the IP adress of a device"""
+"""Module to obtain the IP address of a device"""
 
 from __future__ import annotations  # python -3.9 compatibility
 
 import argparse
-import concurrent.futures
 
 import timtools.log
-from tabulate import tabulate
 
 import sshtools.device
 import sshtools.errors
 import sshtools.sshin
+import sshtools.tools
 
 logger = timtools.log.get_logger("ssh-tools.getip")
 
@@ -69,12 +68,6 @@ def run():
         help="Gebruik alleen IP adressen en geen DNS of hostnamen",
         action="store_true",
     )
-    parser.add_argument(
-        "-j",
-        "--json",
-        help="Geef de output als een json",
-        action="store_true",
-    )
     args = parser.parse_args()
 
     timtools.log.set_verbose(args.verbose)
@@ -85,9 +78,7 @@ def run():
     else:
         targets = [sshtools.device.Device(name) for name in args.target]
 
-    output: list[list[str]] = []
-
-    def device_add_row(device: sshtools.device.Device):
+    def device_add_row(output: list[list[str]], device: sshtools.device.Device):
         ip_string = get_ip_string(
             device,
             ssh_string=args.ssh_string,
@@ -97,30 +88,22 @@ def run():
         )
         output.append([device.name, ip_string])
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-        executor.map(device_add_row, targets)
-
-    if args.json is True:
-
-        def x_to_none(value: str):
-            return None if value == "x" else value
-
-        output_json: dict[str, str] = {
-            device: x_to_none(ip_address) for device, ip_address in output
-        }
-        print(output_json)
-        return
-
-    if len(output) == 0:
-        print(output)
-    elif len(output) == 1:
+    if len(targets) == 1:
+        output = []
+        device_add_row(output, targets[0])
         output_str = output[0][1]
         if output_str == "x":
             raise sshtools.errors.DeviceNotPresentError(targets[0].name)
         print(output_str)
     else:
-        output_sorted = sorted(output, key=lambda r: r[0])
-        print(tabulate(output_sorted, headers=["Device", "IP Address"]))
+        print(
+            sshtools.tools.create_table(
+                device_add_row,
+                targets,
+                sorting_key=lambda r: r[0],
+                headers=["Device", "IP Address"],
+            )
+        )
 
 
 if __name__ == "__main__":
