@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.18.1 (2022-06-12)
+### Fix
+* **tools.py:** Increase the SSH timeout to correspond to the value in the ssh command ([`d34876d`](https://github.com/tim83/sshtools/commit/d34876df83574918e856344a0e7328e1ce5e9f2c))
+
 ## v4.18.0 (2022-06-12)
 ### Feature
 * **ip_address.py:** Set a timeout for ssh and mosh check ([`137d554`](https://github.com/tim83/sshtools/commit/137d55481448f8639d4c4e547d67c802f84867a9))
