@@ -196,13 +196,17 @@ class IPAddress:
             "exit",
         ]
 
-        cmd_res = timtools.bash.run(
-            ssh_cmd,
-            passable_exit_codes=["*"],
-            capture_stderr=True,
-            capture_stdout=True,
-        )
-        return cmd_res.exit_code == 0
+        try:
+            cmd_res = timtools.bash.run(
+                ssh_cmd,
+                passable_exit_codes=["*"],
+                capture_stderr=True,
+                capture_stdout=True,
+                timeout=sshtools.tools.IP_SSH_TIMEOUT,
+            )
+            return cmd_res.exit_code == 0
+        except subprocess.TimeoutExpired:
+            return False
 
     @cachetools.func.ttl_cache(ttl=sshtools.tools.IP_CACHE_TIMEOUT)
     def is_moshable(self) -> bool:
@@ -215,6 +219,7 @@ class IPAddress:
             capture_stdout=True,
             capture_stderr=True,
             passable_exit_codes=["*"],
+            timeout=sshtools.tools.IP_SSH_TIMEOUT,
         )
         if mosh_is_installed_check.exit_code != 0:
             return False
