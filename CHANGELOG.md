@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v4.16.0 (2022-06-12)
+### Feature
+* **device.py:** Check tailscale magic dns ([`b895a31`](https://github.com/tim83/sshtools/commit/b895a31d23c75e5a506146c78b5504d6a8de82be))
+
+### Fix
+* **ip.py:** Increase priority of mDNS ([`6838364`](https://github.com/tim83/sshtools/commit/683836409316de0084ac4b3cd72c650c991cf8b1))
+
 ## v4.15.1 (2022-06-11)
 ### Fix
 * **ssync.py:** Only sync to sshable devices ([`f2c2740`](https://github.com/tim83/sshtools/commit/f2c2740afa0cafeea2caf570fd1776b1b5bc674e))
