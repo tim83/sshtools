@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v4.18.0 (2022-06-12)
+### Feature
+* **ip_address.py:** Set a timeout for ssh and mosh check ([`137d554`](https://github.com/tim83/sshtools/commit/137d55481448f8639d4c4e547d67c802f84867a9))
+
+### Fix
+* **getip.py:** Use better variable names ([`609d70e`](https://github.com/tim83/sshtools/commit/609d70e50ecb55f23ca13de3dbfb3312100369b8))
+
 ## v4.17.0 (2022-06-12)
 ### Feature
 * **ssinfo.py:** Implement a function to lookup data about devices ([`2d3a259`](https://github.com/tim83/sshtools/commit/2d3a2598ca35a891e96e408f434eb58eeb4731a5))
