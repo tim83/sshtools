@@ -20,16 +20,13 @@ def get_ip_string(
     ssh_string: bool = False,
     strict_ip: bool = False,
     only_sshable: bool = False,
-    only_moshable=False,
 ) -> str:
     """Return the full address of the user on the device"""
 
     if not target.is_present:
         return "x"
 
-    ip_address = target.get_ip(
-        strict_ip=strict_ip, only_sshable=only_sshable, only_moshable=only_moshable
-    )
+    ip_address = target.get_ip(strict_ip=strict_ip, only_sshable=only_sshable)
     if ssh_string:
         user = target.user
         return f"{user}@{ip_address}"
@@ -54,12 +51,6 @@ def run():
         "-s",
         "--ssh",
         help="Selecteer alleen maar IPs waar met SSH naar geconnecteerd worden",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-m",
-        "--mosh",
-        help="Selecteer alleen maar IPs waar met MOSH naar geconnecteerd worden",
         action="store_true",
     )
     parser.add_argument(
@@ -90,7 +81,6 @@ def run():
             ssh_string=args.ssh_string,
             strict_ip=args.ip,
             only_sshable=args.ssh,
-            only_moshable=args.mosh,
         )
         rows.append([device.name, ip_string])
 

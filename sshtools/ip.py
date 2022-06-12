@@ -58,15 +58,12 @@ class IPAddressList:
         else:
             raise ValueError("Only IPAddress objects can be added to a IPAddressList")
 
-    def get_alive_addresses(
-        self, only_sshable: bool = False, only_moshable: bool = False
-    ) -> "IPAddressList":
+    def get_alive_addresses(self, only_sshable: bool = False) -> "IPAddressList":
         """
         Determine which ip addresses from the collection are reachable.
         Multiple filters (only_*) will act as an AND operation.
 
         :param only_sshable: Only return IPs that can be connected to using SSH
-        :param only_moshable: Filter IPs on whether they can be connected to using mosh
 
         :return: A IPAddressList of reachable ip addresses
         """
@@ -75,8 +72,6 @@ class IPAddressList:
             out = ip_address.is_alive
             if only_sshable:
                 out = out and ip_address.is_sshable()
-            if only_moshable:
-                out = out and ip_address.is_moshable()
             return out
 
         # Lookup ssh/mosh-ability for all IPAddresses simultaneously to improve performance

@@ -121,9 +121,7 @@ class IPAddress:
         def exec_string_method(method_string: str):
             getattr(self, method_string)()
 
-        timtools.multithreading.mt_map(
-            exec_string_method, ["ping", "sshable", "moshable"]
-        )
+        timtools.multithreading.mt_map(exec_string_method, ["ping", "sshable"])
 
     @cachetools.func.ttl_cache(ttl=sshtools.tools.IP_CACHE_TIMEOUT)
     def ping(self) -> PingResult:
@@ -207,38 +205,6 @@ class IPAddress:
             return cmd_res.exit_code == 0
         except subprocess.TimeoutExpired:
             return False
-
-    @cachetools.func.ttl_cache(ttl=sshtools.tools.IP_CACHE_TIMEOUT)
-    def is_moshable(self) -> bool:
-        """Can an SSH connection be established to the IP?"""
-        if not self.is_sshable() or self.config_value("mosh") is False:
-            return False
-
-        mosh_is_installed_check = timtools.bash.run(
-            ["which", "mosh"],
-            capture_stdout=True,
-            capture_stderr=True,
-            passable_exit_codes=["*"],
-        )
-        if mosh_is_installed_check.exit_code != 0:
-            return False
-
-        try:
-            cmd_res = timtools.bash.run(
-                [
-                    "mosh",
-                    self.ssh_string,
-                    "exit",
-                ],
-                passable_exit_codes=["*"],
-                capture_stderr=True,
-                capture_stdout=True,
-                timeout=sshtools.tools.IP_SSH_TIMEOUT,
-            )
-        except subprocess.TimeoutExpired:
-            return False
-
-        return cmd_res.exit_code == 0
 
     def __repr__(self):
         return f"<sshtools.ip.IPAddress {self.ip_address}>"
