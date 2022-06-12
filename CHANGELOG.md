@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v4.19.1 (2022-06-12)
+### Fix
+* **sshin.py:** Actually call the moshable check ([`b8de6f5`](https://github.com/tim83/sshtools/commit/b8de6f5687ee9c3e2a35f479125be210739dba27))
+* **ssinfo.py:** Don't check for moshability to prevent newline problems ([`8f94787`](https://github.com/tim83/sshtools/commit/8f9478777ab050a2dcec11f362fa65be3b8ef82b))
+* **getip.py:** Remove useless fix ([`7097563`](https://github.com/tim83/sshtools/commit/7097563dd76fe834f880305032491c1c04724d7c))
+* **ip_address.py:** Use the timeout on the correct function call ([`7d5f8af`](https://github.com/tim83/sshtools/commit/7d5f8af26d90ac4ed5cf3c4cfbd954ce817c5fbc))
+
 ## v4.19.0 (2022-06-12)
 ### Feature
 * **getip.py:** Reenable json output ([`0902155`](https://github.com/tim83/sshtools/commit/0902155ab2b8c1fa8a8b13d92f2dedff069bee76))
