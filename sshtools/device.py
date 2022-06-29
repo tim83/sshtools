@@ -105,6 +105,7 @@ class Device:  # pylint:disable=too-many-instance-attributes
     ip_address_list_all: sshtools.ip.IPAddressList
     interfaces: list[sshtools.interface.Interface]
     is_main_device: bool
+    use_generated_ips: bool
 
     last_ip_address: Optional[sshtools.ip.IPAddress]
     last_ip_address_update: Optional[dt.datetime]
@@ -130,6 +131,7 @@ class Device:  # pylint:disable=too-many-instance-attributes
         )
 
         self.is_main_device = config.get("main_device", self.config.sync is not False)
+        self.use_generated_ips = config.get("use_generated_ips", True)
 
         if isinstance(self.config.sync, str):
             if self.config.sync.lower() in ["true", "full", "yes"]:
@@ -253,7 +255,8 @@ class Device:  # pylint:disable=too-many-instance-attributes
 
         if include_ips:
             possible_ips.add_list(self.reachable_ip_addresses)
-        if include_dns:
+
+        if include_dns and self.use_generated_ips:
             possible_ips.add_list(
                 clean_ip_group(
                     [
@@ -262,7 +265,7 @@ class Device:  # pylint:disable=too-many-instance-attributes
                     ]
                 )
             )
-        if include_hostname:
+        if include_hostname and self.use_generated_ips:
             possible_ips.add_list(clean_ip_group([self.hostname], hostname=True))
 
         return possible_ips
