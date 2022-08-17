@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.21.0 (2022-06-29)
+### Feature
+* **device.py:** Enable limiting possible ips to only those defined in the config ([`f9462db`](https://github.com/tim83/sshtools/commit/f9462dbde7241014ad68e82e9150aece7887e5e4))
+
 ## v4.20.0 (2022-06-12)
 ### Feature
 * Remove moshable functions and checks ([`dab1766`](https://github.com/tim83/sshtools/commit/dab1766185a66eb2c96c6d852319fd30bbbaa889))
