@@ -60,7 +60,9 @@ class DeviceConfig:
         cls, filter_main: bool = False, filter_super: bool = False
     ) -> list[Device]:
         """
-        Return devices in the configuration. Multiple filters can be applied at the same time for an AND operation.
+        Return devices in the configuration.
+        Multiple filters can be applied at the same time for an AND operation.
+
         :param filter_main: Returns only devices that are marked as "main devices"
         :param filter_super: Returns only devices that are marked as "super devices"
         """

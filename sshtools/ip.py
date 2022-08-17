@@ -108,7 +108,10 @@ class IPAddressList:
 
     @property
     def _is_sorted(self):
-        """Checks if the order and/or composition of the ip list has been changed since the last sort"""
+        """
+        Checks if the order and/or composition of the ip list
+        has been changed since the last sort
+        """
         list_hash = hash_ip_list(self._ip_addresses)
         return list_hash == self._last_sort_hash
 

@@ -64,12 +64,16 @@ def create_table(
     **kwargs,
 ) -> tabulate.tabulate:
     """
-    Prints a table containing the rows creating by running a 'add_row' on every item in 'row_source' in parallel.
+    Prints a table containing the rows creating by running a 'add_row'
+    on every item in 'row_source' in parallel.
 
-    :param add_row: The function that takes an element from 'row_source' as input and returns a list of cells for
-    that row
+    :param add_row:
+        The function that takes an element from 'row_source' as input
+        and returns a list of cells for that row
     :param row_source: The iterable that contains the base data for the rows
-    :param sorting_key: The function used to sort the rows (will be an input for 'sorted(rows, key=sorting_key)'
+    :param sorting_key:
+        The function used to sort the rows
+        (will be an input for 'sorted(rows, key=sorting_key)'
     :param kwargs: Additional keyword arguments will be passed directly to tabulate
 
     :return: A 'tabulate' table object (can be printed simply with 'print(table)'
