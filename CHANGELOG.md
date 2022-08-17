@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.22.0 (2022-08-17)
+### Feature
+* **device.py:** Return False for Device.is_local when NotReachable Tim Mees 21 minutes ago - Use correct format ([`103f1df`](https://github.com/tim83/sshtools/commit/103f1df4377fa9410cd3a0c5767aee30d6355ee9))
+
 ## v4.21.0 (2022-06-29)
 ### Feature
 * **device.py:** Enable limiting possible ips to only those defined in the config ([`f9462db`](https://github.com/tim83/sshtools/commit/f9462dbde7241014ad68e82e9150aece7887e5e4))
