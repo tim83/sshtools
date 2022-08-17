@@ -339,7 +339,10 @@ class Device:  # pylint:disable=too-many-instance-attributes
         """
         Checks if the device is present on the local LAN (VPN is not regarded as local)
         """
-        return self.ip_address.is_local(include_vpn=False)
+        try:
+            return self.ip_address.is_local(include_vpn=False)
+        except sshtools.errors.NotReachableError:
+            return False
 
     @property
     def is_present(self) -> bool:
