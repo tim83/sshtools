@@ -1,5 +1,5 @@
 # sshtools
-FOR PERSONAL USE ONLY
+FOR PERSONAL USE ONLY!
 
 [![CI](https://github.com/tim83/sshtools/actions/workflows/ci.yml/badge.svg)](https://github.com/tim83/sshtools/actions/workflows/ci.yml)
 
