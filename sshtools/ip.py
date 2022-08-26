@@ -96,7 +96,7 @@ class IPAddressList:
                 else:
                     value -= 5
 
-            if not ip_address.config.mosh:
+            if (ip_address.config is not None) and (not ip_address.config.mosh):
                 value += 15
 
             return value
