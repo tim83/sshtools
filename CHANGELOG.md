@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v4.23.0 (2022-08-26)
+### Feature
+* **ip.py:** Prioritise IPs that can be reached with mosh ([`b35885f`](https://github.com/tim83/sshtools/commit/b35885faa1426dfedf0d4142a062d4b317d4eb4b))
+
+### Fix
+* **ip.py:** Allow ip config to be None ([`196f7d7`](https://github.com/tim83/sshtools/commit/196f7d7c5b4d5f2d6d78c91183d82efea01fb00c))
+
 ## v4.22.0 (2022-08-17)
 ### Feature
 * **device.py:** Return False for Device.is_local when NotReachable Tim Mees 21 minutes ago - Use correct format ([`103f1df`](https://github.com/tim83/sshtools/commit/103f1df4377fa9410cd3a0c5767aee30d6355ee9))
