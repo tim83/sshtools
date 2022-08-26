@@ -88,6 +88,19 @@ class IPAddressList:
         if self._is_sorted:
             return
 
+        def sort_value(ip_address: IPAddress) -> float:
+            value: float = ip_address.latency
+            if not any(char.isdigit() for char in str(ip_address)):
+                if ".local" in str(ip_address):
+                    value -= 7
+                else:
+                    value -= 5
+
+            if not ip_address.config.mosh:
+                value += 15
+
+            return value
+
         sorted_ips = {}
 
         # Lookup ssh/mosh-ability for all IPAddresses simultaneously to improve performance
@@ -97,9 +110,7 @@ class IPAddressList:
             dict.fromkeys(
                 sorted(
                     self._ip_addresses,
-                    key=lambda ip: ip.latency
-                    if any(char.isdigit() for char in str(ip))
-                    else (ip.latency - 7 if ".local" in str(ip) else ip.latency - 5),
+                    key=sort_value,
                 )
             )
         )
