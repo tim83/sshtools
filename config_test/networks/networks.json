@@ -1,0 +1,27 @@
+[
+  {
+	"name": "home",
+	"ip_start": "1.1.1."
+  },
+  {
+	"name": "work",
+	"ip_start": "4.4.4."
+  },
+  {
+	"name": "zerotier",
+	"ip_start": "2.2.2.",
+	"interface": "zerotierid21",
+	"vpn": true
+  },
+  {
+	"name": "public",
+	"public": true
+  },
+  {
+	"name": "zerotier-techsupport",
+	"ip_start": "3.3.3.",
+	"interface": "zerotierid2",
+	"vpn": true,
+	"public": true
+  }
+]

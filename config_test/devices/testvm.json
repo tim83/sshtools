@@ -1,0 +1,7 @@
+{
+  "hostname": "testvm-hostname",
+  "sync": "Limited",
+  "user": "tim",
+  "mosh": false,
+  "main_device": false
+}

@@ -1,0 +1,14 @@
+{
+  "hostname": "pi-hostname",
+  "sync": "Limited",
+  "connections": [
+	{
+	  "network": "zerotier",
+	  "ip_address": "2.2.2.60"
+	},
+	{
+	  "network": "work",
+	  "ip_address": "4.4.4.60"
+	}
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "hostname": "desktop2-hostname",
+  "sync": false,
+  "user": "notme",
+  "connections": [
+	{
+	  "network": "zerotier-techsupport",
+	  "ip_address": "3.3.3.50"
+	},
+	{
+	  "network": "home",
+	  "ip_address": "4.4.4.50"
+	}
+  ]
+}

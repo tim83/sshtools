@@ -1,0 +1,13 @@
+{
+  "hostname": "laptop2-hostname",
+  "sync": "limited",
+  "id": 60,
+  "priority": 90,
+  "main_device": false,
+  "connections": [
+	{
+	  "network": "zerotier-techsupport",
+	  "ip_address": "3.3.3.160"
+	}
+  ]
+}

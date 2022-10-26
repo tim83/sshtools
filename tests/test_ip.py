@@ -42,7 +42,7 @@ def test_singleton():
 
 def test_create_hostname():
     """Tests the creation of an IPAddress model with a hostname"""
-    for ip_str in ["localhost", "laptop-tim.local", "mees.vip"]:
+    for ip_str in ["localhost", "laptop-hostname.local"]:
         ipv6 = ip.IPAddress(ip_str)
         assert ipv6.ip_address == ip_str
         assert ipv6.version == 0
@@ -50,8 +50,8 @@ def test_create_hostname():
 
 def test_vpn():
     """Tests whether an IP is correctly identified as a VPN"""
-    assert sshtools.ip.IPAddress("192.168.193.20").is_vpn is True
-    assert sshtools.ip.IPAddress("10.147.20.130").is_vpn is True
+    assert sshtools.ip.IPAddress("2.2.2.20").is_vpn is True
+    assert sshtools.ip.IPAddress("3.3.3.130").is_vpn is True
 
     assert sshtools.ip.IPAddress("192.168.20.140").is_vpn is False
     assert sshtools.ip.IPAddress("8.8.8.8").is_vpn is False
@@ -65,11 +65,11 @@ def test_local():
         (socket.gethostname(), True, False, True),
         ("127.0.0.1", True, False, True),
         ("::1", True, False, True),
-        ("192.168.193.116", True, True, False),
+        ("2.2.2.116", True, True, False),
         ("143.169.210.13", False, False, False),
         ("ff80::94b6:ff97:1c37:3f66", False, False, False),
         ("arandomcomputer.local", True, False, False),
-        ("10.147.20.130", False, False, False),
+        ("3.3.3.130", False, False, False),
     ]
     for ip_str, is_local, is_vpn, is_loopback in test_ips:
         ip_address = ip.IPAddress(ip_str)
@@ -87,7 +87,7 @@ def test_alive():
 def test_str_conversion():
     """Tests that convert an instance to a string returns the ip address"""
     assert str(ip.IPAddress("localhost")) == "localhost"
-    assert str(ip.IPAddress("192.168.23.2")) == "192.168.23.2"
+    assert str(ip.IPAddress("1.1.1.2")) == "1.1.1.2"
 
 
 def test_list_creation():

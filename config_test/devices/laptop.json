@@ -1,0 +1,27 @@
+{
+  "hostname": "laptop-hostname",
+  "sync": true,
+  "priority": 0,
+  "ip_id": 30,
+  "interfaces": [
+	{
+	  "name": "wlan0",
+	  "mac": "97:1c:4e:3c:b9:d5"
+	}
+  ],
+  "connections": [
+	{
+	  "network": "home",
+	  "adapter": "wlan0"
+	},
+	{
+	  "network": "work"
+	},
+	{
+	  "network": "zerotier"
+	},
+	{
+	  "network": "zerotier-techsupport"
+	}
+  ]
+}

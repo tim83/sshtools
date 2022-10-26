@@ -41,8 +41,8 @@ def test_get_networks():
 
 def test_ip_ascosiation():
     home = connection.Network("home")
-    assert home.has_ip_address(ip.IPAddress("192.168.20.132"))
+    assert home.has_ip_address(ip.IPAddress("1.1.1.132"))
     zt = connection.Network("zerotier")
-    assert zt.has_ip_address(ip.IPAddress("192.168.193.150"))
+    assert zt.has_ip_address(ip.IPAddress("2.2.2.150"))
     ztts = connection.Network("zerotier-techsupport")
-    assert ztts.has_ip_address(ip.IPAddress("10.147.20.20"))
+    assert ztts.has_ip_address(ip.IPAddress("3.3.3.20"))

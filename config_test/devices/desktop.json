@@ -1,0 +1,19 @@
+{
+  "hostname": "desktop-hostname",
+  "sync": true,
+  "priority": 20,
+  "connections": [
+	{
+	  "network": "zerotier-techsupport",
+	  "ip_address": "3.3.3.30"
+	},
+	{
+	  "network": "zerotier",
+	  "ip_address": "2.2.2.30"
+	},
+	{
+	  "network": "work",
+	  "ip_address": "4.4.4.30"
+	}
+  ]
+}

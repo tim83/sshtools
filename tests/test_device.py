@@ -6,8 +6,8 @@ from sshtools import device, errors, ip
 def test_creation():
     dev = device.Device("laptop")
     assert dev.name == "laptop"
-    assert dev.hostname == "laptop-tim"
-    assert dev.mdns == "laptop-tim.local"
+    assert dev.hostname == "laptop-hostname"
+    assert dev.mdns == "laptop-hostname.local"
     assert isinstance(dev.config.mosh, bool)
     assert isinstance(dev.config.ssh, bool)
     assert dev.config.sync in [True, False, "limited"]
@@ -29,10 +29,10 @@ def test_get_devices():
 
 def test_name_or_hostname():
     assert device.DeviceConfig.get_name_from_hostname("laptop") == "laptop"
-    assert device.DeviceConfig.get_name_from_hostname("laptop-tim") == "laptop"
-    assert device.Device("laptop") == device.Device("laptop-tim")
+    assert device.DeviceConfig.get_name_from_hostname("laptop-hostname") == "laptop"
+    assert device.Device("laptop") == device.Device("laptop-hostname")
 
-    assert device.Device("laptop-greta") != device.Device("localhost")
+    assert device.Device("laptop2") != device.Device("localhost")
 
     assert device.DeviceConfig.get_name_from_hostname("doesnotexist") == "doesnotexist"
 
@@ -40,7 +40,7 @@ def test_name_or_hostname():
 def test_main_device():
     m_implied_dev = device.Device("laptop")
     nm_specified_dev = device.Device("testvm")
-    nm_implied_dev = device.Device("desktop-ben")
+    nm_implied_dev = device.Device("desktop2")
     assert m_implied_dev.is_main_device is True
     assert nm_implied_dev.is_main_device is False
     assert nm_specified_dev.is_main_device is False
@@ -70,4 +70,4 @@ def test_device_class():
 
 def test_super():
     assert device.Device("laptop").is_super is True
-    assert device.Device("probook").is_super is False
+    assert device.Device("laptop2").is_super is False
