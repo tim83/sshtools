@@ -14,7 +14,7 @@ PROJECT_DIR = Path(__file__).parent
 src_config_dir = PROJECT_DIR.parent / "config"
 if not src_config_dir.is_dir():
     src_config_dir = (
-            timtools.locations.get_user_home("tim") / "Programs/python/sshtools/config"
+        timtools.locations.get_user_home("tim") / "Programs/python/sshtools/config"
     )
 user_config_dir = timtools.locations.get_user_config_dir() / "sshtools"
 global_config_dir = Path("/etc/sshtools")
