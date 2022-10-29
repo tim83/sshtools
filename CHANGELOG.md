@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.24.0 (2022-10-26)
+### Feature
+* **tools.py:** Enable global config dir ([`0e874fb`](https://github.com/tim83/sshtools/commit/0e874fb71ae2c69ab2cc7b16874415ba9dceebd3))
+
 ## v4.23.0 (2022-08-26)
 ### Feature
 * **ip.py:** Prioritise IPs that can be reached with mosh ([`b35885f`](https://github.com/tim83/sshtools/commit/b35885faa1426dfedf0d4142a062d4b317d4eb4b))
