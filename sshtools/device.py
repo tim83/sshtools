@@ -263,8 +263,10 @@ class Device:  # pylint:disable=too-many-instance-attributes
                 clean_ip_group(
                     [
                         self.mdns,
-                        f"{self.hostname}.tim-mees83.gmail.com.beta.tailscale.net",  # Tailscale beta
-                        f"{self.hostname}.tailf057c.ts.net",  # Tailscale new
+                        # Tailscale old (beta) - EOL 2023-11-01
+                        f"{self.hostname}.tim-mees83.gmail.com.beta.tailscale.net",
+                        # Tailscale new (https://tailscale.com/blog/magicdns)
+                        f"{self.hostname}.tailf057c.ts.net",
                     ]
                 )
             )
