@@ -220,8 +220,9 @@ class Device:  # pylint:disable=too-many-instance-attributes
     def reachable_ip_addresses(self) -> sshtools.ip.IPAddressList:
         """Returns the reachable ip addresses"""
         reachable_ips = sshtools.ip.IPAddressList()
+        host_device = Device.get_self()
         for ip_address in self.ip_address_list_all:
-            if ip_address.config.network.is_connected or self.is_container:
+            if ip_address.config.network.is_connected or host_device.is_container:
                 reachable_ips.add(ip_address)
         return reachable_ips
 
