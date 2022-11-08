@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.25.2 (2022-11-08)
+### Fix
+* **device.py:** Remove debug code ([`6766ff6`](https://github.com/tim83/sshtools/commit/6766ff633a8a70e055a44a293f227be1eb2c207c))
+
 ## v4.25.1 (2022-11-08)
 ### Fix
 * **device.py:** Allow containers to always check for networks the host is present on, even when the IP can't be checked ([`affb07e`](https://github.com/tim83/sshtools/commit/affb07e7e4e84efdfb39cb052b5fa5da62034d97))
