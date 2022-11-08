@@ -39,6 +39,9 @@ def test_name_or_hostname():
 
 def test_container_detection():
     assert device.DeviceConfig.get_name_from_hostname("desktop-container") == "desktop"
+    assert device.Device("desktop-container") == device.Device("desktop")
+    assert device.Device("desktop-container").is_container is True
+    assert device.Device("desktop").is_container is False
 
 
 def test_main_device():

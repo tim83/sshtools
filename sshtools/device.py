@@ -107,6 +107,7 @@ class Device:  # pylint:disable=too-many-instance-attributes
     hostname: str
     mdns: Optional[str]
     ip_id: int
+    is_container: bool = False
     config: sshtools.config.ConnectionConfig
     ip_address_list_all: sshtools.ip.IPAddressList
     interfaces: list[sshtools.interface.Interface]
@@ -120,11 +121,17 @@ class Device:  # pylint:disable=too-many-instance-attributes
         self.last_ip_address = None
         self.last_ip_address_update = None
 
-        name = DeviceConfig.get_name_from_hostname(name)
+        _initial_name = name
+        name = DeviceConfig.get_name_from_hostname(_initial_name)
         config = DeviceConfig.get_config(name)
 
         self.name = name
         self.hostname = config.get("hostname", name)
+        print(name, config.get("container_hostnames"), self.hostname)
+        self.is_container = (
+            _initial_name in config.get("container_hostnames", [])
+            and _initial_name != self.hostname
+        )
         self.ip_id = config.get("ip_id")
 
         self.config = sshtools.config.ConnectionConfig(
@@ -209,7 +216,7 @@ class Device:  # pylint:disable=too-many-instance-attributes
         """Returns the reachable ip addresses"""
         reachable_ips = sshtools.ip.IPAddressList()
         for ip_address in self.ip_address_list_all:
-            if ip_address.config.network.is_connected:
+            if ip_address.config.network.is_connected or self.is_container:
                 reachable_ips.add(ip_address)
         return reachable_ips
 
