@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v4.24.1 (2022-10-31)
+### Fix
+* **device.py:** Add better documentation & fix linelength ([`3d75bbb`](https://github.com/tim83/sshtools/commit/3d75bbbb8a2128eb1b45947c756ec2a291f0b33e))
+* **device.py:** Prepare for the sunsetting of the *.beta.tailscale.net addresses ([`921f008`](https://github.com/tim83/sshtools/commit/921f00845c65514a8cb85649d4a352a8d11cf2be))
+
 ## v4.24.0 (2022-10-26)
 ### Feature
 * **tools.py:** Enable global config dir ([`0e874fb`](https://github.com/tim83/sshtools/commit/0e874fb71ae2c69ab2cc7b16874415ba9dceebd3))
