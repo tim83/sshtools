@@ -92,6 +92,10 @@ class DeviceConfig:
         for name, config in cls._get_config_all().items():
             if config.get("hostname", None) == hostname:
                 return name
+
+            if hostname in config.get("container_hostnames", []):
+                return name
+
         return hostname
 
 

@@ -2,6 +2,9 @@
   "hostname": "desktop-hostname",
   "sync": true,
   "priority": 20,
+  "container_hostnames": [
+	"desktop-container"
+  ],
   "connections": [
 	{
 	  "network": "zerotier-techsupport",

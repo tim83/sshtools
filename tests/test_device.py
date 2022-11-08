@@ -37,6 +37,10 @@ def test_name_or_hostname():
     assert device.DeviceConfig.get_name_from_hostname("doesnotexist") == "doesnotexist"
 
 
+def test_container_detection():
+    assert device.DeviceConfig.get_name_from_hostname("desktop-container") == "desktop"
+
+
 def test_main_device():
     m_implied_dev = device.Device("laptop")
     nm_specified_dev = device.Device("testvm")
