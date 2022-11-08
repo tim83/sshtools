@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.25.0 (2022-11-08)
+### Feature
+* **device.py:** Add functionality for detecting container hosts ([`2eea987`](https://github.com/tim83/sshtools/commit/2eea987b15962ab5945841459333814fd5ad0c29))
+
 ## v4.24.1 (2022-10-31)
 ### Fix
 * **device.py:** Add better documentation & fix linelength ([`3d75bbb`](https://github.com/tim83/sshtools/commit/3d75bbbb8a2128eb1b45947c756ec2a291f0b33e))
