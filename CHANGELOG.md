@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.25.1 (2022-11-08)
+### Fix
+* **device.py:** Allow containers to always check for networks the host is present on, even when the IP can't be checked ([`affb07e`](https://github.com/tim83/sshtools/commit/affb07e7e4e84efdfb39cb052b5fa5da62034d97))
+
 ## v4.25.0 (2022-11-08)
 ### Feature
 * **device.py:** Add functionality for detecting container hosts ([`2eea987`](https://github.com/tim83/sshtools/commit/2eea987b15962ab5945841459333814fd5ad0c29))
