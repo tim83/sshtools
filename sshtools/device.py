@@ -127,10 +127,15 @@ class Device:  # pylint:disable=too-many-instance-attributes
 
         self.name = name
         self.hostname = config.get("hostname", name)
-        print(name, config.get("container_hostnames"), self.hostname)
         self.is_container = (
             _initial_name in config.get("container_hostnames", [])
             and _initial_name != self.hostname
+        )
+        logger.debug(
+            "Device %s with initial name %s is%s a container.",
+            self.name,
+            _initial_name,
+            " not" if not self.is_container else "",
         )
         self.ip_id = config.get("ip_id")
 
