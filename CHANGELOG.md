@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.25.3 (2022-11-08)
+### Fix
+* **device.py:** Try numero dos ([`76909ea`](https://github.com/tim83/sshtools/commit/76909ea07a9daa7c88bc105bf051d28028de7819))
+
 ## v4.25.2 (2022-11-08)
 ### Fix
 * **device.py:** Remove debug code ([`6766ff6`](https://github.com/tim83/sshtools/commit/6766ff633a8a70e055a44a293f227be1eb2c207c))
