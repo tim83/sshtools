@@ -54,7 +54,8 @@ class Ssh:
 
     def relay_connect(self, mosh: bool = None, exe: (str, list) = None):
         """Connect to the device using a relay"""
-        # Alternative: use jump hosts (https://www.tecmint.com/access-linux-server-using-a-jump-host/)
+        # Alternative: use jump hosts
+        # https://www.tecmint.com/access-linux-server-using-a-jump-host/
         logger.info(
             "%s could not be reached, trying to find an alternative path.",
             self.device,
