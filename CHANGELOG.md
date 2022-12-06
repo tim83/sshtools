@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.26.0 (2022-12-06)
+### Feature
+* **interface.py:** Only use sudo when user is not root ([`5922101`](https://github.com/tim83/sshtools/commit/5922101bcc08707a4ee7ef0fa31ea5f163d8b98c))
+
 ## v4.25.3 (2022-11-08)
 ### Fix
 * **device.py:** Try numero dos ([`76909ea`](https://github.com/tim83/sshtools/commit/76909ea07a9daa7c88bc105bf051d28028de7819))
