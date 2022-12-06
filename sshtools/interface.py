@@ -1,6 +1,7 @@
 """Module for managing network interfaces"""
 from __future__ import annotations  # python -3.9 compatibility
 
+import os
 from typing import TYPE_CHECKING
 
 import timtools.bash
@@ -42,4 +43,7 @@ class Interface:  # pylint: disable=too-few-public-methods
         if wol_present_check.exit_code == 0:
             timtools.bash.run(["wol", self.mac])
         else:
-            timtools.bash.run(["sudo", "wakeonlan", self.mac])
+            cmd = ["wakeonlan", self.mac]
+            if os.getuid() > 0:
+                cmd += ["sudo"] + cmd
+            timtools.bash.run(cmd)
