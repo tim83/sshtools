@@ -380,7 +380,7 @@ gitdb = ">=4.0.1,<5"
 
 [[package]]
 name = "identify"
-version = "2.5.9"
+version = "2.5.10"
 description = "File identification library for Python"
 category = "dev"
 optional = false
@@ -1004,7 +1004,7 @@ widechars = ["wcwidth"]
 
 [[package]]
 name = "timtools"
-version = "1.6.2"
+version = "2.0.1"
 description = ""
 category = "main"
 optional = false
@@ -1022,7 +1022,7 @@ xdg = ">=0.27"
 type = "git"
 url = "https://github.com/tim83/timtools"
 reference = "master"
-resolved_reference = "ee56fa5b4eb4f2cf89d4b015575cfa2d8b8f7481"
+resolved_reference = "5d716da4db7a97838884847e37d3c449385bfb8c"
 
 [[package]]
 name = "toml"
@@ -1381,8 +1381,8 @@ gitdb = [
 ]
 gitpython = []
 identify = [
-    {file = "identify-2.5.9-py2.py3-none-any.whl", hash = "sha256:a390fb696e164dbddb047a0db26e57972ae52fbd037ae68797e5ae2f4492485d"},
-    {file = "identify-2.5.9.tar.gz", hash = "sha256:906036344ca769539610436e40a684e170c3648b552194980bb7b617a8daeb9f"},
+    {file = "identify-2.5.10-py2.py3-none-any.whl", hash = "sha256:fb7c2feaeca6976a3ffa31ec3236a6911fbc51aec9acc111de2aed99f244ade2"},
+    {file = "identify-2.5.10.tar.gz", hash = "sha256:dce9e31fee7dbc45fea36a9e855c316b8fbf807e65a862f160840bb5a2bf5dfd"},
 ]
 idna = []
 importlib-metadata = [
