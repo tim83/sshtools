@@ -7,7 +7,7 @@ from typing import Union
 import psutil
 import timtools.log
 import timtools.multithreading
-from cachetools.func import ttl_cache
+import cachetools.func
 
 import sshtools.errors
 import sshtools.ip_address
@@ -165,7 +165,7 @@ class IPAddressListIterator:  # pylint: disable=too-few-public-methods
         raise StopIteration
 
 
-@ttl_cache(ttl=3)
+@cachetools.func.ttl_cache(ttl=sshtools.tools.IP_CACHE_TIMEOUT)
 def get_current_ips() -> IPAddressList:
     """Get the IPs that the current device has assigned"""
     interface_data = psutil.net_if_addrs()
