@@ -4,10 +4,10 @@ from __future__ import annotations
 import socket
 from typing import Union
 
+import cachetools.func
 import psutil
 import timtools.log
 import timtools.multithreading
-import cachetools.func
 
 import sshtools.errors
 import sshtools.ip_address
