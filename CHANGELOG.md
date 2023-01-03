@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.26.1 (2023-01-03)
+### Fix
+* **pyproject.toml:** Include cachetool depedency ([`be4d6d2`](https://github.com/tim83/sshtools/commit/be4d6d225a9d5dfee3404bbb2a1c3ce0d6e178f6))
+
 ## v4.26.0 (2022-12-06)
 ### Feature
 * **interface.py:** Only use sudo when user is not root ([`5922101`](https://github.com/tim83/sshtools/commit/5922101bcc08707a4ee7ef0fa31ea5f163d8b98c))
