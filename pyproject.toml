@@ -26,6 +26,7 @@ psutil = ">=5.8.0"
 timtools = { git = "https://github.com/tim83/timtools" }
 ipaddress = ">=1.0.23"
 tabulate = ">=0.8.9"
+cachetools = "^5.2.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = ">=4.0.1"
