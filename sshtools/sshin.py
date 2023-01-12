@@ -93,7 +93,7 @@ class Ssh:
         :param copy_id: Copy the SSH keys from this machine to the target
         :param mosh: Use MOSH instead of SSH
         """
-        ip_address = self.device.ip_address
+        ip_address = self.device.get_ip(only_sshable=True)
         user = self.device.user
         if not self.device.ssh:
             raise sshtools.errors.ConfigError(self.device.name)
