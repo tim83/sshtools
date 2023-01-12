@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v4.26.3 (2023-01-12)
+### Fix
+* **ssync.py:** Select an sshable IP ([`0358873`](https://github.com/tim83/sshtools/commit/03588731bccc859f06808acccddf0b4168a9a738))
+* **interface.py:** Remove unnecessary import ([`41ed87c`](https://github.com/tim83/sshtools/commit/41ed87c85507bec76d250b0c00c74e85ecd53e26))
+* **interface.py:** Don't use unnecessary sudo for wakeonlan ([`376df76`](https://github.com/tim83/sshtools/commit/376df76ce882933d98760200dca0f1e1368c879a))
+
 ## v4.26.2 (2023-01-12)
 ### Fix
 * **sshin.py:** Only select IPs that are sshable ([`6cac28f`](https://github.com/tim83/sshtools/commit/6cac28f9265ab23e4ee28c15b219d17f8f7926a0))
