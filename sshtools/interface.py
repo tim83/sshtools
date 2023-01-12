@@ -44,6 +44,4 @@ class Interface:  # pylint: disable=too-few-public-methods
             timtools.bash.run(["wol", self.mac])
         else:
             cmd = ["wakeonlan", self.mac]
-            if os.getuid() > 0:
-                cmd += ["sudo"] + cmd
             timtools.bash.run(cmd)
