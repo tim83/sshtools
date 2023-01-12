@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.26.2 (2023-01-12)
+### Fix
+* **sshin.py:** Only select IPs that are sshable ([`6cac28f`](https://github.com/tim83/sshtools/commit/6cac28f9265ab23e4ee28c15b219d17f8f7926a0))
+
 ## v4.26.1 (2023-01-03)
 ### Fix
 * **pyproject.toml:** Include cachetool depedency ([`be4d6d2`](https://github.com/tim83/sshtools/commit/be4d6d225a9d5dfee3404bbb2a1c3ce0d6e178f6))
