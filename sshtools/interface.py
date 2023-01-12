@@ -1,7 +1,6 @@
 """Module for managing network interfaces"""
 from __future__ import annotations  # python -3.9 compatibility
 
-import os
 from typing import TYPE_CHECKING
 
 import timtools.bash
