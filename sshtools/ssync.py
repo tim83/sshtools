@@ -18,6 +18,7 @@ import timtools.log
 
 import sshtools.device
 import sshtools.errors
+import sshtools.ip
 import sshtools.tools
 
 logger = timtools.log.get_logger("sshtools.ssync")
@@ -199,11 +200,12 @@ class Sync:
         :param slave: The device to sync to
         :return: A list of strings containing the sync target
         """
+        ip_address: sshtools.ip.IPAddress = slave.get_ip(only_sshable=True)
         target: list[str]
         if slave.is_self:
             target = [f"{self.dir}"]
         else:
-            target = [f"{slave.user}@{slave.ip_address}:{slave.home}/"]
+            target = [f"{slave.user}@{ip_address}:{slave.home}/"]
         return target
 
 
