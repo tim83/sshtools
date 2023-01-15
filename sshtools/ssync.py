@@ -57,6 +57,7 @@ class Sync:
         )
 
         tmp_dir: Path
+        error_slaves: list[sshtools.device.Device] = []
         for slave in sorted(active_slaves, key=lambda d: d.priority):
             print(f"\n{self.master} -> {slave}")
 
@@ -71,10 +72,15 @@ class Sync:
                     if len(active_slaves) == 1:
                         raise sshtools.errors.NotReachableError(slave.name) from error
                     logger.error("%s has disappeared.", slave)
-                raise error
+                    error_slaves.append(slave)
+                else:
+                    raise error
 
             finally:
                 shutil.rmtree(tmp_dir)
+                if len(error_slaves) > 0:
+                    for error_slave in error_slaves:
+                        print(f"There was an error syncing with {error_slave}")
 
     def get_cmd(self, slave: sshtools.device.Device, tmp_dir: Path) -> list[str]:
         """
