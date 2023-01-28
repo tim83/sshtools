@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.26.4 (2023-01-15)
+### Fix
+* **ssync.py:** Fix if then logic to not raise an unnecessarily reraise an error ([`a69d40f`](https://github.com/tim83/sshtools/commit/a69d40fb3a60cc56c0ecf65a2ce2ee134ced2a4e))
+
 ## v4.26.3 (2023-01-12)
 ### Fix
 * **ssync.py:** Select an sshable IP ([`0358873`](https://github.com/tim83/sshtools/commit/03588731bccc859f06808acccddf0b4168a9a738))
