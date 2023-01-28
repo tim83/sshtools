@@ -2,14 +2,20 @@
 from __future__ import annotations  # python -3.9 compatibility
 
 import json
+import typing
 from pathlib import Path
 
 import psutil
 import timtools.log
 
 import sshtools.errors
+import sshtools.interface
 import sshtools.ip
 import sshtools.tools
+
+if typing.TYPE_CHECKING:
+    import sshtools.device
+
 
 logger = timtools.log.get_logger("sshtools.connection")
 
@@ -79,6 +85,18 @@ class Network:
                 return True
 
         return False
+
+    def get_interface(
+        self, device: "sshtools.device.Device"
+    ) -> typing.Optional[sshtools.interface.Interface]:
+        """Returns an interface object for that the devices uses to connect to this network"""
+        if self.interface is None:
+            return None
+
+        for interface in device.interfaces:
+            if interface.name == self.interface:
+                return interface
+        return None
 
     def has_ip_address(self, ip_address: sshtools.ip.IPAddress) -> bool:
         """Is an ip address part of this network"""
