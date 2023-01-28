@@ -44,3 +44,6 @@ class Interface:  # pylint: disable=too-few-public-methods
         else:
             cmd = ["wakeonlan", self.mac]
             timtools.bash.run(cmd)
+
+    def __repr__(self):
+        return f"<sshtools.interface.Interface {self.name} ({self.type})"
