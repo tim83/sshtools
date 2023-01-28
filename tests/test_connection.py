@@ -67,7 +67,7 @@ def test_get_construct_ip():
     assert str(ip_addr) == "4.4.4.30"
 
 
-def test_ip_ascosiation():
+def test_ip_association():
     home = connection.Network("home")
     assert home.has_ip_address(ip.IPAddress("1.1.1.132"))
     zt = connection.Network("vpn")
