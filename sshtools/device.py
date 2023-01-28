@@ -170,6 +170,11 @@ class Device:  # pylint:disable=too-many-instance-attributes
             config_network: sshtools.connection.Network = sshtools.connection.Network(
                 ip_data.get("network", "public")
             )
+
+            interface = ip_data.get("adapter", None)
+            if interface is not None:
+                config_network.interface = interface
+
             if config_ip_address is not None:
                 ip_address = sshtools.ip.IPAddress(ip_data.get("ip_address"))
             elif config_network.ip_start is not None and self.ip_id is not None:
