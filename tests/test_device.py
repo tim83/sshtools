@@ -82,7 +82,7 @@ def test_super():
 
 def test_interface():
     dev = device.Device("laptop")
-    assert len(dev.interfaces) == 1
+    assert len(dev.interfaces) == 3  # 1 of the device, 2 of the networks (vpns)
     iface = dev.interfaces[0]
     assert iface.name == "wlan0"
     assert isinstance(iface.mac, str)

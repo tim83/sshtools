@@ -117,7 +117,7 @@ class Device:  # pylint:disable=too-many-instance-attributes
     last_ip_address: Optional[sshtools.ip.IPAddress]
     last_ip_address_update: Optional[dt.datetime]
 
-    def __init__(self, name: str):
+    def __init__(self, name: str):  # pylint: disable=too-many-branches
         self.last_ip_address = None
         self.last_ip_address_update = None
 
@@ -160,7 +160,7 @@ class Device:  # pylint:disable=too-many-instance-attributes
         self.interfaces = []
         for iface_data in config.get("interfaces", []):
             iface = sshtools.interface.Interface(
-                self, iface_data.get("name"), iface_data.get("mac", None)
+                self, iface_data.get("name"), mac=iface_data.get("mac", None)
             )
             self.interfaces.append(iface)
 
@@ -170,6 +170,14 @@ class Device:  # pylint:disable=too-many-instance-attributes
             config_network: sshtools.connection.Network = sshtools.connection.Network(
                 ip_data.get("network", "public")
             )
+
+            if config_network.interface is not None:
+                if config_network.interface not in [
+                    iface.name for iface in self.interfaces
+                ]:
+                    self.interfaces.append(
+                        sshtools.interface.Interface(self, config_network.interface)
+                    )
 
             interface = ip_data.get("adapter", None)
             if interface is not None:

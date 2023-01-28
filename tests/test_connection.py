@@ -48,7 +48,6 @@ def test_get_interface():
     interface = network.get_interface(device)
     assert isinstance(interface, sshtools.interface.Interface)
     assert interface.name == network.interface
-    assert isinstance(interface.mac, str)
 
     assert network.get_interface(sshtools.device.Device("testvm")) is None
 
