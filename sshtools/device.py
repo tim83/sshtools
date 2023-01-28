@@ -152,10 +152,9 @@ class Device:  # pylint:disable=too-many-instance-attributes
         self.use_generated_ips = config.get("use_generated_ips", True)
 
         if isinstance(self.config.sync, str):
-            if self.config.sync.lower() in ["true", "full", "yes"]:
-                self.config.sync = True
-            elif self.config.sync.lower() in ["false", "no"]:
-                self.config.sync = False
+            self.config.sync = sshtools.tools.str_to_bool(
+                self.config.sync, default="limited"
+            )
 
         self.interfaces = []
         for iface_data in config.get("interfaces", []):

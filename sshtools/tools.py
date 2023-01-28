@@ -60,6 +60,21 @@ def mt_map(func: Callable, collection: Iterable, max_workers=20):
     timtools.multithreading.mt_map(func, collection, max_workers=max_workers)
 
 
+def str_to_bool(string: str, default: Any = False) -> bool:
+    """
+    Takes a string and converts it in a boolean (e.g. yes -> True)
+    :param string: The string to convert
+    :param default: The default value to return when there is no clear answer
+    """
+    string = string.lower()
+    if string in ["true", "full", "yes", "ja", "y", "j"]:
+        return True
+    if string in ["false", "no", "nee", "n"]:
+        return False
+
+    return default
+
+
 def create_table(
     add_row: Callable[[list, Any], Any],
     row_source: Iterable,
