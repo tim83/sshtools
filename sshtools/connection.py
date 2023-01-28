@@ -125,10 +125,12 @@ class Network:
         else:
             interface_type = None
 
-        if self.is_vpn or interface_type == "wifi" and device.ip_id < 155:
-            device.ip_id += 100
+        if (self.is_vpn or interface_type == "wifi") and device.ip_id < 155:
+            ip_id = device.ip_id + 100
+        else:
+            ip_id = device.ip_id
 
-        return sshtools.ip.IPAddress(self.ip_start + str(device.ip_id))
+        return sshtools.ip.IPAddress(self.ip_start + str(ip_id))
 
     @classmethod
     def get_networks(cls) -> list[Network]:
