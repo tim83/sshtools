@@ -78,3 +78,36 @@ def test_device_class():
 def test_super():
     assert device.Device("laptop").is_super is True
     assert device.Device("laptop2").is_super is False
+
+
+def test_interface():
+    dev = device.Device("laptop")
+    assert len(dev.interfaces) == 1
+    iface = dev.interfaces[0]
+    assert iface.name == "wlan0"
+    assert isinstance(iface.mac, str)
+    assert iface.device == dev
+
+
+def test_network():
+    dev = device.Device("laptop")
+    ip_addr = next(
+        filter(lambda ipa: ipa.network.name == "home", dev.ip_address_list_all), None
+    )
+    assert ip_addr is not None
+    assert ip_addr.network.name == "home"
+    assert ip_addr.network.interface == "wlan0"
+    assert ip_addr.network.get_interface(dev).name == "wlan0"
+
+
+def test_ip_construction():
+    dev = device.Device("laptop")
+    ips = [str(ipa) for ipa in dev.ip_address_list_all]
+    # home
+    assert "1.1.1.130" in ips
+    # work
+    assert "4.4.4.30" in ips
+    # vpn
+    assert "2.2.2.130" in ips
+    # public
+    assert "123.123.123" in ips

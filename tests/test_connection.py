@@ -56,15 +56,14 @@ def test_get_interface():
 def test_get_construct_ip():
     device = sshtools.device.Device("laptop")
 
-    network = connection.Network("vpn")
-    ip_addr = network.construct_ip(device)
-    assert isinstance(ip_addr, ip.IPAddress)
-    assert str(ip_addr) == "2.2.2.130"
-
-    network = connection.Network("work")
-    ip_addr = network.construct_ip(device)
-    assert isinstance(ip_addr, ip.IPAddress)
-    assert str(ip_addr) == "4.4.4.30"
+    for network_name, ip_str in [
+        ("vpn", "2.2.2.130"),
+        ("work", "4.4.4.30"),
+    ]:
+        network = connection.Network(network_name)
+        ip_addr = network.construct_ip(device)
+        assert isinstance(ip_addr, ip.IPAddress)
+        assert str(ip_addr) == ip_str
 
 
 def test_ip_association():
