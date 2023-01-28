@@ -1,5 +1,7 @@
 import pytest
 
+import sshtools.device
+import sshtools.interface
 from sshtools import connection, errors, ip
 
 
@@ -37,6 +39,18 @@ def test_get_networks():
     assert all(
         isinstance(net, connection.Network) for net in connection.Network.get_networks()
     )
+
+
+def test_get_interface():
+    network = connection.Network("vpn")
+    device = sshtools.device.Device("laptop")
+
+    interface = network.get_interface(device)
+    assert isinstance(interface, sshtools.interface.Interface)
+    assert interface.name == network.interface
+    assert isinstance(interface.mac, str)
+
+    assert network.get_interface(sshtools.device.Device("testvm")) is None
 
 
 def test_ip_ascosiation():
