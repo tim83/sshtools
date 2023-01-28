@@ -8,9 +8,9 @@
 	"ip_start": "4.4.4."
   },
   {
-	"name": "zerotier",
+	"name": "vpn",
 	"ip_start": "2.2.2.",
-	"interface": "zerotierid21",
+	"interface": "vpnid21",
 	"vpn": true
   },
   {
@@ -18,9 +18,9 @@
 	"public": true
   },
   {
-	"name": "zerotier-techsupport",
+	"name": "family",
 	"ip_start": "3.3.3.",
-	"interface": "zerotierid2",
+	"interface": "familyid2",
 	"vpn": true,
 	"public": true
   }

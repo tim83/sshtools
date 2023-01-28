@@ -7,11 +7,11 @@
   ],
   "connections": [
 	{
-	  "network": "zerotier-techsupport",
+	  "network": "family",
 	  "ip_address": "3.3.3.30"
 	},
 	{
-	  "network": "zerotier",
+	  "network": "vpn",
 	  "ip_address": "2.2.2.30"
 	},
 	{

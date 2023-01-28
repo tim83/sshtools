@@ -4,7 +4,7 @@
   "user": "notme",
   "connections": [
 	{
-	  "network": "zerotier-techsupport",
+	  "network": "family",
 	  "ip_address": "3.3.3.50"
 	},
 	{

@@ -18,10 +18,10 @@
 	  "network": "work"
 	},
 	{
-	  "network": "zerotier"
+	  "network": "vpn"
 	},
 	{
-	  "network": "zerotier-techsupport"
+	  "network": "family"
 	}
   ]
 }

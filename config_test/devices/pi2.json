@@ -3,7 +3,7 @@
   "sync": "Limited",
   "connections": [
 	{
-	  "network": "zerotier",
+	  "network": "vpn",
 	  "ip_address": "2.2.2.100"
 	},
 	{

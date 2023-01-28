@@ -9,13 +9,13 @@ def test_creation():
     assert net.is_vpn is False
     assert net.is_public is False
 
-    net = connection.Network("zerotier")
-    assert net.name == "zerotier"
+    net = connection.Network("vpn")
+    assert net.name == "vpn"
     assert net.is_vpn is True
     assert net.is_public is False
 
-    net = connection.Network("zerotier-techsupport")
-    assert net.name == "zerotier-techsupport"
+    net = connection.Network("family")
+    assert net.name == "family"
     assert net.is_vpn is True
     assert net.is_public is True
 
@@ -42,7 +42,7 @@ def test_get_networks():
 def test_ip_ascosiation():
     home = connection.Network("home")
     assert home.has_ip_address(ip.IPAddress("1.1.1.132"))
-    zt = connection.Network("zerotier")
+    zt = connection.Network("vpn")
     assert zt.has_ip_address(ip.IPAddress("2.2.2.150"))
-    ztts = connection.Network("zerotier-techsupport")
+    ztts = connection.Network("family")
     assert ztts.has_ip_address(ip.IPAddress("3.3.3.20"))

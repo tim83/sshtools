@@ -6,7 +6,7 @@
   "main_device": false,
   "connections": [
 	{
-	  "network": "zerotier-techsupport",
+	  "network": "family",
 	  "ip_address": "3.3.3.160"
 	}
   ]

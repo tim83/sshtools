@@ -14,9 +14,7 @@ def test_get_device_networks():
     assert any(
         isinstance(network, sshtools.connection.Network) for network in dev_networks
     )
-    assert sorted([network.name for network in dev_networks]) == sorted(
-        ["work", "zerotier"]
-    )
+    assert sorted([network.name for network in dev_networks]) == sorted(["work", "vpn"])
 
 
 def test_is_same_network():
