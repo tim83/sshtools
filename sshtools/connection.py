@@ -105,6 +105,31 @@ class Network:
 
         return False
 
+    def construct_ip(self, device: "sshtools.device.Device") -> sshtools.ip.IPAddress:
+        """
+        Returns the IP for a device on this network based on the prefix of the network
+        :param device: The device whose IP is requested, must have an ip_id
+        """
+        if device.ip_id is None:
+            raise AttributeError(
+                f"Device {device} must have a not-None ip_id attribute"
+            )
+        if self.ip_start is None:
+            raise AttributeError(
+                f"Network {self} must have a not-None ip_start attribute"
+            )
+
+        interface = self.get_interface(device)
+        if interface is not None:
+            interface_type = interface.type
+        else:
+            interface_type = None
+
+        if self.is_vpn or interface_type == "wifi" and device.ip_id < 155:
+            device.ip_id += 100
+
+        return sshtools.ip.IPAddress(self.ip_start + str(device.ip_id))
+
     @classmethod
     def get_networks(cls) -> list[Network]:
         """Get the IPs that the networks the current machine has access to"""

@@ -173,9 +173,7 @@ class Device:  # pylint:disable=too-many-instance-attributes
             if config_ip_address is not None:
                 ip_address = sshtools.ip.IPAddress(ip_data.get("ip_address"))
             elif config_network.ip_start is not None and self.ip_id is not None:
-                ip_address = sshtools.ip.IPAddress(
-                    config_network.ip_start + str(self.ip_id)
-                )
+                ip_address = config_network.construct_ip(self)
             else:
                 raise ValueError(
                     f"No IP address configured for {self} in network {config_network}"
