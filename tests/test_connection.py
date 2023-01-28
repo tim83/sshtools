@@ -53,6 +53,20 @@ def test_get_interface():
     assert network.get_interface(sshtools.device.Device("testvm")) is None
 
 
+def test_get_construct_ip():
+    device = sshtools.device.Device("laptop")
+
+    network = connection.Network("vpn")
+    ip_addr = network.construct_ip(device)
+    assert isinstance(ip_addr, ip.IPAddress)
+    assert str(ip_addr) == "2.2.2.130"
+
+    network = connection.Network("work")
+    ip_addr = network.construct_ip(device)
+    assert isinstance(ip_addr, ip.IPAddress)
+    assert str(ip_addr) == "4.4.4.30"
+
+
 def test_ip_ascosiation():
     home = connection.Network("home")
     assert home.has_ip_address(ip.IPAddress("1.1.1.132"))
