@@ -198,7 +198,7 @@ class Device:  # pylint:disable=too-many-instance-attributes
                 ssh_port=ip_data.get("ssh_port", self.config.ssh_port),
                 mosh=ip_data.get("mosh", self.config.mosh),
                 user=ip_data.get("user", self.config.user),
-                priority=ip_data.get("priority", self.config.priority),
+                priority=ip_data.get("priority", config_network.priority),
                 network=config_network,
                 check_online=ip_data.get("check_online", True),
             )
