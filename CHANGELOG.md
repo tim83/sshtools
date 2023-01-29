@@ -2,6 +2,19 @@
 
 <!--next-version-placeholder-->
 
+## v4.27.0 (2023-01-28)
+### Feature
+* **connection.py:** Enable constructing the theoretical IP for a device ([`f5c4f8a`](https://github.com/tim83/sshtools/commit/f5c4f8a1c0916b8cc88d6ce1c09cf5c8d2df35ee))
+* **connection.py:** Enable returning an interface object from a network ([`bc2214e`](https://github.com/tim83/sshtools/commit/bc2214e568b1ab7df1186dfcc65e6cc61275c527))
+
+### Fix
+* **device.py:** Actually include all interfaces in the list ([`df8486b`](https://github.com/tim83/sshtools/commit/df8486bd92a2a0fd566cbe69e2c5d53a5ea9946a))
+* **device.py:** Actually use the adapters in the config to link network and ip ([`601fb0d`](https://github.com/tim83/sshtools/commit/601fb0df8a1934c46fa47aadb2a033a6d4ce36b7))
+* **connection.py:** Fix cumulative adding of 100 to ip_id ([`9716298`](https://github.com/tim83/sshtools/commit/97162983514b20c46fbebbe246a367cc92b80ca4))
+
+### Documentation
+* **interface.py:** Improve naming of an interface ([`0179c01`](https://github.com/tim83/sshtools/commit/0179c01e44a7bbb1494d1a89c57c7a16c526f1d4))
+
 ## v4.26.4 (2023-01-15)
 ### Fix
 * **ssync.py:** Fix if then logic to not raise an unnecessarily reraise an error ([`a69d40f`](https://github.com/tim83/sshtools/commit/a69d40fb3a60cc56c0ecf65a2ce2ee134ced2a4e))
