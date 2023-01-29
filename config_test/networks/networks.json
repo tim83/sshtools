@@ -22,6 +22,7 @@
     "ip_start": "3.3.3.",
     "interface": "familyid2",
     "vpn": true,
-    "public": true
+    "public": true,
+    "priority": 20
   }
 ]

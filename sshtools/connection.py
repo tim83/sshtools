@@ -16,7 +16,6 @@ import sshtools.tools
 if typing.TYPE_CHECKING:
     import sshtools.device
 
-
 logger = timtools.log.get_logger("sshtools.connection")
 
 NETWORK_DIR: Path = sshtools.tools.CONFIG_DIR / "networks"
@@ -32,6 +31,7 @@ class Network:
     is_public: bool
     ip_start: str
     interface: str
+    priority: int
 
     def __init__(self, name: str):
         self.name = name
@@ -44,6 +44,14 @@ class Network:
         self.is_public = net_config.get("public", False)
         self.ip_start = net_config.get("ip_start", None)
         self.interface = net_config.get("interface", None)
+
+        default_priority = 80
+        if self.is_public:
+            default_priority -= 30
+        if self.is_vpn:
+            default_priority -= 20
+
+        self.priority = net_config.get("priority", default_priority)
 
     def __new__(cls, name: str, *_, **__):
         if name in cls.__instances:

@@ -10,21 +10,25 @@ def test_creation():
     assert net.name == "home"
     assert net.is_vpn is False
     assert net.is_public is False
+    assert net.priority == 80
 
     net = connection.Network("vpn")
     assert net.name == "vpn"
     assert net.is_vpn is True
     assert net.is_public is False
+    assert net.priority == 60
 
     net = connection.Network("family")
     assert net.name == "family"
     assert net.is_vpn is True
     assert net.is_public is True
+    assert net.priority == 20
 
     pub_net = connection.Network("public")
     assert pub_net.name == "public"
     assert pub_net.is_vpn is False
     assert pub_net.is_public is True
+    assert pub_net.priority == 50
 
     with pytest.raises(errors.NetworkNotFound):
         connection.Network("doesnotexist")
