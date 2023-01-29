@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v4.28.0 (2023-01-29)
+### Feature
+* **ip.py:** Use IP priority in sorting IP list ([`209848a`](https://github.com/tim83/sshtools/commit/209848aaa0a8e10885fc96564877580057289ae1))
+* **device.py:** Use network priority as IP fallback instead of device ([`085487b`](https://github.com/tim83/sshtools/commit/085487b08c04146ce43452887d692717b1b32344))
+* **connection.py:** Add a priority value for networks ([`c93bc7c`](https://github.com/tim83/sshtools/commit/c93bc7c2469637971ac698fc2a30255d6022c8ff))
+
 ## v4.27.0 (2023-01-28)
 ### Feature
 * **connection.py:** Enable constructing the theoretical IP for a device ([`f5c4f8a`](https://github.com/tim83/sshtools/commit/f5c4f8a1c0916b8cc88d6ce1c09cf5c8d2df35ee))
