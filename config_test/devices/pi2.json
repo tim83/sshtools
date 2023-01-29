@@ -2,13 +2,13 @@
   "hostname": "pi2-hostname",
   "sync": "Limited",
   "connections": [
-	{
-	  "network": "vpn",
-	  "ip_address": "2.2.2.100"
-	},
-	{
-	  "network": "work",
-	  "ip_address": "4.4.4.23"
-	}
+    {
+      "network": "vpn",
+      "ip_address": "2.2.2.100"
+    },
+    {
+      "network": "work",
+      "ip_address": "4.4.4.23"
+    }
   ]
 }

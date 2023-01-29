@@ -5,9 +5,9 @@
   "priority": 90,
   "main_device": false,
   "connections": [
-	{
-	  "network": "family",
-	  "ip_address": "3.3.3.160"
-	}
+    {
+      "network": "family",
+      "ip_address": "3.3.3.160"
+    }
   ]
 }

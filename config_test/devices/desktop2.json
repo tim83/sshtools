@@ -3,13 +3,13 @@
   "sync": false,
   "user": "notme",
   "connections": [
-	{
-	  "network": "family",
-	  "ip_address": "3.3.3.50"
-	},
-	{
-	  "network": "home",
-	  "ip_address": "4.4.4.50"
-	}
+    {
+      "network": "family",
+      "ip_address": "3.3.3.50"
+    },
+    {
+      "network": "home",
+      "ip_address": "4.4.4.50"
+    }
   ]
 }

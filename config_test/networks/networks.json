@@ -1,27 +1,27 @@
 [
   {
-	"name": "home",
-	"ip_start": "1.1.1."
+    "name": "home",
+    "ip_start": "1.1.1."
   },
   {
-	"name": "work",
-	"ip_start": "4.4.4."
+    "name": "work",
+    "ip_start": "4.4.4."
   },
   {
-	"name": "vpn",
-	"ip_start": "2.2.2.",
-	"interface": "vpnid21",
-	"vpn": true
+    "name": "vpn",
+    "ip_start": "2.2.2.",
+    "interface": "vpnid21",
+    "vpn": true
   },
   {
-	"name": "public",
-	"public": true
+    "name": "public",
+    "public": true
   },
   {
-	"name": "family",
-	"ip_start": "3.3.3.",
-	"interface": "familyid2",
-	"vpn": true,
-	"public": true
+    "name": "family",
+    "ip_start": "3.3.3.",
+    "interface": "familyid2",
+    "vpn": true,
+    "public": true
   }
 ]

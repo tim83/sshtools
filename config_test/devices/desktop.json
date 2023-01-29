@@ -3,20 +3,20 @@
   "sync": true,
   "priority": 20,
   "container_hostnames": [
-	"desktop-container"
+    "desktop-container"
   ],
   "connections": [
-	{
-	  "network": "family",
-	  "ip_address": "3.3.3.30"
-	},
-	{
-	  "network": "vpn",
-	  "ip_address": "2.2.2.30"
-	},
-	{
-	  "network": "work",
-	  "ip_address": "4.4.4.30"
-	}
+    {
+      "network": "family",
+      "ip_address": "3.3.3.30"
+    },
+    {
+      "network": "vpn",
+      "ip_address": "2.2.2.30"
+    },
+    {
+      "network": "work",
+      "ip_address": "4.4.4.30"
+    }
   ]
 }
