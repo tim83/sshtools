@@ -96,8 +96,14 @@ class IPAddressList:
                 else:
                     value -= 5
 
-            if (ip_address.config is not None) and (not ip_address.config.mosh):
+            if ip_address.config and ip_address.config.mosh:
                 value += 15
+
+            if ip_address.config and ip_address.config.priority:
+                priority = ip_address.config.priority
+            else:
+                priority = 80
+            value = priority / 10
 
             return value
 
