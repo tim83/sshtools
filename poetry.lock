@@ -415,7 +415,7 @@ socks = ["socksio (>=1.0.0,<2.0.0)"]
 
 [[package]]
 name = "identify"
-version = "2.5.15"
+version = "2.5.17"
 description = "File identification library for Python"
 category = "dev"
 optional = false
@@ -474,16 +474,16 @@ python-versions = "*"
 
 [[package]]
 name = "isort"
-version = "5.11.4"
+version = "5.12.0"
 description = "A Python utility / library to sort Python imports."
 category = "dev"
 optional = false
-python-versions = ">=3.7.0"
+python-versions = ">=3.8.0"
 
 [package.extras]
-colors = ["colorama (>=0.4.3,<0.5.0)"]
+colors = ["colorama (>=0.4.3)"]
 requirements-deprecated-finder = ["pip-api", "pipreqs"]
-pipfile-deprecated-finder = ["pipreqs", "requirementslib"]
+pipfile-deprecated-finder = ["pip-shims (>=0.5.2)", "pipreqs", "requirementslib"]
 plugins = ["setuptools"]
 
 [[package]]
@@ -648,7 +648,7 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "pre-commit"
-version = "3.0.1"
+version = "3.0.2"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
 category = "dev"
 optional = false
@@ -780,7 +780,7 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.
 
 [[package]]
 name = "python-gitlab"
-version = "3.12.0"
+version = "3.13.0"
 description = "Interact with GitLab API"
 category = "dev"
 optional = false
@@ -788,7 +788,7 @@ python-versions = ">=3.7.0"
 
 [package.dependencies]
 requests = ">=2.25.0"
-requests-toolbelt = ">=0.9.1"
+requests-toolbelt = ">=0.10.1"
 
 [package.extras]
 autocompletion = ["argcomplete (>=1.10.0,<3)"]
@@ -1501,8 +1501,8 @@ httpx = [
     {file = "httpx-0.23.3.tar.gz", hash = "sha256:9818458eb565bb54898ccb9b8b251a28785dd4a55afbc23d0eb410754fe7d0f9"},
 ]
 identify = [
-    {file = "identify-2.5.15-py2.py3-none-any.whl", hash = "sha256:1f4b36c5f50f3f950864b2a047308743f064eaa6f6645da5e5c780d1c7125487"},
-    {file = "identify-2.5.15.tar.gz", hash = "sha256:c22aa206f47cc40486ecf585d27ad5f40adbfc494a3fa41dc3ed0499a23b123f"},
+    {file = "identify-2.5.17-py2.py3-none-any.whl", hash = "sha256:7d526dd1283555aafcc91539acc061d8f6f59adb0a7bba462735b0a318bff7ed"},
+    {file = "identify-2.5.17.tar.gz", hash = "sha256:93cc61a861052de9d4c541a7acb7e3dcc9c11b398a2144f6e52ae5285f5f4f06"},
 ]
 idna = []
 importlib-metadata = [
@@ -1519,8 +1519,8 @@ invoke = [
 ]
 ipaddress = []
 isort = [
-    {file = "isort-5.11.4-py3-none-any.whl", hash = "sha256:c033fd0edb91000a7f09527fe5c75321878f98322a77ddcc81adbd83724afb7b"},
-    {file = "isort-5.11.4.tar.gz", hash = "sha256:6db30c5ded9815d813932c04c2f85a360bcdd35fed496f4d8f35495ef0a261b6"},
+    {file = "isort-5.12.0-py3-none-any.whl", hash = "sha256:f84c2818376e66cf843d497486ea8fed8700b340f308f076c6fb1229dff318b6"},
+    {file = "isort-5.12.0.tar.gz", hash = "sha256:8bef7dde241278824a6d83f44a544709b065191b95b6e50894bdc722fcba0504"},
 ]
 "jaraco.classes" = [
     {file = "jaraco.classes-3.2.3-py3-none-any.whl", hash = "sha256:2353de3288bc6b82120752201c6b1c1a14b058267fa424ed5ce5984e3b922158"},
@@ -1602,8 +1602,8 @@ platformdirs = [
 ]
 pluggy = []
 pre-commit = [
-    {file = "pre_commit-3.0.1-py2.py3-none-any.whl", hash = "sha256:61ecb75e0e99939cc30c79181c0394545657855e9172c42ff98ebecb0e02fcb7"},
-    {file = "pre_commit-3.0.1.tar.gz", hash = "sha256:3a3f9229e8c19a626a7f91be25b3c8c135e52de1a678da98eb015c0d0baea7a5"},
+    {file = "pre_commit-3.0.2-py2.py3-none-any.whl", hash = "sha256:f448d5224c70e196a6c6f87961d2333dfdc49988ebbf660477f9efe991c03597"},
+    {file = "pre_commit-3.0.2.tar.gz", hash = "sha256:aa97fa71e7ab48225538e1e91a6b26e483029e6de64824f04760c32557bc91d7"},
 ]
 psutil = []
 pycodestyle = [
@@ -1636,8 +1636,8 @@ pytest = [
     {file = "pytest-7.2.1.tar.gz", hash = "sha256:d45e0952f3727241918b8fd0f376f5ff6b301cc0777c6f9a556935c92d8a7d42"},
 ]
 python-gitlab = [
-    {file = "python-gitlab-3.12.0.tar.gz", hash = "sha256:567390c2b93690dae62ed9738bf9f221fa45c01378fdf896089dbf7c8a134fbd"},
-    {file = "python_gitlab-3.12.0-py3-none-any.whl", hash = "sha256:a5eb36b49783fda34563376674d5251dbbdbd1abd23b287dadf82f67d861b2c1"},
+    {file = "python-gitlab-3.13.0.tar.gz", hash = "sha256:ad502b72b5d1137f4af37d4a68ae20fe7d6c9778f67cbe2aec566f7995053c7d"},
+    {file = "python_gitlab-3.13.0-py3-none-any.whl", hash = "sha256:85ae778d8953aba87ad4b78aef7fbb5dae053980d2c20ff200bea29799685743"},
 ]
 python-semantic-release = [
     {file = "python-semantic-release-7.33.0.tar.gz", hash = "sha256:c559161c091e24f555c021fee63a9a704cc7ae59e774913ba5018fa3c9ce2e89"},
