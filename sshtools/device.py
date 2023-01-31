@@ -342,9 +342,11 @@ class Device:  # pylint:disable=too-many-instance-attributes
     @property
     def ip_address(self) -> sshtools.ip.IPAddress:
         """The ip address of this machine"""
-        if self.last_ip_address is not None and self.last_ip_address_update is not None:
-            td_update: dt.timedelta = dt.datetime.now() - self.last_ip_address_update
-            if td_update.total_seconds() < sshtools.tools.IP_CACHE_TIMEOUT:
+        if self.last_ip_address and self.last_ip_address_update:
+            time_since_update: dt.timedelta = (
+                dt.datetime.now() - self.last_ip_address_update
+            )
+            if time_since_update.total_seconds() < sshtools.tools.IP_CACHE_TIMEOUT:
                 return self.last_ip_address
         return self.get_ip()
 
