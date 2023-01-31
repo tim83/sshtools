@@ -59,10 +59,11 @@ class Sync:
         tmp_dir: Path
         error_slaves: list[sshtools.device.Device] = []
         for slave in sorted(active_slaves, key=lambda d: d.priority):
-            print(f"\n{self.master} -> {slave}")
+            print(f"\n{self.master} -> {slave}", end="")
 
             tmp_dir = sshtools.tools.get_tmp_dir()
             cmd = self.get_cmd(slave, tmp_dir)
+            print(f" ({slave.ip_address})")
 
             logger.debug(" ".join(cmd))
             try:
