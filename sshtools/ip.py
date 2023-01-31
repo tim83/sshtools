@@ -103,7 +103,7 @@ class IPAddressList:
                 priority = ip_address.config.priority
             else:
                 priority = 80
-            value = priority / 10
+            value -= (100 - priority) / 10
 
             return value
 
