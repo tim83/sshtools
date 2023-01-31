@@ -97,7 +97,7 @@ class IPAddressList:
                     value -= 5
 
             if ip_address.config and ip_address.config.mosh:
-                value += 15
+                value -= 10
 
             if ip_address.config and ip_address.config.priority:
                 priority = ip_address.config.priority
