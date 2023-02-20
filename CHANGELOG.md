@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v4.28.1 (2023-02-20)
+### Fix
+* **ip.py:** Fix priority for ascending sort ([`01bb29e`](https://github.com/tim83/sshtools/commit/01bb29e28e73690def95335ad4b322f3aa85a0a4))
+* **ip.py:** Fix priority for ascending sort ([`fae8483`](https://github.com/tim83/sshtools/commit/fae848369eaa4e9737b47410d7c4709477aa4b79))
+* **ip.py:** Fix priority for ascending sort ([`586830b`](https://github.com/tim83/sshtools/commit/586830ba1839daa62a1164209bfae38f34bd800f))
+
 ## v4.28.0 (2023-01-29)
 ### Feature
 * **ip.py:** Use IP priority in sorting IP list ([`209848a`](https://github.com/tim83/sshtools/commit/209848aaa0a8e10885fc96564877580057289ae1))
