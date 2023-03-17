@@ -47,10 +47,6 @@ jobs:
           cache: 'poetry'
       - name: Install dependencies
         run: poetry install --no-interaction
-      - uses: actions/cache@v3
-        with:
-          path: ~/.cache/pre-commit/
-          key: pre-commit-4|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
       - name: Run tests
         run: poetry run pytest .
 
@@ -77,10 +73,6 @@ jobs:
           cache: 'poetry'
       - name: Install dependencies
         run: poetry install --no-interaction
-      - uses: actions/cache@v3
-        with:
-          path: ~/.cache/pre-commit/
-          key: pre-commit-4|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
       - name: Create python semantic release
         uses: relekang/python-semantic-release@master
         with:
