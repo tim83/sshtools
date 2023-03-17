@@ -1,4 +1,3 @@
-#! /usr/bin/python3
 """Classes for managing devices used by other files"""
 
 from __future__ import annotations  # python -3.9 compatibility

@@ -1,4 +1,3 @@
-#! /usr/bin/python3
 """Errors to used by the modules"""
 
 from __future__ import annotations  # python -3.9 compatibility

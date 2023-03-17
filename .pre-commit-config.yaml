@@ -2,13 +2,25 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
-      - id: check-docstring-first
-      - id: check-merge-conflict
-      - id: trailing-whitespace
-      - id: end-of-file-fixer
-      - id: check-yaml
+      - id: check-added-large-files
       - id: check-ast
+      - id: check-builtin-literals
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-shebang-scripts-are-executable
+      - id: check-merge-conflict
       - id: check-json
+      - id: check-toml
+      - id: check-xml
+      - id: check-yaml
+      - id: debug-statements
+      - id: destroyed-symlinks
+      - id: detect-private-key
+      - id: end-of-file-fixer
+        exclude: ^LICENSE|\.(html|csv|txt|svg|py)$
+      - id: pretty-format-json
+        args: [ "--autofix", "--no-ensure-ascii", "--no-sort-keys" ]
+      - id: requirements-txt-fixer
   - repo: https://github.com/pre-commit/mirrors-isort
     rev: v5.10.1
     hooks:
@@ -18,10 +30,11 @@ repos:
     rev: 22.12.0
     hooks:
       - id: black
-  - repo: https://github.com/pycqa/flake8
-    rev: 6.0.0
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: 'v0.0.256'
     hooks:
-      - id: flake8
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
   - repo: local
     hooks:
       - id: pylint
@@ -32,15 +45,9 @@ repos:
         types: [ python ]
         args:
           [
-            "sshtools",
+            ".",
+            "--recursive=y",
+            "--ignore-paths=^tests/",
             "-rn", # Only display messages
             "-sn", # Don't display the score
           ]
-#  - repo: local
-#    hooks:
-#      - id: pytest
-#        name: Unit Tests
-#        entry: pytest .
-#        language: system
-#        always_run: true
-#        pass_filenames: false
