@@ -134,7 +134,7 @@ def test_list_alive():
     alive_list = ip_list.get_alive_addresses()
     end_time = dt.datetime.now()
 
-    assert alive_list._ip_addresses == sorted(alive_ips, key=lambda ip: str(ip))
+    assert alive_list._ip_addresses == sorted(alive_ips, key=lambda i: str(i))
 
     process_time = end_time - start_time
     assert (
