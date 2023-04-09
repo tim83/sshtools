@@ -37,7 +37,7 @@ darglint = ">=1.8.1"
 python-semantic-release = ">=7.25.0"
 pylint = ">=2.12.2"
 ruff = ">=0.0.256"
-
+coverage = ">=7.2.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
