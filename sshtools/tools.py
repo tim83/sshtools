@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Callable, Iterable
 
 import tabulate
+import timtools.bash
 import timtools.locations
 import timtools.multithreading
 
@@ -102,3 +103,17 @@ def create_table(
 
     output_sorted = sorted(output, key=sorting_key)
     return tabulate.tabulate(output_sorted, **kwargs)
+
+
+def execute_is_present(exec_name: str) -> bool:
+    """
+    Checks if a given executable is present on the system.
+    The executable must be in $PATH, and the 'which' command must be present on the system.
+
+    :param exec_name: str: Specify the name of the executable to check for
+    :return: A boolean (true if the executable is present)
+    """
+    present_check: timtools.bash.CommandResult = timtools.bash.run(
+        ["which", exec_name], passable_exit_codes=[0, 1]
+    )
+    return present_check.exit_code == 0

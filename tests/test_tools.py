@@ -47,3 +47,9 @@ def test_create_table():
         [[4, 16, 64], [3, 9, 27], [2, 4, 8], [1, 1, 1], [0, 0, 0]], headers=headers
     )
     assert created_table == reference_table
+
+
+def test_execute_is_present():
+    assert tools.execute_is_present("ls")
+    assert tools.execute_is_present("/usr/bin/ls")
+    assert not tools.execute_is_present("example")

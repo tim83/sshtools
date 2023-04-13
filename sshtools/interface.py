@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 
 import timtools.bash
 
+import sshtools.tools
+
 if TYPE_CHECKING:
     # Circular import
     import sshtools.device
@@ -36,14 +38,20 @@ class Interface:  # pylint: disable=too-few-public-methods
 
     def wake(self):
         """Send a magic packet to this interface using wake on lan"""
-        wol_present_check = timtools.bash.run(
-            ["which", "wol"], passable_exit_codes=[0, 1]
-        )
-        if wol_present_check.exit_code == 0:
-            timtools.bash.run(["wol", self.mac])
+        cmd: list[str]
+        possible_wol_exec: list[str] = ["wol", "wakeonlan"]
+        for wol_exec in possible_wol_exec:
+            if sshtools.tools.execute_is_present(wol_exec):
+                cmd = [wol_exec]
+                break
         else:
-            cmd = ["wakeonlan", self.mac]
-            timtools.bash.run(cmd)
+            possible_wol_exec_string: str = "'" + "', '".join(possible_wol_exec) + "'"
+            raise FileNotFoundError(
+                f"No executable for wake on lan could be found (tried {possible_wol_exec_string})"
+            )
+
+        cmd += [self.mac]
+        timtools.bash.run(cmd)
 
     def __repr__(self):
         return f"<sshtools.interface.Interface {self.name} ({self.type})"
