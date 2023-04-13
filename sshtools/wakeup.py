@@ -17,7 +17,11 @@ def wake(device: sshtools.device.Device):
     :param device: The device to wake up
     """
     for iface in device.interfaces:
-        iface.wake()
+        if iface.mac is not None:
+            iface.wake()
+            break
+    else:
+        raise AttributeError(f"No interface of {device} has a mac address specified")
 
 
 def run():
