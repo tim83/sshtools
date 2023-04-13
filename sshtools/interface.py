@@ -50,6 +50,11 @@ class Interface:  # pylint: disable=too-few-public-methods
                 f"No executable for wake on lan could be found (tried {possible_wol_exec_string})"
             )
 
+        if self.mac is None:
+            raise AttributeError(
+                f"The interface '{self.name}' has no mac address assigned"
+            )
+
         cmd += [self.mac]
         timtools.bash.run(cmd)
 
