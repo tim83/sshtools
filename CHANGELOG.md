@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v4.29.0 (2023-04-13)
+### Feature
+* **wake.py:** Add a check to ensure the mac is defined, before waking to prevent triggering errors ([`e66ed27`](https://github.com/tim83/sshtools/commit/e66ed27e1dd02ea64ed3d367610d4df1551d8ccb))
+* **interface.py:** Add a check to ensure the mac is defined ([`ce08492`](https://github.com/tim83/sshtools/commit/ce08492a0fee4198f834904af652973fa10adaba))
+* **interface.py:** Add checks to ensure the used executable is present ([`75bfef7`](https://github.com/tim83/sshtools/commit/75bfef7f5da4cf4311c4db49319993b6d7d95f46))
+
 ## v4.28.1 (2023-02-20)
 ### Fix
 * **ip.py:** Fix priority for ascending sort ([`01bb29e`](https://github.com/tim83/sshtools/commit/01bb29e28e73690def95335ad4b322f3aa85a0a4))
