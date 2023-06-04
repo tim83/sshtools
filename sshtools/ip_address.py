@@ -14,6 +14,7 @@ import timtools.log
 import timtools.multithreading
 
 import sshtools.connection
+import sshtools.data.ping
 import sshtools.device
 import sshtools.tools
 from sshtools.config import IPConnectionConfig
@@ -129,34 +130,12 @@ class IPAddress:
         if self.config_value("check_online") is False:
             return PingResult(True, -1)
 
-        ping_cmd = [
-            "ping",
-            "-q",  # be quiet
-            "-c 1",  # only try once
-        ]
-        ping_cmd += [self.ip_address]
-
         try:
-            ping_result: timtools.bash.CommandResult = timtools.bash.run(
-                ping_cmd,
-                capture_stdout=True,
-                capture_stderr=True,
-                passable_exit_codes=[0, 2],
-                timeout=sshtools.tools.IP_PING_TIMEOUT,
-            )
-            is_alive = ping_result.exit_code == 0
-            if is_alive:
-                ping_time = float(
-                    ping_result.output.rsplit("\n", maxsplit=1)[-1]
-                    .split(" = ")[1]
-                    .split("/")[1]
-                )
-            else:
-                ping_time = float("inf")
-        except subprocess.TimeoutExpired:
+            ping = sshtools.data.ping.Ping(self.ip_address)
+            ping.ping()
+            return PingResult(ping.alive, ping.latency.total_seconds() / 1000)
+        except (subprocess.TimeoutExpired, ValueError):
             return PingResult(False, float("inf"))
-
-        return PingResult(is_alive, ping_time)
 
     @property
     def is_alive(self) -> bool:
