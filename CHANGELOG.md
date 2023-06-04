@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v4.30.0 (2023-06-04)
+
+
+
 ## v4.29.0 (2023-04-13)
 ### Feature
 * **wake.py:** Add a check to ensure the mac is defined, before waking to prevent triggering errors ([`e66ed27`](https://github.com/tim83/sshtools/commit/e66ed27e1dd02ea64ed3d367610d4df1551d8ccb))
