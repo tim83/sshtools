@@ -49,3 +49,21 @@ def test__process_ping_result_failure():
 
     with pytest.raises(ValueError):
         ping.Ping._process_ping_result(ping_result)
+
+
+def test_ping_alive():
+    p = ping.Ping("localhost")
+    p.ping()
+
+    assert p.alive is True
+    assert isinstance(p.latency, datetime.timedelta)
+    assert p.latency < datetime.timedelta(hours=1)
+
+
+def test_ping_unalive():
+    p = ping.Ping("doesnotexist.be")
+    p.ping()
+
+    assert p.alive is False
+    assert p.latency == datetime.timedelta.max
+    assert p.latency > datetime.timedelta(hours=1)
