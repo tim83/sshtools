@@ -28,8 +28,8 @@ else:
     CONFIG_DIR = src_config_dir
 
 IP_CACHE_TIMEOUT: int = 5
-IP_PING_TIMEOUT: float = 0.7
-IP_SSH_TIMEOUT: float = 3
+IP_PING_TIMEOUT: float = 1
+IP_SSH_TIMEOUT: float = 4
 
 
 def get_tmp_dir() -> Path:
