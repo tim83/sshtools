@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v4.30.1 (2023-06-25)
+
+### Fix
+
+* **tools.py:** Increase timeouts to prevent faulty errors ([`f206e19`](https://github.com/tim83/sshtools/commit/f206e19461f7114ed6f30ce8388be72050bb5091))
+
 ## v4.30.0 (2023-06-04)
 
 
