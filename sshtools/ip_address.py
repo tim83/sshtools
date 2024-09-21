@@ -97,6 +97,9 @@ class IPAddress:
         if self.is_vpn:
             return not self.network.is_public and include_vpn
 
+        if self.network.is_public:
+            return True
+
         if self.__ip_obj and self.__ip_obj.is_private:
             return True
 
